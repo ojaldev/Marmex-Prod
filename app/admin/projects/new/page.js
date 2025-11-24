@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Save, Upload, X } from 'lucide-react'
-import styles from '../products/product-editor.module.css'
+import styles from '../../products/product-editor.module.css'
 
 export default function NewProjectPage() {
     const router = useRouter()

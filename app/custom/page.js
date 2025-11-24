@@ -94,7 +94,7 @@ export default function CustomOrdersPage() {
                 <section className={styles.inquiryForm}>
                     <div className={styles.formCard}>
                         <h2>Start Your Custom Order</h2>
-                        <p>Fill out the form below and we'll get back to you within 24 hours</p>
+                        <p>Fill out the form below and we&apos;ll get back to you within 24 hours</p>
 
                         <form className={styles.form}>
                             <div className={styles.formRow}>

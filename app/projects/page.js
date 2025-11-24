@@ -88,7 +88,7 @@ export default function ProjectsPage() {
 
                                         {project.clientTestimonial && (
                                             <blockquote className={styles.testimonial}>
-                                                "{project.clientTestimonial}"
+                                                &quot;{project.clientTestimonial}&quot;
                                             </blockquote>
                                         )}
                                     </div>

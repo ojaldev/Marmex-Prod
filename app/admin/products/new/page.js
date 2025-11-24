@@ -348,7 +348,7 @@ export default function NewProductPage() {
                 <div className={styles.section}>
                     <h2><ImageIcon size={20} /> Product Images - Cloudinary Upload</h2>
                     <div className={styles.helpText}>
-                        <p>📌 Upload images directly - they'll be stored on Cloudinary</p>
+                        <p>📌 Upload images directly - they&apos;ll be stored on Cloudinary</p>
                     </div>
 
                     {/* Main Image */}
@@ -530,7 +530,7 @@ export default function NewProductPage() {
                             />
                         </div>
                     </div>
-                </div>
+                </div >
 
                 <div className={styles.section}>
                     <h2>SEO & Marketing</h2>
@@ -577,7 +577,7 @@ export default function NewProductPage() {
                         {loading ? 'Saving...' : 'Save Product'}
                     </button>
                 </div>
-            </form>
-        </div>
+            </form >
+        </div >
     )
 }

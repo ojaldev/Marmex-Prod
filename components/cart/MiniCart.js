@@ -52,7 +52,7 @@ export default function MiniCart() {
                 {currentTotal >= freeShippingThreshold && (
                     <div className={`${styles.shippingBanner} ${styles.achieved}`}>
                         <p className={styles.shippingText}>
-                            🎉 You've unlocked <strong>Free Shipping</strong>!
+                            🎉 You&apos;ve unlocked <strong>Free Shipping</strong>!
                         </p>
                     </div>
                 )}

@@ -1,5 +1,7 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -116,7 +118,7 @@ export default function LoginPage() {
                     </button>
 
                     <p className={styles.switchLink}>
-                        Don't have an account? <Link href="/auth/register">Sign up</Link>
+                        Don&apos;t have an account? <Link href="/auth/register">Sign up</Link>
                     </p>
                 </div>
             </div>

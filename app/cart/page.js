@@ -56,7 +56,7 @@ export default function CartPage() {
 
                             {currentTotal >= freeShippingThreshold && (
                                 <div className={`${styles.shippingBanner} ${styles.achieved}`}>
-                                    <p>🎉 You've unlocked <strong>Free Shipping</strong>!</p>
+                                    <p>🎉 You&apos;ve unlocked <strong>Free Shipping</strong>!</p>
                                 </div>
                             )}
 

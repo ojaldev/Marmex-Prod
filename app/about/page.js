@@ -23,7 +23,7 @@ export default function AboutPage() {
                         <p>
                             Our journey began with a simple vision: to preserve and promote the ancient art of stone carving
                             while infusing it with contemporary design sensibilities. Today, we are proud to be recognized as
-                            one of India's leading stone art studios, known for our exceptional craftsmanship, attention to detail,
+                            one of India&apos;s leading stone art studios, known for our exceptional craftsmanship, attention to detail,
                             and commitment to quality.
                         </p>
                     </div>
@@ -83,17 +83,6 @@ export default function AboutPage() {
                                 <p>Our expert team provides professional installation services to ensure your pieces are displayed perfectly.</p>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </section>
-
-            <section className={`section ${styles.cta}`}>
-                <div className="container">
-                    <h2>Ready to Elevate Your Space?</h2>
-                    <p>Discover our collection of handcrafted marble and stone art pieces</p>
-                    <div style={{ display: 'flex', gap: 'var(--spacing-md)', justifyContent: 'center', flexWrap: 'wrap' }}>
-                        <a href="/products" className="btn btn-primary">Browse Collection</a>
-                        <a href="/contact" className="btn btn-outline">Get In Touch</a>
                     </div>
                 </div>
             </section>

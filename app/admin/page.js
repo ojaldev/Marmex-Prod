@@ -78,46 +78,30 @@ export default function AdminDashboard() {
                         <h3>Active</h3>
                         <p>System Status</p>
                     </div>
+                    <h3>Manage Homepage</h3>
+                    <p>Update hero banner and content</p>
                 </div>
             </div>
 
-            <div className={styles.quickActions}>
-                <h2>Quick Actions</h2>
-                <div className={styles.actionGrid}>
-                    <a href="/admin/products/new" className={`${styles.actionCard} card`}>
-                        <Package size={32} />
-                        <h3>Add Product</h3>
-                        <p>Create a new product listing</p>
-                    </a>
-                    <a href="/admin/projects" className={`${styles.actionCard} card`}>
-                        <FileText size={32} />
-                        <h3>Add Portfolio Item</h3>
-                        <p>Showcase a new project</p>
-                    </a>
-                    <a href="/admin/homepage" className={`${styles.actionCard} card`}>
-                        <MessageSquare size={32} />
-                        <h3>Manage Homepage</h3>
-                        <p>Update hero banner and content</p>
-                    </a>
-                </div>
-            </div>
 
-            {stats.recentProducts.length > 0 && (
-                <div className={styles.recentSection}>
-                    <h2>Recently Added Products</h2>
-                    <div className={styles.recentList}>
-                        {stats.recentProducts.map(product => (
-                            <div key={product.id} className={`${styles.recentItem} card`}>
-                                <div className={styles.recentInfo}>
-                                    <h4>{product.name}</h4>
-                                    <p>{product.category}</p>
+            {
+                stats.recentProducts.length > 0 && (
+                    <div className={styles.recentSection}>
+                        <h2>Recently Added Products</h2>
+                        <div className={styles.recentList}>
+                            {stats.recentProducts.map(product => (
+                                <div key={product.id} className={`${styles.recentItem} card`}>
+                                    <div className={styles.recentInfo}>
+                                        <h4>{product.name}</h4>
+                                        <p>{product.category}</p>
+                                    </div>
+                                    <Link href={`/admin/products/${product.id}`} className="btn btn-outline btn-sm">Edit</Link>
                                 </div>
-                                <a href={`/admin/products/${product.id}`} className="btn btn-outline btn-sm">Edit</a>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     )
 }

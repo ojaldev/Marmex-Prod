@@ -12,8 +12,7 @@ const projectSchema = new mongoose.Schema({
     },
     category: {
         type: String,
-        trim: true,
-        index: true
+        trim: true
     },
     description: {
         type: String,
@@ -48,8 +47,7 @@ const projectSchema = new mongoose.Schema({
     },
     featured: {
         type: Boolean,
-        default: false,
-        index: true
+        default: false
     },
     tags: [{
         type: String,

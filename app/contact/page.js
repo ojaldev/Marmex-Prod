@@ -7,7 +7,7 @@ export default function ContactPage() {
             <div className={styles.hero}>
                 <div className="container">
                     <h1>Get In Touch</h1>
-                    <p>We'd love to hear from you about your stone art needs</p>
+                    <p>We&apos;d love to hear from you about your stone art needs</p>
                 </div>
             </div>
 

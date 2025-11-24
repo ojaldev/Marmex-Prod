@@ -1,5 +1,7 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -57,7 +59,7 @@ export default function OrderConfirmationPage() {
                                 </div>
                                 <div className={styles.stepInfo}>
                                     <strong>Order Confirmed</strong>
-                                    <span>We've received your order</span>
+                                    <span>We&apos;ve received your order</span>
                                 </div>
                             </div>
 
@@ -101,10 +103,10 @@ export default function OrderConfirmationPage() {
                         {/* Info Cards */}
                         <div className={styles.infoCards}>
                             <div className={styles.infoCard}>
-                                <h3>What's Next?</h3>
+                                <h3>What&apos;s Next?</h3>
                                 <ul>
-                                    <li>You'll receive a confirmation email shortly</li>
-                                    <li>We'll notify you when your order ships</li>
+                                    <li>You&apos;ll receive a confirmation email shortly</li>
+                                    <li>We&apos;ll notify you when your order ships</li>
                                     <li>Track your order anytime in your account</li>
                                     <li>Estimated delivery: 5-7 business days</li>
                                 </ul>
@@ -113,7 +115,7 @@ export default function OrderConfirmationPage() {
                             <div className={styles.infoCard}>
                                 <h3>Need Help?</h3>
                                 <p>
-                                    If you have any questions about your order, please don't hesitate to contact us:
+                                    If you have any questions about your order, please don&apos;t hesitate to contact us:
                                 </p>
                                 <p>
                                     <strong>Email:</strong> support@marmexindia.com<br />

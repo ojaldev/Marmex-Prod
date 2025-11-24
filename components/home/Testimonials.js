@@ -84,7 +84,7 @@ export default function Testimonials() {
                         </div>
 
                         <blockquote className={styles.quote}>
-                            "{current.content}"
+                            &quot;{current.content}&quot;
                         </blockquote>
 
                         <div className={styles.author}>

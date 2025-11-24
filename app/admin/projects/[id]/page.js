@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Save, Trash2, Upload, X } from 'lucide-react'
-import styles from '../products/product-editor.module.css'
+import styles from '../../products/product-editor.module.css'
 
 export default function EditProjectPage() {
     const params = useParams()

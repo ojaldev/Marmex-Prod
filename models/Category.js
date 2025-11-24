@@ -34,15 +34,13 @@ const categorySchema = new mongoose.Schema({
     },
     active: {
         type: Boolean,
-        default: true,
-        index: true
+        default: true
     }
 }, {
     timestamps: true
 })
 
 // Indexes
-categorySchema.index({ slug: 1 })
 categorySchema.index({ active: 1, order: 1 })
 categorySchema.index({ parentCategory: 1 })
 
