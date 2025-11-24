@@ -1,0 +1,44 @@
+[
+    {
+        "id": "cat-1",
+        "name": "Stone Sculptures",
+        "slug": "stone-sculptures",
+        "description": "Exquisite handcrafted stone sculptures",
+        "image": "https://via.placeholder.com/400x300/1a1a1a/d4af37?text=Sculptures"
+    },
+    {
+        "id": "cat-2",
+        "name": "Stone Carvings",
+        "slug": "stone-carvings",
+        "description": "Intricate jali work, fireplaces, and wall décor",
+        "image": "https://via.placeholder.com/400x300/1a1a1a/d4af37?text=Carvings"
+    },
+    {
+        "id": "cat-3",
+        "name": "Dining Décor",
+        "slug": "dining-decor",
+        "description": "Elegant marble dining accessories",
+        "image": "https://via.placeholder.com/400x300/1a1a1a/d4af37?text=Dining"
+    },
+    {
+        "id": "cat-4",
+        "name": "Wall Art",
+        "slug": "wall-art",
+        "description": "Premium marble wall decorations",
+        "image": "https://via.placeholder.com/400x300/1a1a1a/d4af37?text=Wall+Art"
+    },
+    {
+        "id": "cat-5",
+        "name": "Personalized Gifts",
+        "slug": "personalized-gifts",
+        "description": "Custom name plates and special items",
+        "image": "https://via.placeholder.com/400x300/1a1a1a/d4af37?text=Gifts"
+    },
+    {
+        "id": "cat-6",
+        "name": "Marble Games",
+        "slug": "marble-games",
+        "description": "Chess sets, tic-tac-toe, and board games",
+        "image": "https://via.placeholder.com/400x300/1a1a1a/d4af37?text=Games"
+    }
+]

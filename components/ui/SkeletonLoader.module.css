@@ -1,0 +1,121 @@
+/* ===== SHIMMER ANIMATION ===== */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.skeleton {
+    background: linear-gradient(90deg,
+            var(--color-platinum) 0%,
+            var(--color-pearl) 45%,
+            var(--color-platinum) 100%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite linear;
+    border-radius: var(--radius-sm);
+}
+
+/* ===== PRODUCT CARD SKELETON ===== */
+.productCard {
+    background: var(--color-bg-white);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.imageSkeleton {
+    width: 100%;
+    padding-bottom: 133.33%;
+    /* 3:4 aspect ratio */
+    background: linear-gradient(90deg,
+            var(--color-platinum) 0%,
+            var(--color-pearl) 45%,
+            var(--color-platinum) 100%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite linear;
+}
+
+.content {
+    padding: var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.categoryLine,
+.titleLine,
+.shortLine,
+.priceLine {
+    height: 16px;
+    background: linear-gradient(90deg,
+            var(--color-platinum) 0%,
+            var(--color-pearl) 45%,
+            var(--color-platinum) 100%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite linear;
+    border-radius: var(--radius-sm);
+}
+
+.categoryLine {
+    width: 40%;
+    height: 12px;
+}
+
+.titleLine {
+    width: 90%;
+    height: 20px;
+}
+
+.shortLine {
+    width: 60%;
+}
+
+.priceLine {
+    width: 50%;
+    height: 24px;
+}
+
+/* ===== GRID ===== */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-lg);
+}
+
+/* ===== TEXT SKELETON ===== */
+.textSkeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.line {
+    height: 16px;
+    background: linear-gradient(90deg,
+            var(--color-platinum) 0%,
+            var(--color-pearl) 45%,
+            var(--color-platinum) 100%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite linear;
+    border-radius: var(--radius-sm);
+}
+
+.line:nth-child(1) {
+    width: 100%;
+}
+
+.line:nth-child(2) {
+    width: 95%;
+}
+
+.line:nth-child(3) {
+    width: 85%;
+}
+
+.line:last-child {
+    width: 70%;
+}

@@ -1,0 +1,124 @@
+.promoInput {
+    margin: var(--space-lg) 0;
+}
+
+.inputWrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    border: 2px solid var(--color-platinum);
+    border-radius: var(--radius-md);
+    background: white;
+    transition: border-color var(--duration-fast) ease;
+}
+
+.inputWrapper:focus-within {
+    border-color: var(--color-gold-24k);
+}
+
+.icon {
+    color: var(--color-text-gray);
+    flex-shrink: 0;
+}
+
+.input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: var(--text-base);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.input::placeholder {
+    text-transform: none;
+    font-weight: 400;
+}
+
+.applyBtn {
+    padding: var(--space-sm) var(--space-lg);
+    background: var(--color-gold-24k);
+    color: var(--color-obsidian);
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--duration-fast) ease;
+    white-space: nowrap;
+}
+
+.applyBtn:hover:not(:disabled) {
+    background: var(--color-champagne);
+    transform: scale(1.05);
+}
+
+.applyBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.error {
+    margin-top: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background: #fee;
+    border: 1px solid var(--color-ruby);
+    border-radius: var(--radius-md);
+    color: var(--color-ruby);
+    font-size: var(--text-sm);
+}
+
+/* ===== APPLIED PROMO ===== */
+.appliedPromo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-md) var(--space-lg);
+    background: linear-gradient(135deg, #d4f4dd, #e8f5e9);
+    border: 2px solid var(--color-emerald);
+    border-radius: var(--radius-md);
+    margin: var(--space-lg) 0;
+}
+
+.promoInfo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.checkIcon {
+    color: var(--color-emerald);
+}
+
+.promoInfo strong {
+    display: block;
+    font-size: var(--text-lg);
+    color: var(--color-obsidian);
+}
+
+.discount {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--color-emerald);
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.removeBtn {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background: white;
+    border: 2px solid var(--color-platinum);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--duration-fast) ease;
+}
+
+.removeBtn:hover {
+    border-color: var(--color-ruby);
+    color: var(--color-ruby);
+    transform: scale(1.1);
+}

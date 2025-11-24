@@ -1,0 +1,302 @@
+.bentoHero {
+    padding: var(--space-3xl) 0;
+    background: linear-gradient(180deg, var(--color-pearl) 0%, var(--color-bg-white) 100%);
+    overflow: hidden;
+}
+
+/* ===== BENTO GRID ===== */
+.bentoGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, auto);
+    gap: var(--space-lg);
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Main Hero Block - Takes 2x2 grid space */
+.mainBlock {
+    grid-column: 1 / 3;
+    grid-row: 1 / 3;
+    background: linear-gradient(135deg, var(--color-obsidian) 0%, #2a2a2a 100%);
+    border-radius: var(--radius-xl);
+    padding: var(--space-3xl);
+    color: white;
+    position: relative;
+    overflow: hidden;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.mainBlock::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(212, 165, 116, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    transform: translate(50%, -50%);
+}
+
+.mainContent {
+    position: relative;
+    z-index: 1;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: 0.5rem 1rem;
+    background: rgba(212, 165, 116, 0.15);
+    border: 1px solid rgba(212, 165, 116, 0.3);
+    border-radius: var(--radius-full);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-gold-24k);
+    margin-bottom: var(--space-lg);
+}
+
+.mainBlock h1 {
+    font-size: var(--text-3xl);
+    font-family: var(--font-display);
+    line-height: 1.1;
+    margin-bottom: var(--space-md);
+    background: linear-gradient(135deg, white, var(--color-champagne));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.mainBlock p {
+    font-size: var(--text-lg);
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: var(--space-xl);
+    max-width: 500px;
+}
+
+.ctaGroup {
+    display: flex;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+    flex-wrap: wrap;
+}
+
+.stats {
+    display: flex;
+    gap: var(--space-2xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.stat strong {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-gold-24k);
+}
+
+.stat span {
+    font-size: var(--text-xs);
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Featured Image Block - Takes 2x2 grid space */
+.imageBlock {
+    grid-column: 3 / 5;
+    grid-row: 1 / 3;
+    position: relative;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    min-height: 500px;
+    background: var(--color-pearl);
+}
+
+.heroImage {
+    object-fit: cover;
+    transition: transform 0.8s var(--ease-elegant);
+}
+
+.imageBlock:hover .heroImage {
+    transform: scale(1.05);
+}
+
+.imageOverlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: var(--space-xl);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    color: white;
+}
+
+.imageLabel {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Accent Blocks - Each takes 2x1 grid space */
+.accentBlock {
+    grid-column: span 2;
+    background: linear-gradient(135deg, var(--color-gold-24k) 0%, var(--color-champagne) 100%);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    color: var(--color-obsidian);
+    transition: all var(--duration-normal) var(--ease-elegant);
+    position: relative;
+    overflow: hidden;
+}
+
+.accentBlock::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.2) 100%);
+    opacity: 0;
+    transition: opacity var(--duration-normal) ease;
+}
+
+.accentBlock:hover::before {
+    opacity: 1;
+}
+
+.accentBlock:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+}
+
+.accentIcon {
+    width: 64px;
+    height: 64px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-md);
+    color: var(--color-obsidian);
+}
+
+.accentBlock h3 {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    margin-bottom: var(--space-sm);
+    color: inherit;
+}
+
+.accentBlock p {
+    font-size: var(--text-base);
+    margin-bottom: var(--space-md);
+    opacity: 0.9;
+}
+
+.accentLink {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-weight: 600;
+    color: inherit;
+    transition: gap var(--duration-fast) var(--ease-smooth);
+}
+
+.accentLink:hover {
+    gap: var(--space-sm);
+}
+
+.loading {
+    text-align: center;
+    padding: var(--space-5xl);
+    color: var(--color-text-gray);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    .bentoGrid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto auto auto auto;
+    }
+
+    .mainBlock {
+        grid-column: 1 / 3;
+        grid-row: 1 / 2;
+        min-height: 400px;
+    }
+
+    .imageBlock {
+        grid-column: 1 / 3;
+        grid-row: 2 / 3;
+        min-height: 400px;
+    }
+
+    .accentBlock {
+        grid-column: span 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .bentoHero {
+        padding: var(--space-xl) 0;
+    }
+
+    .bentoGrid {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+
+    .mainBlock {
+        grid-column: 1;
+        grid-row: auto;
+        padding: var(--space-xl);
+        min-height: 350px;
+    }
+
+    .mainBlock h1 {
+        font-size: var(--text-2xl);
+    }
+
+    .mainBlock p {
+        font-size: var(--text-base);
+    }
+
+    .imageBlock {
+        grid-column: 1;
+        grid-row: auto;
+        min-height: 300px;
+    }
+
+    .accentBlock {
+        grid-column: 1;
+        padding: var(--space-lg);
+    }
+
+    .ctaGroup {
+        flex-direction: column;
+    }
+
+    .ctaGroup .btn {
+        width: 100%;
+    }
+
+    .stats {
+        gap: var(--space-md);
+    }
+
+    .stat strong {
+        font-size: var(--text-lg);
+    }
+}

@@ -1,0 +1,111 @@
+.gstInvoice {
+    margin: var(--space-xl) 0;
+    padding: var(--space-xl);
+    background: var(--color-pearl);
+    border-radius: var(--radius-lg);
+}
+
+.gstToggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    cursor: pointer;
+    user-select: none;
+}
+
+.gstToggle input[type="checkbox"] {
+    display: none;
+}
+
+.checkbox {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--color-platinum);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--duration-fast) ease;
+    flex-shrink: 0;
+}
+
+.gstToggle input:checked+.checkbox {
+    background: var(--color-gold-24k);
+    border-color: var(--color-gold-24k);
+}
+
+.gstToggle input:checked+.checkbox::after {
+    content: '✓';
+    color: var(--color-obsidian);
+    font-weight: bold;
+}
+
+.gstLabel {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    flex: 1;
+}
+
+.gstLabel strong {
+    display: block;
+    color: var(--color-obsidian);
+    margin-bottom: 2px;
+}
+
+.gstLabel small {
+    display: block;
+    color: var(--color-text-gray);
+    font-size: var(--text-xs);
+}
+
+.gstForm {
+    margin-top: var(--space-lg);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--color-platinum);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.formGroup label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: var(--space-sm);
+    color: var(--color-obsidian);
+}
+
+.formGroup input,
+.formGroup textarea {
+    width: 100%;
+    padding: var(--space-md);
+    border: 2px solid var(--color-platinum);
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-size: var(--text-base);
+    transition: border-color var(--duration-fast) ease;
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus {
+    outline: none;
+    border-color: var(--color-gold-24k);
+}
+
+.formGroup textarea {
+    resize: vertical;
+}
+
+.formGroup small {
+    display: block;
+    margin-top: var(--space-xs);
+    color: var(--color-text-gray);
+    font-size: var(--text-xs);
+}
+
+.error {
+    display: block;
+    margin-top: var(--space-xs);
+    color: var(--color-ruby);
+    font-size: var(--text-sm);
+}

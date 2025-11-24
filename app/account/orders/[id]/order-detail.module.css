@@ -1,0 +1,329 @@
+.orderDetailPage {
+    padding: var(--space-3xl) 0;
+    min-height: 80vh;
+}
+
+.backLink {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--color-text-gray);
+    margin-bottom: var(--space-xl);
+    transition: color var(--duration-fast) ease;
+}
+
+.backLink:hover {
+    color: var(--color-gold-24k);
+}
+
+/* ===== HEADER ===== */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-3xl);
+    padding-bottom: var(--space-xl);
+    border-bottom: 2px solid var(--color-platinum);
+}
+
+.header h1 {
+    margin-bottom: var(--space-xs);
+}
+
+.orderDate {
+    color: var(--color-text-gray);
+}
+
+.statusBadge {
+    padding: 0.5rem 1.5rem;
+    border-radius: var(--radius-full);
+    color: white;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* ===== CONTENT ===== */
+.content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--space-2xl);
+}
+
+/* ===== TIMELINE ===== */
+.timeline {
+    grid-column: 1 / -1;
+    background: white;
+    padding: var(--space-2xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    margin-bottom: var(--space-xl);
+}
+
+.timeline h2 {
+    margin-bottom: var(--space-xl);
+}
+
+.timelineItems {
+    position: relative;
+    padding-left: var(--space-xl);
+}
+
+.timelineItems::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: var(--color-platinum);
+}
+
+.timelineItem {
+    position: relative;
+    padding-bottom: var(--space-lg);
+    padding-left: var(--space-lg);
+}
+
+.timelineDot {
+    position: absolute;
+    left: 0;
+    top: 4px;
+    width: 18px;
+    height: 18px;
+    border-radius: var(--radius-full);
+    background: var(--color-gold-24k);
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px var(--color-gold-24k);
+}
+
+.timelineContent strong {
+    display: block;
+    text-transform: capitalize;
+    margin-bottom: var(--space-xs);
+    color: var(--color-obsidian);
+}
+
+.timelineContent p {
+    color: var(--color-text-gray);
+    margin-bottom: var(--space-xs);
+}
+
+.timelineContent small {
+    color: var(--color-text-light);
+    font-size: var(--text-xs);
+}
+
+/* ===== SECTIONS ===== */
+.section {
+    background: white;
+    padding: var(--space-2xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.section h2 {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+    color: var(--color-obsidian);
+}
+
+/* ===== ITEMS ===== */
+.items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.item {
+    display: flex;
+    gap: var(--space-lg);
+    padding: var(--space-lg);
+    background: var(--color-pearl);
+    border-radius: var(--radius-md);
+}
+
+.itemImage {
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.itemImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.itemInfo {
+    flex: 1;
+}
+
+.itemInfo h3 {
+    margin-bottom: var(--space-xs);
+    font-size: var(--text-base);
+}
+
+.itemInfo p {
+    color: var(--color-text-gray);
+    font-size: var(--text-sm);
+}
+
+.itemPrice {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-gold-24k);
+}
+
+.discount {
+    color: var(--color-emerald) !important;
+}
+
+/* ===== ADDRESS ===== */
+.address p {
+    margin-bottom: 0.25rem;
+    color: var(--color-text-gray);
+}
+
+.address strong {
+    color: var(--color-obsidian);
+}
+
+/* ===== PAYMENT ===== */
+.payment {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.paymentRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-md);
+    background: var(--color-pearl);
+    border-radius: var(--radius-md);
+}
+
+.paid {
+    color: var(--color-emerald);
+}
+
+.pending {
+    color: var(--color-amber);
+}
+
+/* ===== SUMMARY ===== */
+.summary {
+    background: white;
+    padding: var(--space-2xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.summary h2 {
+    margin-bottom: var(--space-lg);
+}
+
+.summaryRow {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--space-md) 0;
+    border-bottom: 1px solid var(--color-platinum);
+}
+
+.summaryRow.total {
+    border-bottom: none;
+    padding-top: var(--space-lg);
+    font-size: var(--text-xl);
+}
+
+.summaryRow.total strong {
+    color: var(--color-gold-24k);
+}
+
+/* ===== ACTIONS ===== */
+.actions {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+}
+
+.actionBtn,
+.cancelBtn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-xl);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--duration-fast) ease;
+}
+
+.actionBtn {
+    background: var(--color-gold-24k);
+    color: var(--color-obsidian);
+    border: none;
+}
+
+.actionBtn:hover {
+    background: var(--color-champagne);
+    transform: translateY(-2px);
+}
+
+.cancelBtn {
+    background: transparent;
+    color: var(--color-ruby);
+    border: 2px solid var(--color-ruby);
+}
+
+.cancelBtn:hover {
+    background: var(--color-ruby);
+    color: white;
+}
+
+/* ===== LOADING ===== */
+.loading {
+    padding: var(--space-5xl);
+    text-align: center;
+    color: var(--color-text-gray);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    .content {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+
+    .item {
+        flex-direction: column;
+    }
+
+    .itemImage {
+        width: 100%;
+        height: 200px;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+
+    .actionBtn,
+    .cancelBtn {
+        width: 100%;
+        justify-content: center;
+    }
+}

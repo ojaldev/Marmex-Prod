@@ -1,0 +1,249 @@
+.confirmationPage {
+    min-height: 80vh;
+    padding: var(--space-3xl) 0;
+    background: var(--color-bg-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.confirmationCard {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    padding: var(--space-3xl);
+    text-align: center;
+}
+
+/* ===== SUCCESS ICON ===== */
+.successIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 120px;
+    height: 120px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(135deg, rgba(46, 125, 50, 0.1), rgba(46, 125, 50, 0.05));
+    color: var(--color-emerald);
+    margin-bottom: var(--space-xl);
+    animation: scaleIn 0.5s var(--ease-elegant);
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ===== HEADER ===== */
+.confirmationCard h1 {
+    font-size: var(--text-4xl);
+    font-family: var(--font-display);
+    margin-bottom: var(--space-md);
+    color: var(--color-obsidian);
+}
+
+.subtitle {
+    font-size: var(--text-lg);
+    color: var(--color-text-gray);
+    margin-bottom: var(--space-2xl);
+}
+
+/* ===== ORDER NUMBER ===== */
+.orderNumber {
+    display: inline-flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-lg);
+    background: var(--color-pearl);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-2xl);
+}
+
+.orderNumber span {
+    font-size: var(--text-sm);
+    color: var(--color-text-gray);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.orderNumber strong {
+    font-size: var(--text-2xl);
+    color: var(--color-gold-24k);
+    font-weight: 700;
+    font-family: var(--font-mono);
+}
+
+/* ===== STATUS STEPS ===== */
+.statusSteps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: var(--space-2xl) 0;
+    padding: var(--space-2xl);
+    background: var(--color-pearl);
+    border-radius: var(--radius-lg);
+}
+
+.statusStep {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    flex: 1;
+    max-width: 150px;
+}
+
+.stepIcon {
+    width: 50px;
+    height: 50px;
+    border-radius: var(--radius-full);
+    background: white;
+    color: var(--color-text-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--duration-smooth) ease;
+}
+
+.stepActive .stepIcon {
+    background: var(--color-emerald);
+    color: white;
+    box-shadow: 0 0 0 4px rgba(46, 125, 50, 0.2);
+}
+
+.stepInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    text-align: center;
+}
+
+.stepInfo strong {
+    font-size: var(--text-sm);
+    color: var(--color-obsidian);
+}
+
+.stepInfo span {
+    font-size: var(--text-xs);
+    color: var(--color-text-gray);
+}
+
+.stepActive .stepInfo strong {
+    color: var(--color-emerald);
+}
+
+.statusLine {
+    width: 60px;
+    height: 2px;
+    background: var(--color-platinum);
+    margin: 0 var(--space-md) var(--space-2xl) var(--space-md);
+}
+
+/* ===== INFO CARDS ===== */
+.infoCards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-xl);
+    margin: var(--space-2xl) 0;
+    text-align: left;
+}
+
+.infoCard {
+    padding: var(--space-xl);
+    background: var(--color-pearl);
+    border-radius: var(--radius-lg);
+}
+
+.infoCard h3 {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-md);
+    color: var(--color-obsidian);
+}
+
+.infoCard p {
+    font-size: var(--text-sm);
+    color: var(--color-text-gray);
+    line-height: 1.6;
+    margin-bottom: var(--space-md);
+}
+
+.infoCard ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.infoCard li {
+    font-size: var(--text-sm);
+    color: var(--color-text-gray);
+    padding: var(--space-sm) 0;
+    padding-left: var(--space-lg);
+    position: relative;
+}
+
+.infoCard li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--color-emerald);
+    font-weight: 700;
+}
+
+/* ===== ACTIONS ===== */
+.actions {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    margin-top: var(--space-2xl);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .confirmationCard {
+        padding: var(--space-xl);
+    }
+
+    .statusSteps {
+        flex-direction: column;
+        padding: var(--space-lg);
+    }
+
+    .statusLine {
+        width: 2px;
+        height: 40px;
+        margin: var(--space-md) 0;
+    }
+
+    .statusStep {
+        flex-direction: row;
+        max-width: none;
+        width: 100%;
+    }
+
+    .stepInfo {
+        text-align: left;
+        align-items: flex-start;
+    }
+
+    .infoCards {
+        grid-template-columns: 1fr;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+
+    .actions .btn {
+        width: 100%;
+    }
+}

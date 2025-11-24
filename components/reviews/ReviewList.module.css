@@ -1,0 +1,220 @@
+.reviewList {
+    margin-top: var(--space-2xl);
+}
+
+.empty {
+    text-align: center;
+    padding: var(--space-5xl);
+    color: var(--color-text-gray);
+    background: white;
+    border-radius: var(--radius-lg);
+}
+
+/* ===== CONTROLS ===== */
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-2xl);
+    gap: var(--space-lg);
+    flex-wrap: wrap;
+}
+
+.sortSelect {
+    padding: var(--space-sm) var(--space-md);
+    border: 2px solid var(--color-platinum);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.sortSelect:focus {
+    outline: none;
+    border-color: var(--color-gold-24k);
+}
+
+.filterButtons {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+.filterButtons button {
+    padding: var(--space-sm) var(--space-md);
+    border: 2px solid var(--color-platinum);
+    border-radius: var(--radius-md);
+    background: white;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--duration-fast) ease;
+}
+
+.filterButtons button:hover {
+    border-color: var(--color-gold-24k);
+}
+
+.filterButtons button.active {
+    background: var(--color-gold-24k);
+    border-color: var(--color-gold-24k);
+    color: var(--color-obsidian);
+}
+
+/* ===== REVIEWS ===== */
+.reviews {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+}
+
+.reviewCard {
+    background: white;
+    padding: var(--space-2xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+/* ===== HEADER ===== */
+.reviewHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-lg);
+}
+
+.userInfo {
+    display: flex;
+    gap: var(--space-md);
+    align-items: center;
+}
+
+.avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+}
+
+.avatarPlaceholder {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(135deg, var(--color-gold-24k), var(--color-champagne));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-lg);
+    font-weight: 700;
+}
+
+.userName {
+    font-weight: 600;
+    color: var(--color-obsidian);
+}
+
+.reviewDate {
+    font-size: var(--text-xs);
+    color: var(--color-text-gray);
+    margin-top: 2px;
+}
+
+.rating {
+    display: flex;
+    gap: 2px;
+}
+
+/* ===== CONTENT ===== */
+.reviewContent h4 {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-sm);
+    color: var(--color-obsidian);
+}
+
+.reviewContent p {
+    color: var(--color-text-gray);
+    line-height: 1.6;
+    margin-bottom: var(--space-md);
+}
+
+.verifiedBadge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: #efe;
+    color: var(--color-emerald);
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    font-weight: 600;
+}
+
+/* ===== MEDIA ===== */
+.reviewMedia {
+    display: flex;
+    gap: var(--space-md);
+    margin: var(--space-lg) 0;
+    flex-wrap: wrap;
+}
+
+.reviewMedia img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: transform var(--duration-fast) ease;
+}
+
+.reviewMedia img:hover {
+    transform: scale(1.05);
+}
+
+/* ===== FOOTER ===== */
+.reviewFooter {
+    display: flex;
+    gap: var(--space-md);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--color-platinum);
+}
+
+.helpfulBtn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    background: white;
+    border: 2px solid var(--color-platinum);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text-gray);
+    cursor: pointer;
+    transition: all var(--duration-fast) ease;
+}
+
+.helpfulBtn:hover {
+    border-color: var(--color-gold-24k);
+    color: var(--color-obsidian);
+}
+
+.helpfulBtn.marked {
+    background: var(--color-gold-24k);
+    border-color: var(--color-gold-24k);
+    color: var(--color-obsidian);
+}
+
+@media (max-width: 768px) {
+    .controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filterButtons {
+        justify-content: center;
+    }
+
+    .reviewHeader {
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+}

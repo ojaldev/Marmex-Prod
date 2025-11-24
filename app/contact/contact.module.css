@@ -1,0 +1,189 @@
+.contactPage {
+    min-height: 100vh;
+}
+
+.hero {
+    background: linear-gradient(135deg, var(--color-primary), #2a2a2a);
+    padding: var(--spacing-xl) 0;
+    text-align: center;
+    color: white;
+    margin-bottom: var(--spacing-xl);
+}
+
+.hero h1 {
+    color: white;
+    font-size: 3rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.hero p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.25rem;
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+.contactInfo h2 {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-md);
+    color: var(--color-primary);
+}
+
+.intro {
+    color: var(--color-text-gray);
+    line-height: 1.7;
+    margin-bottom: var(--spacing-lg);
+}
+
+.infoList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+}
+
+.infoItem {
+    display: flex;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: var(--color-bg-light);
+    border-radius: 8px;
+}
+
+.infoItem h4 {
+    font-size: 1.1rem;
+    color: var(--color-primary);
+    margin-bottom: 0.25rem;
+}
+
+.infoItem p {
+    color: var(--color-text-gray);
+    margin: 0;
+}
+
+.social h4 {
+    font-size: 1.1rem;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.socialLinks {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.socialBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem var(--spacing-md);
+    background: white;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-text-dark);
+    font-weight: 600;
+    transition: var(--transition-smooth);
+}
+
+.socialBtn:hover {
+    border-color: var(--color-secondary);
+    color: var(--color-secondary);
+    transform: translateY(-2px);
+}
+
+.formContainer {
+    background: white;
+    padding: var(--spacing-lg);
+    border-radius: 8px;
+    box-shadow: var(--shadow-md);
+}
+
+.formContainer h2 {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-md);
+    color: var(--color-primary);
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.field label {
+    font-weight: 600;
+    color: var(--color-text-dark);
+    font-size: 0.95rem;
+}
+
+.field input,
+.field textarea {
+    padding: 0.875rem;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    font-size: 0.95rem;
+    font-family: var(--font-sans);
+    transition: var(--transition-fast);
+}
+
+.field input:focus,
+.field textarea:focus {
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.bulkOrder {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(212, 175, 55, 0.05));
+    padding: var(--spacing-xl);
+    border-radius: 8px;
+    text-align: center;
+    border: 2px solid var(--color-border-gold);
+}
+
+.bulkOrder h2 {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-md);
+    color: var(--color-primary);
+}
+
+.bulkOrder p {
+    color: var(--color-text-gray);
+    line-height: 1.7;
+    max-width: 800px;
+    margin: 0 auto var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .layout {
+        grid-template-columns: 1fr;
+    }
+
+    .formGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .socialLinks {
+        flex-direction: column;
+    }
+}

@@ -1,0 +1,150 @@
+.aboutPage {
+    min-height: 100vh;
+}
+
+.hero {
+    background: linear-gradient(135deg, var(--color-primary), #2a2a2a);
+    padding: var(--spacing-xl) 0;
+    text-align: center;
+    color: white;
+    margin-bottom: var(--spacing-xl);
+}
+
+.hero h1 {
+    color: white;
+    font-size: 3rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.hero p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.25rem;
+}
+
+.story {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.story h2 {
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-lg);
+    color: var(--color-primary);
+}
+
+.story p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--color-text-gray);
+    margin-bottom: var(--spacing-md);
+}
+
+.valuesSection {
+    background: var(--color-bg-light);
+}
+
+.values {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.valueCard {
+    background: white;
+    padding: var(--spacing-lg);
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-smooth);
+}
+
+.valueCard:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-4px);
+}
+
+.valueCard svg {
+    margin-bottom: var(--spacing-md);
+}
+
+.valueCard h3 {
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-primary);
+}
+
+.valueCard p {
+    color: var(--color-text-gray);
+    line-height: 1.7;
+}
+
+.offerings {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.offerings h2 {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+    color: var(--color-primary);
+}
+
+.offeringsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.offering {
+    padding: var(--spacing-md);
+    background: var(--color-bg-light);
+    border-left: 4px solid var(--color-secondary);
+    border-radius: 4px;
+}
+
+.offering h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-primary);
+}
+
+.offering p {
+    color: var(--color-text-gray);
+    line-height: 1.6;
+}
+
+.cta {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(212, 175, 55, 0.05));
+    text-align: center;
+    padding: var(--spacing-xl) 0;
+}
+
+.cta h2 {
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-primary);
+}
+
+.cta p {
+    font-size: 1.1rem;
+    color: var(--color-text-gray);
+    margin-bottom: var(--spacing-lg);
+}
+
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .story h2,
+    .offerings h2,
+    .cta h2 {
+        font-size: 2rem;
+    }
+
+    .values {
+        grid-template-columns: 1fr;
+    }
+}

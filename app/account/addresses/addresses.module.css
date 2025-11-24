@@ -1,0 +1,248 @@
+.addressesPage {
+    padding: var(--space-3xl) 0;
+    min-height: 80vh;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-3xl);
+}
+
+.header h1 {
+    margin: 0;
+}
+
+/* ===== FORM MODAL ===== */
+.formModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: var(--space-xl);
+}
+
+.formCard {
+    background: white;
+    border-radius: var(--radius-xl);
+    padding: var(--space-3xl);
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.formCard h2 {
+    margin-bottom: var(--space-xl);
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.formRow {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-lg);
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.formGroup label {
+    font-weight: 600;
+    color: var(--color-obsidian);
+    font-size: var(--text-sm);
+}
+
+.formGroup input,
+.formGroup select {
+    padding: var(--space-md);
+    border: 2px solid var(--color-platinum);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+}
+
+.formGroup input:focus,
+.formGroup select:focus {
+    outline: none;
+    border-color: var(--color-gold-24k);
+}
+
+.checkboxGroup label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    cursor: pointer;
+}
+
+.checkboxGroup input {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.formActions {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: flex-end;
+    margin-top: var(--space-lg);
+}
+
+/* ===== ADDRESS LIST ===== */
+.addressList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-xl);
+}
+
+.addressCard {
+    position: relative;
+    background: white;
+    padding: var(--space-xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 2px solid transparent;
+    transition: all var(--duration-fast) ease;
+}
+
+.addressCard:hover {
+    border-color: var(--color-gold-24k);
+    box-shadow: var(--shadow-lg);
+}
+
+.defaultBadge {
+    position: absolute;
+    top: var(--space-md);
+    right: var(--space-md);
+    background: var(--color-emerald);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.addressType {
+    display: inline-block;
+    background: var(--color-pearl);
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--color-text-gray);
+    margin-bottom: var(--space-md);
+}
+
+.addressCard h3 {
+    margin-bottom: var(--space-xs);
+    color: var(--color-obsidian);
+}
+
+.addressCard>p {
+    color: var(--color-text-gray);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-xs);
+}
+
+.addressText {
+    margin: var(--space-md) 0;
+    line-height: 1.6;
+    color: var(--color-text-gray);
+}
+
+.addressActions {
+    display: flex;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--color-platinum);
+}
+
+.editBtn,
+.deleteBtn {
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--duration-fast) ease;
+}
+
+.editBtn {
+    flex: 1;
+    background: var(--color-gold-24k);
+    color: var(--color-obsidian);
+    border: none;
+}
+
+.editBtn:hover {
+    background: var(--color-champagne);
+}
+
+.deleteBtn {
+    background: transparent;
+    color: var(--color-ruby);
+    border: 2px solid var(--color-ruby);
+}
+
+.deleteBtn:hover {
+    background: var(--color-ruby);
+    color: white;
+}
+
+/* ===== EMPTY STATE ===== */
+.empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: var(--space-5xl);
+    color: var(--color-text-gray);
+}
+
+.empty svg {
+    color: var(--color-platinum);
+    margin-bottom: var(--space-lg);
+}
+
+.empty p {
+    margin-bottom: var(--space-xl);
+    font-size: var(--text-lg);
+}
+
+/* ===== LOADING ===== */
+.loading {
+    padding: var(--space-5xl);
+    text-align: center;
+    color: var(--color-text-gray);
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-lg);
+    }
+
+    .formCard {
+        padding: var(--space-xl);
+    }
+
+    .addressList {
+        grid-template-columns: 1fr;
+    }
+}

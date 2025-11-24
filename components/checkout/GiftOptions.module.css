@@ -1,0 +1,96 @@
+.giftOptions {
+    margin: var(--space-xl) 0;
+    padding: var(--space-xl);
+    background: var(--color-pearl);
+    border-radius: var(--radius-lg);
+}
+
+.giftToggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    cursor: pointer;
+    user-select: none;
+}
+
+.giftToggle input[type="checkbox"] {
+    display: none;
+}
+
+.checkbox {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--color-platinum);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--duration-fast) ease;
+    flex-shrink: 0;
+}
+
+.giftToggle input:checked+.checkbox {
+    background: var(--color-gold-24k);
+    border-color: var(--color-gold-24k);
+}
+
+.giftToggle input:checked+.checkbox::after {
+    content: '✓';
+    color: var(--color-obsidian);
+    font-weight: bold;
+}
+
+.giftLabel {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    flex: 1;
+}
+
+.giftLabel strong {
+    display: block;
+    color: var(--color-obsidian);
+    margin-bottom: 2px;
+}
+
+.giftLabel small {
+    display: block;
+    color: var(--color-text-gray);
+    font-size: var(--text-xs);
+}
+
+.giftMessageSection {
+    margin-top: var(--space-lg);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--color-platinum);
+}
+
+.giftMessageSection label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: var(--space-sm);
+    color: var(--color-obsidian);
+}
+
+.giftMessageSection textarea {
+    width: 100%;
+    padding: var(--space-md);
+    border: 2px solid var(--color-platinum);
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-size: var(--text-base);
+    resize: vertical;
+    transition: border-color var(--duration-fast) ease;
+}
+
+.giftMessageSection textarea:focus {
+    outline: none;
+    border-color: var(--color-gold-24k);
+}
+
+.giftMessageSection small {
+    display: block;
+    margin-top: var(--space-xs);
+    color: var(--color-text-gray);
+    font-size: var(--text-xs);
+}

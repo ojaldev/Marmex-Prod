@@ -1,0 +1,116 @@
+.adminLayout {
+    display: flex;
+    min-height: 100vh;
+    background: var(--color-bg-light);
+}
+
+.sidebar {
+    width: 280px;
+    background: var(--color-primary);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.logo {
+    padding: var(--spacing-lg) var(--spacing-md);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo h2 {
+    font-family: var(--font-serif);
+    font-size: 1.75rem;
+    color: var(--color-secondary);
+    margin: 0;
+}
+
+.nav {
+    flex: 1;
+    padding: var(--spacing-md) 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.navItem {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem var(--spacing-md);
+    color: rgba(255, 255, 255, 0.8);
+    transition: var(--transition-fast);
+    position: relative;
+}
+
+.navItem:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.navItem.active {
+    background: rgba(212, 175, 55, 0.15);
+    color: var(--color-secondary);
+    border-left: 3px solid var(--color-secondary);
+}
+
+.navItem svg {
+    flex-shrink: 0;
+}
+
+.badge {
+    background: var(--color-secondary);
+    color: var(--color-primary);
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-left: auto;
+}
+
+.sidebarFooter {
+    margin-top: auto;
+    padding: var(--spacing-md);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logoutBtn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem var(--spacing-md);
+    background: rgba(220, 53, 69, 0.1);
+    border: none;
+    border-radius: 6px;
+    color: #ff6b6b;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.logoutBtn:hover {
+    background: rgba(220, 53, 69, 0.2);
+    transform: translateX(4px);
+}
+
+.mainContent {
+    margin-left: 280px;
+    flex: 1;
+    padding: var(--spacing-lg);
+    min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+
+    .mainContent {
+        margin-left: 0;
+    }
+}
