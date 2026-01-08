@@ -2,7 +2,7 @@
   "hero": {
     "title": "Luxury Marble & Stone Art",
     "subtitle": "Handcrafted Perfection for Your Space",
-    "image": "https://via.placeholder.com/1920x800/1a1a1a/d4af37?text=Marmex+India",
+    "image": "https://res.cloudinary.com/das4iqlfb/image/upload/v1766742049/marmex/homepage/ve6xaebdeya29squdadh.jpg",
     "cta": {
       "primary": "Explore Collection",
       "secondary": "Custom Orders"
@@ -11,7 +11,7 @@
   "brandStory": {
     "title": "Where Marble Meets Mastery",
     "content": "Marmex India brings you exquisite handcrafted marble and stone products that blend traditional craftsmanship with contemporary design. Each piece is meticulously carved by skilled artisans, ensuring unparalleled quality and uniqueness.",
-    "image": "https://via.placeholder.com/600x400/1a1a1a/d4af37?text=Craftsmanship"
+    "image": "https://res.cloudinary.com/das4iqlfb/image/upload/v1766742064/marmex/homepage/o5zohkm6qzj5k3oerny6.jpg"
   },
   "featuredVideo": {
     "title": "Watch Our Craftsmen at Work",

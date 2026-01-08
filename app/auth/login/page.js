@@ -12,6 +12,7 @@ export default function LoginPage() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const callbackUrl = searchParams.get('callbackUrl') || '/'
+    const justRegistered = searchParams.get('registered') === 'true'
 
     const [formData, setFormData] = useState({
         email: '',
@@ -63,11 +64,18 @@ export default function LoginPage() {
                     <h1>Welcome Back</h1>
                     <p className={styles.subtitle}>Sign in to your account</p>
 
+                    {justRegistered && (
+                        <div className={styles.success}>
+                            ✅ Account created successfully! Please sign in with your credentials.
+                        </div>
+                    )}
+
                     {error && (
                         <div className={styles.error}>
                             {error}
                         </div>
                     )}
+
 
                     <form onSubmit={handleSubmit} className={styles.form}>
                         <div className={styles.inputGroup}>

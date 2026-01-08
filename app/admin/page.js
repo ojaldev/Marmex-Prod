@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { Package, FileText, MessageSquare, TrendingUp } from 'lucide-react'
 import styles from './dashboard.module.css'
 

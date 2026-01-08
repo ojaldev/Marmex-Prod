@@ -6,13 +6,13 @@ import Review from '@/models/Review'
 // Mark review as helpful
 export async function POST(request, { params }) {
     try {
-        const session = await getServerSession(authOptions)
+        const session = await auth()
 
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const reviewId = params.id
+        const { id: reviewId } = await params
 
         await connectDB()
 

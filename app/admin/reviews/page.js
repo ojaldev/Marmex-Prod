@@ -1,11 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Star, Check, X, Eye } from 'lucide-react'
+import { Star, Check, X, Eye, RefreshCw } from 'lucide-react'
+import { useNotification } from '@/contexts/NotificationContext'
 import styles from './reviews.module.css'
 
 export default function AdminReviewsPage() {
+    const notification = useNotification()
     const [reviews, setReviews] = useState([])
+    const [counts, setCounts] = useState({ pending: 0, approved: 0, rejected: 0, total: 0 })
     const [filter, setFilter] = useState('pending')
     const [loading, setLoading] = useState(true)
     const [selectedReview, setSelectedReview] = useState(null)
@@ -15,12 +18,14 @@ export default function AdminReviewsPage() {
     }, [filter])
 
     const fetchReviews = async () => {
+        setLoading(true)
         try {
             const res = await fetch(`/api/admin/reviews?status=${filter}`)
             const data = await res.json()
             setReviews(data.reviews || [])
+            setCounts(data.counts || { pending: 0, approved: 0, rejected: 0, total: 0 })
         } catch (error) {
-            console.error('Failed to fetch reviews:', error)
+            notification.error('Failed to fetch reviews')
         } finally {
             setLoading(false)
         }
@@ -35,10 +40,11 @@ export default function AdminReviewsPage() {
             })
 
             if (res.ok) {
+                notification.success('Review approved successfully')
                 fetchReviews()
             }
         } catch (error) {
-            alert('Failed to approve review')
+            notification.error('Failed to approve review')
         }
     }
 
@@ -53,10 +59,11 @@ export default function AdminReviewsPage() {
             })
 
             if (res.ok) {
+                notification.success('Review rejected')
                 fetchReviews()
             }
         } catch (error) {
-            alert('Failed to reject review')
+            notification.error('Failed to reject review')
         }
     }
 
@@ -69,10 +76,11 @@ export default function AdminReviewsPage() {
             })
 
             if (res.ok) {
+                notification.success('Review deleted successfully')
                 fetchReviews()
             }
         } catch (error) {
-            alert('Failed to delete review')
+            notification.error('Failed to delete review')
         }
     }
 
@@ -91,15 +99,21 @@ export default function AdminReviewsPage() {
 
             {/* Filter Tabs */}
             <div className={styles.filterTabs}>
-                {['pending', 'approved', 'rejected'].map(status => (
+                {['pending', 'approved', 'rejected', 'all'].map(status => (
                     <button
                         key={status}
                         className={filter === status ? styles.active : ''}
                         onClick={() => setFilter(status)}
                     >
                         {status.charAt(0).toUpperCase() + status.slice(1)}
+                        {status === 'pending' && counts.pending > 0 && (
+                            <span className={styles.badge}>{counts.pending}</span>
+                        )}
                     </button>
                 ))}
+                <button onClick={fetchReviews} className={styles.refreshBtn} disabled={loading}>
+                    <RefreshCw size={18} className={loading ? styles.spinning : ''} />
+                </button>
             </div>
 
             {/* Reviews List */}

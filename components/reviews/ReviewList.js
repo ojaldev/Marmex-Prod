@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Star, ThumbsUp } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import styles from './ReviewList.module.css'
@@ -8,8 +8,29 @@ import styles from './ReviewList.module.css'
 export default function ReviewList({ reviews: initialReviews, productId }) {
     const { data: session } = useSession()
     const [reviews, setReviews] = useState(initialReviews || [])
+    const [loading, setLoading] = useState(false)
     const [sort, setSort] = useState('newest')
     const [filter, setFilter] = useState('all')
+
+    // Fetch reviews when productId changes
+    useEffect(() => {
+        if (productId) {
+            fetchReviews()
+        }
+    }, [productId, sort])
+
+    const fetchReviews = async () => {
+        setLoading(true)
+        try {
+            const res = await fetch(`/api/reviews?productId=${productId}&sort=${sort}`)
+            const data = await res.json()
+            setReviews(data.reviews || [])
+        } catch (error) {
+            console.error('Failed to fetch reviews:', error)
+        } finally {
+            setLoading(false)
+        }
+    }
 
     const handleHelpful = async (reviewId) => {
         if (!session) {
@@ -36,10 +57,18 @@ export default function ReviewList({ reviews: initialReviews, productId }) {
         }
     }
 
+    if (loading) {
+        return (
+            <div className={styles.empty}>
+                <p>Loading reviews...</p>
+            </div>
+        )
+    }
+
     if (!reviews || reviews.length === 0) {
         return (
             <div className={styles.empty}>
-                <p>No reviews yet for this product</p>
+                <p>No reviews yet. Be the first to review!</p>
             </div>
         )
     }

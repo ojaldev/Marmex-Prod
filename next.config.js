@@ -21,12 +21,14 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'res.cloudinary.com',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
       }
     ],
-    unoptimized: true // Disable optimization for Google Drive images
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
+    unoptimized: true
   },
   typescript: {
     ignoreBuildErrors: true,
@@ -34,3 +36,4 @@ const nextConfig = {
 }
 
 export default nextConfig
+

@@ -1,0 +1,121 @@
+/* ===== TOAST CONTAINER ===== */
+.container {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    max-width: 400px;
+    width: 100%;
+    pointer-events: none;
+}
+
+/* ===== TOAST ===== */
+.toast {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--radius-lg);
+    background: white;
+    box-shadow: var(--shadow-xl);
+    animation: slideIn 0.3s ease-out;
+    pointer-events: auto;
+    border-left: 4px solid;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* ===== TOAST TYPES ===== */
+.success {
+    border-left-color: var(--color-emerald, #10b981);
+    background: linear-gradient(to right, rgba(16, 185, 129, 0.05), white);
+}
+
+.success .iconWrapper {
+    color: var(--color-emerald, #10b981);
+}
+
+.error {
+    border-left-color: var(--color-ruby, #dc2626);
+    background: linear-gradient(to right, rgba(220, 38, 38, 0.05), white);
+}
+
+.error .iconWrapper {
+    color: var(--color-ruby, #dc2626);
+}
+
+.warning {
+    border-left-color: var(--color-amber, #f59e0b);
+    background: linear-gradient(to right, rgba(245, 158, 11, 0.05), white);
+}
+
+.warning .iconWrapper {
+    color: var(--color-amber, #f59e0b);
+}
+
+.info {
+    border-left-color: var(--color-gold-24k, #d4a574);
+    background: linear-gradient(to right, rgba(212, 165, 116, 0.05), white);
+}
+
+.info .iconWrapper {
+    color: var(--color-gold-24k, #d4a574);
+}
+
+/* ===== TOAST CONTENT ===== */
+.iconWrapper {
+    flex-shrink: 0;
+    padding-top: 2px;
+}
+
+.message {
+    flex: 1;
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    color: var(--color-obsidian);
+    margin: 0;
+}
+
+.closeBtn {
+    flex-shrink: 0;
+    padding: var(--space-xs);
+    background: transparent;
+    border: none;
+    color: var(--color-text-gray);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: all var(--duration-fast) ease;
+}
+
+.closeBtn:hover {
+    background: var(--color-pearl);
+    color: var(--color-obsidian);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+    .container {
+        top: auto;
+        bottom: 20px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+
+    .toast {
+        padding: var(--space-md);
+    }
+}

@@ -56,6 +56,46 @@
     border-bottom-color: var(--color-gold-24k);
 }
 
+.filterTabs .badge {
+    background: var(--color-ruby);
+    color: white;
+    font-size: var(--text-xs);
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius-full);
+    margin-left: var(--space-xs);
+}
+
+.refreshBtn {
+    background: none !important;
+    border: none !important;
+    padding: var(--space-sm) !important;
+    color: var(--color-text-gray);
+    margin-left: auto;
+}
+
+.refreshBtn:hover {
+    color: var(--color-gold-24k);
+}
+
+.refreshBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.spinning {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 /* ===== REVIEWS LIST ===== */
 .reviewsList {
     display: flex;

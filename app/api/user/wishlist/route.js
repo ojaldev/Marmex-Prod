@@ -6,7 +6,7 @@ import User from '@/models/User'
 // Get user's wishlist
 export async function GET(request) {
     try {
-        const session = await getServerSession(authOptions)
+        const session = await auth()
 
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -27,7 +27,7 @@ export async function GET(request) {
 // Add item to wishlist
 export async function POST(request) {
     try {
-        const session = await getServerSession(authOptions)
+        const session = await auth()
 
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -43,9 +43,14 @@ export async function POST(request) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 })
         }
 
+        // Initialize wishlist if not exists
+        if (!user.wishlist) {
+            user.wishlist = []
+        }
+
         // Check if already in wishlist
         if (user.wishlist.includes(productId)) {
-            return NextResponse.json({ message: 'Already in wishlist' })
+            return NextResponse.json({ message: 'Already in wishlist', wishlist: user.wishlist })
         }
 
         user.wishlist.push(productId)
@@ -65,7 +70,7 @@ export async function POST(request) {
 // Remove item from wishlist
 export async function DELETE(request) {
     try {
-        const session = await getServerSession(authOptions)
+        const session = await auth()
 
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -82,7 +87,7 @@ export async function DELETE(request) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 })
         }
 
-        user.wishlist = user.wishlist.filter(id => id !== productId)
+        user.wishlist = (user.wishlist || []).filter(id => id !== productId)
         await user.save()
 
         return NextResponse.json({
@@ -95,3 +100,4 @@ export async function DELETE(request) {
         return NextResponse.json({ error: 'Failed to remove from wishlist' }, { status: 500 })
     }
 }
+

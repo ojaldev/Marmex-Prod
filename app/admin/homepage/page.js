@@ -1,12 +1,16 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Save, Image as ImageIcon } from 'lucide-react'
+import { Save, Upload, X, Image as ImageIcon } from 'lucide-react'
+import { useNotification } from '@/contexts/NotificationContext'
 import styles from '../products/product-editor.module.css'
 
 export default function HomepagePage() {
+    const notification = useNotification()
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
+    const [uploadingHero, setUploadingHero] = useState(false)
+    const [uploadingStory, setUploadingStory] = useState(false)
     const [config, setConfig] = useState({
         hero: {
             title: '',
@@ -44,6 +48,46 @@ export default function HomepagePage() {
         }
     }
 
+    const handleImageUpload = async (file, type) => {
+        if (!file) return
+
+        const setUploading = type === 'hero' ? setUploadingHero : setUploadingStory
+
+        setUploading(true)
+        const reader = new FileReader()
+
+        reader.onloadend = async () => {
+            try {
+                const res = await fetch('/api/upload-image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        image: reader.result,
+                        folder: 'marmex/homepage'
+                    })
+                })
+                const data = await res.json()
+
+                if (res.ok) {
+                    if (type === 'hero') {
+                        setConfig(prev => ({ ...prev, hero: { ...prev.hero, image: data.url } }))
+                    } else {
+                        setConfig(prev => ({ ...prev, brandStory: { ...prev.brandStory, image: data.url } }))
+                    }
+                    notification.success('Image uploaded!')
+                } else {
+                    notification.error(data.error || 'Failed to upload image')
+                }
+            } catch (error) {
+                console.error('Upload error:', error)
+                notification.error('Failed to upload image')
+            } finally {
+                setUploading(false)
+            }
+        }
+        reader.readAsDataURL(file)
+    }
+
     const handleSave = async (e) => {
         e.preventDefault()
         setSaving(true)
@@ -56,11 +100,13 @@ export default function HomepagePage() {
             })
 
             if (res.ok) {
-                alert('Homepage updated successfully!')
+                notification.success('Homepage updated successfully!')
+            } else {
+                notification.error('Failed to save changes')
             }
         } catch (error) {
             console.error('Failed to save config:', error)
-            alert('Failed to save changes')
+            notification.error('Failed to save changes')
         } finally {
             setSaving(false)
         }
@@ -105,15 +151,67 @@ export default function HomepagePage() {
                     </div>
 
                     <div className={styles.field}>
-                        <label><ImageIcon size={16} /> Hero Image (Google Drive URL) *</label>
-                        <input
-                            type="url"
-                            required
-                            value={config.hero.image}
-                            onChange={e => setConfig({ ...config, hero: { ...config.hero, image: e.target.value } })}
-                            placeholder="https://drive.google.com/file/d/..."
-                        />
-                        <small style={{ color: 'var(--color-text-gray)' }}>Recommended size: 1920x800px</small>
+                        <label><ImageIcon size={16} /> Hero Image</label>
+                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                            {config.hero.image ? (
+                                <div style={{ position: 'relative' }}>
+                                    <img
+                                        src={config.hero.image}
+                                        alt="Hero"
+                                        style={{ width: '200px', height: '120px', objectFit: 'cover', borderRadius: '8px' }}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setConfig({ ...config, hero: { ...config.hero, image: '' } })}
+                                        style={{
+                                            position: 'absolute',
+                                            top: '-8px',
+                                            right: '-8px',
+                                            width: '24px',
+                                            height: '24px',
+                                            borderRadius: '50%',
+                                            border: 'none',
+                                            background: '#e53935',
+                                            color: 'white',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                        }}
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                </div>
+                            ) : (
+                                <label style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    width: '200px',
+                                    height: '120px',
+                                    border: '2px dashed #ccc',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    background: '#f9f9f9'
+                                }}>
+                                    <Upload size={24} style={{ marginBottom: '8px', color: '#888' }} />
+                                    <span style={{ fontSize: '14px', color: '#888' }}>
+                                        {uploadingHero ? 'Uploading...' : 'Upload Image'}
+                                    </span>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        hidden
+                                        disabled={uploadingHero}
+                                        onChange={(e) => handleImageUpload(e.target.files[0], 'hero')}
+                                    />
+                                </label>
+                            )}
+                        </div>
+                        <small style={{ color: 'var(--color-text-gray)', marginTop: '8px', display: 'block' }}>
+                            Recommended size: 1920x800px
+                        </small>
                     </div>
 
                     <div className={styles.grid}>
@@ -164,14 +262,64 @@ export default function HomepagePage() {
                     </div>
 
                     <div className={styles.field}>
-                        <label><ImageIcon size={16} /> Story Image (Google Drive URL) *</label>
-                        <input
-                            type="url"
-                            required
-                            value={config.brandStory.image}
-                            onChange={e => setConfig({ ...config, brandStory: { ...config.brandStory, image: e.target.value } })}
-                            placeholder="https://drive.google.com/file/d/..."
-                        />
+                        <label><ImageIcon size={16} /> Story Image</label>
+                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                            {config.brandStory.image ? (
+                                <div style={{ position: 'relative' }}>
+                                    <img
+                                        src={config.brandStory.image}
+                                        alt="Brand Story"
+                                        style={{ width: '200px', height: '120px', objectFit: 'cover', borderRadius: '8px' }}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setConfig({ ...config, brandStory: { ...config.brandStory, image: '' } })}
+                                        style={{
+                                            position: 'absolute',
+                                            top: '-8px',
+                                            right: '-8px',
+                                            width: '24px',
+                                            height: '24px',
+                                            borderRadius: '50%',
+                                            border: 'none',
+                                            background: '#e53935',
+                                            color: 'white',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                        }}
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                </div>
+                            ) : (
+                                <label style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    width: '200px',
+                                    height: '120px',
+                                    border: '2px dashed #ccc',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    background: '#f9f9f9'
+                                }}>
+                                    <Upload size={24} style={{ marginBottom: '8px', color: '#888' }} />
+                                    <span style={{ fontSize: '14px', color: '#888' }}>
+                                        {uploadingStory ? 'Uploading...' : 'Upload Image'}
+                                    </span>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        hidden
+                                        disabled={uploadingStory}
+                                        onChange={(e) => handleImageUpload(e.target.files[0], 'story')}
+                                    />
+                                </label>
+                            )}
+                        </div>
                     </div>
                 </div>
 
@@ -209,3 +357,4 @@ export default function HomepagePage() {
         </div>
     )
 }
+

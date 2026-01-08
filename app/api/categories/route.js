@@ -7,16 +7,19 @@ export async function GET(request) {
         await connectDB()
 
         const { searchParams } = new URL(request.url)
-        const activeOnly = searchParams.get('active') !== 'false'
+        const activeParam = searchParams.get('active')
 
         let query = {}
-        if (activeOnly) {
+        // Only filter by active if explicitly set to 'true'
+        if (activeParam === 'true') {
             query.active = true
         }
 
         const categories = await Category.find(query)
             .sort({ order: 1, name: 1 })
             .lean()
+
+        console.log('Categories fetched:', categories.length, 'Query:', query)
 
         return NextResponse.json(categories)
     } catch (error) {

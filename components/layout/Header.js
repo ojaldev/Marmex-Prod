@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { Search, ShoppingCart, Heart, Menu, X, ChevronDown, User } from 'lucide-react'
 import { useCart } from '@/contexts/CartContext'
+import { useWishlist } from '@/contexts/WishlistContext'
 import MiniCart from '@/components/cart/MiniCart'
 import styles from './Header.module.css'
 
@@ -13,12 +15,13 @@ export default function Header() {
     const pathname = usePathname()
     const { data: session } = useSession()
     const { getCartCount, setIsCartOpen } = useCart()
+    const { getWishlistCount } = useWishlist()
     const [scrolled, setScrolled] = useState(false)
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [activeDropdown, setActiveDropdown] = useState(null)
     const [searchOpen, setSearchOpen] = useState(false)
-    const [wishlistCount, setWishlistCount] = useState(0)
     const cartCount = getCartCount()
+    const wishlistCount = getWishlistCount()
 
     useEffect(() => {
         const handleScroll = () => {
@@ -58,8 +61,17 @@ export default function Header() {
             <div className={styles.headerContainer}>
                 {/* Logo */}
                 <Link href="/" className={styles.logo}>
-                    <h1>MARMEX</h1>
-                    <span>India</span>
+                    <Image
+                        src="/logo.png"
+                        alt="Marmex India"
+                        width={50}
+                        height={50}
+                        className={styles.logoImage}
+                    />
+                    <div className={styles.logoText}>
+                        <h1>MARMEX</h1>
+                        <span>India</span>
+                    </div>
                 </Link>
 
                 {/* Desktop Navigation */}

@@ -99,6 +99,72 @@
     margin-bottom: var(--space-lg);
 }
 
+/* ===== FIELD VALIDATION ===== */
+.fieldError {
+    color: var(--color-ruby);
+    font-size: var(--text-xs);
+    margin-top: var(--space-xs);
+    display: block;
+}
+
+.fieldHint {
+    color: var(--color-text-gray);
+    font-size: var(--text-xs);
+    margin-top: var(--space-xs);
+    display: block;
+}
+
+.inputError {
+    border-color: var(--color-ruby) !important;
+    background-color: #fff5f5;
+}
+
+.inputError:focus {
+    box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.1) !important;
+}
+
+/* ===== PHONE INPUT GROUP ===== */
+.phoneInputGroup {
+    display: flex;
+    gap: var(--space-sm);
+    width: 100%;
+}
+
+.countryCodeSelect {
+    width: 140px;
+    min-width: 140px;
+    flex-shrink: 0;
+    padding: var(--space-md);
+    border: 2px solid var(--color-platinum);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    background: white;
+    cursor: pointer;
+    transition: all var(--duration-fast) ease;
+}
+
+.countryCodeSelect:focus {
+    outline: none;
+    border-color: var(--color-gold-24k);
+    box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.1);
+}
+
+.phoneInput {
+    flex: 1;
+    min-width: 0;
+    padding: var(--space-md);
+    border: 2px solid var(--color-platinum);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    transition: all var(--duration-fast) ease;
+}
+
+.phoneInput:focus {
+    outline: none;
+    border-color: var(--color-gold-24k);
+    box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.1);
+}
+
 /* ===== DIVIDER ===== */
 .divider {
     position: relative;

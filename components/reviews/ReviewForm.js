@@ -2,9 +2,11 @@
 
 import { useState } from 'react'
 import { Star, Upload, X } from 'lucide-react'
+import { useNotification } from '@/contexts/NotificationContext'
 import styles from './ReviewForm.module.css'
 
 export default function ReviewForm({ productId, onSuccess }) {
+    const notification = useNotification()
     const [formData, setFormData] = useState({
         rating: 0,
         title: '',
@@ -14,7 +16,6 @@ export default function ReviewForm({ productId, onSuccess }) {
     const [hoverRating, setHoverRating] = useState(0)
     const [loading, setLoading] = useState(false)
     const [uploading, setUploading] = useState(false)
-    const [error, setError] = useState('')
     const [mediaPreviews, setMediaPreviews] = useState([])
 
     const handleRatingClick = (rating) => {
@@ -32,12 +33,11 @@ export default function ReviewForm({ productId, onSuccess }) {
         const files = Array.from(e.target.files)
 
         if (files.length + mediaPreviews.length > 5) {
-            setError('Maximum 5 images/videos allowed')
+            notification.warning('Maximum 5 images/videos allowed')
             return
         }
 
         setUploading(true)
-        setError('')
 
         try {
             const uploadedUrls = []
@@ -45,13 +45,13 @@ export default function ReviewForm({ productId, onSuccess }) {
             for (const file of files) {
                 // Check file size (max 10MB)
                 if (file.size > 10 * 1024 * 1024) {
-                    setError('Files must be less than 10MB')
+                    notification.warning('Files must be less than 10MB')
                     continue
                 }
 
                 // Check file type
                 if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
-                    setError('Only images and videos are allowed')
+                    notification.warning('Only images and videos are allowed')
                     continue
                 }
 
@@ -81,7 +81,7 @@ export default function ReviewForm({ productId, onSuccess }) {
                 media: [...prev.media, ...uploadedUrls]
             }))
         } catch (err) {
-            setError('Failed to upload media')
+            notification.error('Failed to upload media')
         } finally {
             setUploading(false)
         }
@@ -97,10 +97,9 @@ export default function ReviewForm({ productId, onSuccess }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        setError('')
 
         if (formData.rating === 0) {
-            setError('Please select a rating')
+            notification.warning('Please select a rating')
             return
         }
 
@@ -126,12 +125,15 @@ export default function ReviewForm({ productId, onSuccess }) {
             setFormData({ rating: 0, title: '', content: '', media: [] })
             setMediaPreviews([])
 
+            // Show success notification
+            notification.success('Thank you for your review! It will be published after moderation.')
+
             if (onSuccess) {
                 onSuccess(data.review)
             }
 
         } catch (err) {
-            setError(err.message)
+            notification.error(err.message)
         } finally {
             setLoading(false)
         }
@@ -140,8 +142,6 @@ export default function ReviewForm({ productId, onSuccess }) {
     return (
         <div className={styles.reviewForm}>
             <h3>Write a Review</h3>
-
-            {error && <div className={styles.error}>{error}</div>}
 
             <form onSubmit={handleSubmit}>
                 {/* Star Rating */}

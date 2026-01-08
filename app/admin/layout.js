@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { LayoutDashboard, Package, Briefcase, Star, Home, Settings, LogOut } from 'lucide-react'
+import { LayoutDashboard, Package, Briefcase, Star, MessageSquare, FolderOpen, Home, Settings, LogOut } from 'lucide-react'
 import styles from './admin.module.css'
 
 export default function AdminLayout({ children }) {
@@ -50,8 +50,10 @@ export default function AdminLayout({ children }) {
     const navItems = [
         { href: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
         { href: '/admin/products', icon: Package, label: 'Products', count: counts.products },
+        { href: '/admin/categories', icon: FolderOpen, label: 'Categories' },
         { href: '/admin/projects', icon: Briefcase, label: 'Portfolio', count: counts.projects },
         { href: '/admin/testimonials', icon: Star, label: 'Testimonials', count: counts.testimonials },
+        { href: '/admin/reviews', icon: MessageSquare, label: 'Reviews' },
         { href: '/admin/homepage', icon: Home, label: 'Homepage' },
         { href: '/admin/settings', icon: Settings, label: 'Settings' }
     ]

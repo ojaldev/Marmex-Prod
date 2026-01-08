@@ -7,7 +7,7 @@ const registerSchema = z.object({
     name: z.string().min(2, 'Name must be at least 2 characters'),
     email: z.string().email('Invalid email address'),
     password: z.string().min(8, 'Password must be at least 8 characters'),
-    mobile: z.string().optional()
+    mobile: z.string().min(7, 'Mobile number is required')
 })
 
 export async function POST(request) {
@@ -19,14 +19,26 @@ export async function POST(request) {
 
         await connectDB()
 
-        // Check if user already exists
-        const existingUser = await User.findOne({
+        // Check if email already exists
+        const existingEmail = await User.findOne({
             email: validatedData.email.toLowerCase()
         })
 
-        if (existingUser) {
+        if (existingEmail) {
             return NextResponse.json(
-                { error: 'User with this email already exists' },
+                { error: 'This email address is already registered. Please use a different email or login to your existing account.' },
+                { status: 400 }
+            )
+        }
+
+        // Check if mobile number already exists
+        const existingMobile = await User.findOne({
+            mobile: validatedData.mobile
+        })
+
+        if (existingMobile) {
+            return NextResponse.json(
+                { error: 'This mobile number is already registered. Please use a different mobile number.' },
                 { status: 400 }
             )
         }

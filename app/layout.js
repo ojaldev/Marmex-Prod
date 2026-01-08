@@ -1,8 +1,7 @@
 import './globals.css'
+import Providers from '@/components/providers/Providers'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
-import { CartProvider } from '@/contexts/CartContext'
-import AuthProvider from '@/components/providers/AuthProvider'
 
 export const metadata = {
     title: 'Marmex India - Premium Marble Art & Sculptures',
@@ -14,13 +13,11 @@ export default function RootLayout({ children }) {
     return (
         <html lang="en">
             <body>
-                <AuthProvider>
-                    <CartProvider>
-                        <Header />
-                        {children}
-                        <Footer />
-                    </CartProvider>
-                </AuthProvider>
+                <Providers>
+                    <Header />
+                    {children}
+                    <Footer />
+                </Providers>
             </body>
         </html>
     )

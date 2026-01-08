@@ -4,63 +4,56 @@ import { useState, useEffect } from 'react'
 import { Heart, ShoppingCart, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useCart } from '@/contexts/CartContext'
+import { useWishlist } from '@/contexts/WishlistContext'
 import styles from './wishlist.module.css'
 
 export default function WishlistPage() {
-    const [wishlist, setWishlist] = useState([])
     const [products, setProducts] = useState([])
     const [loading, setLoading] = useState(true)
     const { addToCart } = useCart()
+    const { wishlist, removeFromWishlist, loading: wishlistLoading } = useWishlist()
 
     useEffect(() => {
-        fetchWishlist()
-    }, [])
+        if (!wishlistLoading) {
+            fetchProducts()
+        }
+    }, [wishlist, wishlistLoading])
 
-    const fetchWishlist = async () => {
+    const fetchProducts = async () => {
+        if (wishlist.length === 0) {
+            setProducts([])
+            setLoading(false)
+            return
+        }
+
         try {
-            // Get wishlist product IDs
-            const wishlistRes = await fetch('/api/user/wishlist')
-            const wishlistData = await wishlistRes.json()
+            // Get all products
+            const productsRes = await fetch('/api/products')
+            const allProducts = await productsRes.json()
 
-            if (wishlistData.wishlist?.length > 0) {
-                // Get all products
-                const productsRes = await fetch('/api/products')
-                const allProducts = await productsRes.json()
+            // Filter products that are in wishlist (handle both id and _id)
+            const wishlistProducts = allProducts.filter(p =>
+                wishlist.includes(p.id) || wishlist.includes(p._id)
+            )
 
-                // Filter products that are in wishlist
-                const wishlistProducts = allProducts.filter(p =>
-                    wishlistData.wishlist.includes(p.id)
-                )
-
-                setProducts(wishlistProducts)
-            }
-
-            setWishlist(wishlistData.wishlist || [])
+            setProducts(wishlistProducts)
         } catch (error) {
-            console.error('Failed to fetch wishlist:', error)
+            console.error('Failed to fetch products:', error)
         } finally {
             setLoading(false)
         }
     }
 
-    const removeFromWishlist = async (productId) => {
-        try {
-            await fetch(`/api/user/wishlist?productId=${productId}`, {
-                method: 'DELETE'
-            })
-
-            setProducts(prev => prev.filter(p => p.id !== productId))
-            setWishlist(prev => prev.filter(id => id !== productId))
-        } catch (error) {
-            console.error('Failed to remove from wishlist:', error)
-        }
+    const handleRemove = async (productId) => {
+        await removeFromWishlist(productId)
+        setProducts(prev => prev.filter(p => p.id !== productId && p._id !== productId))
     }
 
     const handleAddToCart = (product) => {
         addToCart(product, 1)
     }
 
-    if (loading) {
+    if (loading || wishlistLoading) {
         return <div className={styles.loading}>Loading wishlist...</div>
     }
 
@@ -82,22 +75,22 @@ export default function WishlistPage() {
                 ) : (
                     <div className={styles.grid}>
                         {products.map(product => (
-                            <div key={product.id} className={styles.card}>
+                            <div key={product._id || product.id} className={styles.card}>
                                 <button
                                     className={styles.removeBtn}
-                                    onClick={() => removeFromWishlist(product.id)}
+                                    onClick={() => handleRemove(product._id || product.id)}
                                 >
                                     <Trash2 size={18} />
                                 </button>
 
-                                <Link href={`/products/${product.id}`} className={styles.imageWrapper}>
-                                    {product.mainImage && (
-                                        <img src={product.mainImage} alt={product.name} />
+                                <Link href={`/products/${product._id || product.id}`} className={styles.imageWrapper}>
+                                    {(product.mainImage || product.images?.[0]) && (
+                                        <img src={product.mainImage || product.images?.[0]} alt={product.name} />
                                     )}
                                 </Link>
 
                                 <div className={styles.info}>
-                                    <Link href={`/products/${product.id}`}>
+                                    <Link href={`/products/${product._id || product.id}`}>
                                         <h3>{product.name}</h3>
                                     </Link>
 
@@ -134,3 +127,4 @@ export default function WishlistPage() {
         </div>
     )
 }
+

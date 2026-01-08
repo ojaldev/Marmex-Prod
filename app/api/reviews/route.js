@@ -96,7 +96,7 @@ export async function GET(request) {
 // Submit a review
 export async function POST(request) {
     try {
-        const session = await getServerSession(authOptions)
+        const session = await auth()
 
         if (!session) {
             return NextResponse.json({ error: 'Please login to submit a review' }, { status: 401 })
@@ -105,10 +105,24 @@ export async function POST(request) {
         const body = await request.json()
         const { productId, rating, title, content, media } = body
 
+        console.log('Review submission data:', { productId, rating, title, content: content?.substring(0, 50), media: media?.length })
+
         // Validation
         if (!productId || !rating || !title || !content) {
+            console.log('Review validation failed:', {
+                hasProductId: !!productId,
+                hasRating: !!rating,
+                hasTitle: !!title,
+                hasContent: !!content
+            })
             return NextResponse.json({
-                error: 'Product ID, rating, title, and content are required'
+                error: 'Product ID, rating, title, and content are required',
+                missing: {
+                    productId: !productId,
+                    rating: !rating,
+                    title: !title,
+                    content: !content
+                }
             }, { status: 400 })
         }
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Save, Image as ImageIcon, Upload, X, Youtube, Instagram } from 'lucide-react'
 import Link from 'next/link'
@@ -10,6 +10,7 @@ export default function NewProductPage() {
     const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [uploadingImage, setUploadingImage] = useState(null)
+    const [categories, setCategories] = useState([])
     const [formData, setFormData] = useState({
         name: '',
         category: '',
@@ -38,6 +39,20 @@ export default function NewProductPage() {
         giftReady: false,
         exportGrade: false,
     })
+
+    // Fetch categories on mount
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const res = await fetch('/api/categories')
+                const data = await res.json()
+                setCategories(data || [])
+            } catch (error) {
+                console.error('Failed to fetch categories:', error)
+            }
+        }
+        fetchCategories()
+    }, [])
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -177,14 +192,17 @@ export default function NewProductPage() {
 
                         <div className={styles.field}>
                             <label>Category *</label>
-                            <input
-                                type="text"
+                            <select
                                 name="category"
                                 value={formData.category}
                                 onChange={handleChange}
                                 required
-                                placeholder="e.g., Stone Sculptures"
-                            />
+                            >
+                                <option value="">Select Category</option>
+                                {categories.map(cat => (
+                                    <option key={cat._id || cat.id} value={cat.name}>{cat.name}</option>
+                                ))}
+                            </select>
                         </div>
 
                         <div className={styles.field}>
