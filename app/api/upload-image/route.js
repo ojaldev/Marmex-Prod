@@ -1,13 +1,19 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { auth } from '@/app/api/auth/[...nextauth]/route'
 import { uploadImage } from '@/lib/cloudinary'
 
 export async function POST(request) {
     try {
-        // Check if user is authenticated
+        // Check for NextAuth session OR admin cookie
         const session = await auth()
+        const cookieStore = await cookies()
+        const adminAuth = cookieStore.get('admin-auth')
 
-        if (!session) {
+        const isAuthenticated = session || (adminAuth && adminAuth.value === 'authenticated')
+
+        if (!isAuthenticated) {
+            console.log('Upload unauthorized: No session and no admin cookie')
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
@@ -34,3 +40,4 @@ export async function POST(request) {
         }, { status: 500 })
     }
 }
+
