@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Package, FileText, MessageSquare, TrendingUp } from 'lucide-react'
+import { Package, FileText, MessageSquare, TrendingUp, Home } from 'lucide-react'
 import styles from './dashboard.module.css'
 
 export default function AdminDashboard() {
@@ -79,30 +79,37 @@ export default function AdminDashboard() {
                         <h3>Active</h3>
                         <p>System Status</p>
                     </div>
-                    <h3>Manage Homepage</h3>
-                    <p>Update hero banner and content</p>
                 </div>
             </div>
 
-
-            {
-                stats.recentProducts.length > 0 && (
-                    <div className={styles.recentSection}>
-                        <h2>Recently Added Products</h2>
-                        <div className={styles.recentList}>
-                            {stats.recentProducts.map(product => (
-                                <div key={product.id} className={`${styles.recentItem} card`}>
-                                    <div className={styles.recentInfo}>
-                                        <h4>{product.name}</h4>
-                                        <p>{product.category}</p>
-                                    </div>
-                                    <Link href={`/admin/products/${product.id}`} className="btn btn-outline btn-sm">Edit</Link>
-                                </div>
-                            ))}
-                        </div>
+            {/* Quick Actions */}
+            <div className={styles.quickActions}>
+                <Link href="/admin/homepage" className={styles.quickAction}>
+                    <Home size={20} />
+                    <div>
+                        <h4>Manage Homepage</h4>
+                        <p>Update hero banner and content</p>
                     </div>
-                )
-            }
-        </div >
+                </Link>
+            </div>
+
+            {stats.recentProducts.length > 0 && (
+                <div className={styles.recentSection}>
+                    <h2>Recently Added Products</h2>
+                    <div className={styles.recentList}>
+                        {stats.recentProducts.map(product => (
+                            <div key={product._id || product.id} className={`${styles.recentItem} card`}>
+                                <div className={styles.recentInfo}>
+                                    <h4>{product.name}</h4>
+                                    <p>{product.category}</p>
+                                </div>
+                                <Link href={`/admin/products/${product._id || product.id}`} className="btn btn-outline btn-sm">Edit</Link>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </div>
     )
 }
+

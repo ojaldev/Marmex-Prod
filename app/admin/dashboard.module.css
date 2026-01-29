@@ -104,6 +104,42 @@
     margin: 0;
 }
 
+.quickAction {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: white;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    transition: var(--transition-smooth);
+    border: 2px solid transparent;
+}
+
+.quickAction:hover {
+    border-color: var(--color-secondary);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.quickAction svg {
+    color: var(--color-secondary);
+    flex-shrink: 0;
+}
+
+.quickAction h4 {
+    font-size: 1.1rem;
+    margin: 0 0 0.25rem 0;
+    color: var(--color-primary);
+}
+
+.quickAction p {
+    color: var(--color-text-gray);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
 .recentSection {
     margin-bottom: var(--spacing-xl);
 }

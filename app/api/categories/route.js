@@ -34,7 +34,21 @@ export async function POST(request) {
 
         const categoryData = await request.json()
 
-        const category = await Category.create(categoryData)
+        // Generate slug if not provided
+        if (!categoryData.slug && categoryData.name) {
+            categoryData.slug = categoryData.name
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/(^-|-$)/g, '')
+        }
+
+        console.log('Creating category with data:', categoryData)
+
+        // Use new + save instead of create for better error handling
+        const category = new Category(categoryData)
+        await category.save()
+
+        console.log('Category created successfully:', category._id)
 
         return NextResponse.json(category, { status: 201 })
     } catch (error) {
@@ -45,3 +59,4 @@ export async function POST(request) {
         }, { status: 500 })
     }
 }
+

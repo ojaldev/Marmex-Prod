@@ -1,5 +1,10 @@
 import mongoose from 'mongoose'
 
+// Delete the model if it exists to ensure fresh schema
+if (mongoose.models.Category) {
+    delete mongoose.models.Category
+}
+
 const categorySchema = new mongoose.Schema({
     name: {
         type: String,
@@ -9,24 +14,27 @@ const categorySchema = new mongoose.Schema({
     },
     slug: {
         type: String,
-        required: true,
         unique: true,
         lowercase: true,
         trim: true
     },
     description: {
         type: String,
-        trim: true
+        trim: true,
+        default: ''
     },
     image: {
-        type: String
+        type: String,
+        default: ''
     },
     icon: {
-        type: String
+        type: String,
+        default: ''
     },
     parentCategory: {
         type: String,
-        trim: true
+        trim: true,
+        default: ''
     },
     order: {
         type: Number,
@@ -42,30 +50,7 @@ const categorySchema = new mongoose.Schema({
 
 // Indexes
 categorySchema.index({ active: 1, order: 1 })
-categorySchema.index({ parentCategory: 1 })
-
-// Virtual for product count (will be populated via aggregation)
-categorySchema.virtual('productCount', {
-    ref: 'Product',
-    localField: 'name',
-    foreignField: 'category',
-    count: true
-})
-
-// Auto-generate slug from name
-categorySchema.pre('save', function (next) {
-    if (this.isModified('name') && !this.slug) {
-        this.slug = this.name
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/(^-|-$)/g, '')
-    }
-    next()
-})
-
-// Ensure virtuals are included
-categorySchema.set('toJSON', { virtuals: true })
-categorySchema.set('toObject', { virtuals: true })
 
 // Export model
-export default mongoose.models.Category || mongoose.model('Category', categorySchema)
+const Category = mongoose.model('Category', categorySchema)
+export default Category
