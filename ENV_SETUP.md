@@ -6,17 +6,17 @@ Create a `.env.local` file in the root directory with the following variables:
 
 ```env
 # MongoDB Connection
-MONGODB_URI=mongodb+srv://marmexindiadb_db_user:HqyPcHdijhDWNZcE@marmex.2yif07q.mongodb.net/marmex?retryWrites=true&w=majority&appName=marmex
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-url>/?retryWrites=true&w=majority
 
 # NextAuth Configuration
 NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=marmex-2025-nextauth-secret-key-change-in-production
+NEXTAUTH_SECRET=your_nextauth_secret_key_here
 
-# Cloudinary (Image Uploads)
-CLOUDINARY_URL=cloudinary://675497825176269:9n5_xYyWtofkVpFEI_pyWmp7gfM@das4iqlfb
-CLOUDINARY_CLOUD_NAME=das4iqlfb
-CLOUDINARY_API_KEY=675497825176269
-CLOUDINARY_API_SECRET=9n5_xYyWtofkVpFEI_pyWmp7gfM
+# Cloudinary (Image Uploads & Automatic Cleanup)
+CLOUDINARY_URL=cloudinary://<api_key>:<api_secret>@<cloud_name>
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 
 # Email Configuration (Gmail SMTP)
 # IMPORTANT: You need to set up an App Password for Gmail
