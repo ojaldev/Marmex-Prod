@@ -60,6 +60,15 @@ export async function DELETE(request, { params }) {
             return NextResponse.json({ error: 'Category not found' }, { status: 404 })
         }
 
+        // Clean up images from Cloudinary
+        const { deleteImageFromUrl } = await import('@/lib/cloudinary');
+        if (category.image) {
+            deleteImageFromUrl(category.image).catch(err => console.error('Failed to delete category image:', err));
+        }
+        if (category.icon) {
+            deleteImageFromUrl(category.icon).catch(err => console.error('Failed to delete category icon:', err));
+        }
+
         return NextResponse.json({ message: 'Category deleted successfully' })
     } catch (error) {
         console.error('Error deleting category:', error)

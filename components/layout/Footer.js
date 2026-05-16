@@ -74,8 +74,8 @@ export default function Footer() {
                     <div className={styles.bottomContent}>
                         <p>&copy; {new Date().getFullYear()} Marmex India. All rights reserved.</p>
                         <div className={styles.legalLinks}>
-                            <Link href="/privacy">Privacy Policy</Link>
-                            <Link href="/terms">Terms of Service</Link>
+                            <Link href="/privacy-policy">Privacy Policy</Link>
+                            <Link href="/terms-of-service">Terms of Service</Link>
                         </div>
                     </div>
                 </div>

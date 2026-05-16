@@ -60,6 +60,27 @@ export async function DELETE(request, { params }) {
             return NextResponse.json({ error: 'Product not found' }, { status: 404 })
         }
 
+        // Clean up images from Cloudinary
+        const { deleteImageFromUrl } = await import('@/lib/cloudinary');
+        
+        // Collect all image URLs
+        const imagesToDelete = [];
+        if (product.mainImage) imagesToDelete.push(product.mainImage);
+        if (product.additionalImages && product.additionalImages.length > 0) {
+            imagesToDelete.push(...product.additionalImages);
+        }
+        if (product.lifestyleImages && product.lifestyleImages.length > 0) {
+            imagesToDelete.push(...product.lifestyleImages);
+        }
+        if (product.packagingImages && product.packagingImages.length > 0) {
+            imagesToDelete.push(...product.packagingImages);
+        }
+
+        // Delete all images without blocking the response
+        Promise.allSettled(imagesToDelete.map(url => deleteImageFromUrl(url)))
+            .then(results => console.log(`Deleted ${results.filter(r => r.status === 'fulfilled').length} images for product ${id}`))
+            .catch(err => console.error('Error during product image cleanup:', err));
+
         return NextResponse.json({ message: 'Product deleted successfully' })
     } catch (error) {
         console.error('Error deleting product:', error)

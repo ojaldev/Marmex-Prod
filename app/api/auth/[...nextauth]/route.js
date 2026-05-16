@@ -1,5 +1,13 @@
-import NextAuth from 'next-auth'
+import NextAuth, { CredentialsSignin } from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
+
+class UserNotFoundError extends CredentialsSignin {
+    code = "User not found."
+}
+
+class InvalidPasswordError extends CredentialsSignin {
+    code = "Invalid password."
+}
 import connectDB from '@/lib/mongodb'
 import User from '@/models/User'
 
@@ -23,13 +31,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     })
 
                     if (!user) {
-                        return null
+                        console.log('Auth: User not found for email', credentials.email)
+                        throw new UserNotFoundError()
                     }
 
                     const isValid = await user.comparePassword(credentials.password)
-
                     if (!isValid) {
-                        return null
+                        console.log('Auth: Invalid password for email', credentials.email)
+                        throw new InvalidPasswordError()
                     }
 
                     return {
@@ -40,8 +49,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                         role: user.role
                     }
                 } catch (error) {
-                    console.error('Auth error:', error)
-                    return null
+                    console.error('CRITICAL AUTH ERROR CAUGHT:', error)
+                    throw error
                 }
             }
         })

@@ -24,7 +24,7 @@ export default function CategoryTiles() {
                     {categories.map((category, index) => (
                         <Link
                             href={`/products?category=${category.slug}`}
-                            key={category.id}
+                            key={category._id || index}
                             className={styles.tile}
                             style={{ animationDelay: `${index * 0.1}s` }}
                         >

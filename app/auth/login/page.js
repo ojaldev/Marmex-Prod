@@ -41,7 +41,17 @@ export default function LoginPage() {
             })
 
             if (result?.error) {
-                setError(result.error)
+                if (result.error === 'CredentialsSignin') {
+                    setError('Invalid email or password.')
+                } else if (result.error === 'CallbackRouteError') {
+                    setError('Authentication failed. Please check your credentials.')
+                } else if (result.error === 'UserNotFoundError' || result.error === 'User not found.') {
+                    setError('User not found.')
+                } else if (result.error === 'InvalidPasswordError' || result.error === 'Invalid password.') {
+                    setError('Invalid password.')
+                } else {
+                    setError(result.error.replace('Error: ', ''))
+                }
             } else {
                 router.push(callbackUrl)
                 router.refresh()
