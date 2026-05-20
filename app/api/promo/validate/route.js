@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@/app/api/auth/[...nextauth]/route'
+import { auth } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import PromoCode from '@/models/PromoCode'
 
 export async function POST(request) {
     try {
-        const session = await getServerSession(authOptions)
+        const session = await auth()
         const { code, orderTotal } = await request.json()
 
         if (!code || !orderTotal) {

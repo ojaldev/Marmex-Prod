@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@/app/api/auth/[...nextauth]/route'
+import { auth } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import Return from '@/models/Return'
 import Order from '@/models/Order'
@@ -8,7 +8,7 @@ import { initiateRefund } from '@/lib/razorpay'
 // Get return details
 export async function GET(request, { params }) {
     try {
-        const session = await getServerSession(authOptions)
+        const session = await auth()
 
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -42,7 +42,7 @@ export async function GET(request, { params }) {
 // Update return status (Admin only)
 export async function PUT(request, { params }) {
     try {
-        const session = await getServerSession(authOptions)
+        const session = await auth()
 
         if (!session || session.user.role !== 'admin') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
@@ -128,7 +128,7 @@ export async function PUT(request, { params }) {
 // Cancel return (User)
 export async function DELETE(request, { params }) {
     try {
-        const session = await getServerSession(authOptions)
+        const session = await auth()
 
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

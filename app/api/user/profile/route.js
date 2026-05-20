@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@/app/api/auth/[...nextauth]/route'
+import { auth } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import User from '@/models/User'
 import { uploadImage } from '@/lib/cloudinary'

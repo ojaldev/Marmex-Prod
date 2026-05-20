@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@/app/api/auth/[...nextauth]/route'
+import { auth } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import Ticket from '@/models/Ticket'
 
 export async function POST(request, { params }) {
     try {
-        const session = await getServerSession(authOptions)
+        const session = await auth()
 
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

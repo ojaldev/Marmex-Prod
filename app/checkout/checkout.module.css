@@ -89,11 +89,77 @@
     font-weight: 700;
 }
 
+.stepWrapper {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    justify-content: center;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    cursor: pointer;
+    transition: all var(--duration-fast);
+}
+
+.stepNumber {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-full);
+    background: var(--color-pearl);
+    color: var(--color-text-gray);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    transition: all var(--duration-normal) var(--ease-elegant);
+    border: 2px solid var(--color-platinum);
+}
+
+.step.completed .stepNumber {
+    background: var(--color-emerald);
+    color: white;
+    border-color: var(--color-emerald);
+}
+
+.step.active .stepNumber {
+    background: var(--color-gold-24k);
+    color: white;
+    border-color: var(--color-gold-24k);
+    box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.2);
+}
+
+.stepLabel {
+    font-size: var(--text-sm);
+    color: var(--color-text-gray);
+    font-weight: 500;
+    transition: all var(--duration-fast);
+}
+
+.step.active .stepLabel {
+    color: var(--color-obsidian);
+    font-weight: 700;
+}
+
+.step.completed .stepLabel {
+    color: var(--color-emerald);
+}
+
 .stepLine {
-    width: 100px;
+    width: 60px;
     height: 2px;
     background: var(--color-platinum);
-    margin: 0 var(--space-lg);
+    margin: 0 var(--space-md);
+    flex-shrink: 0;
+    position: relative;
+    top: -14px;
+}
+
+.stepLine.completedLine {
+    background: var(--color-emerald);
 }
 
 /* ===== LAYOUT ===== */
@@ -355,5 +421,217 @@
 
     .inputGrid {
         grid-template-columns: 1fr;
+    }
+}
+/* Step Navigation */
+.nextStepBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, var(--color-obsidian), #1a1a1a);
+    color: var(--color-gold-24k);
+    border: 1px solid rgba(212, 165, 116, 0.2);
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all var(--duration-normal) var(--ease-elegant);
+    width: 100%;
+    margin-top: var(--space-lg);
+}
+
+.nextStepBtn:hover {
+    border-color: var(--color-gold-24k);
+    box-shadow: var(--shadow-gold);
+    transform: translateY(-2px);
+}
+
+.backStepBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    color: var(--color-text-gray);
+    border: 2px solid var(--color-platinum);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    cursor: pointer;
+    transition: all var(--duration-fast);
+}
+
+.backStepBtn:hover {
+    border-color: var(--color-gold-24k);
+    color: var(--color-gold-24k);
+}
+
+.stepNav {
+    display: flex;
+    gap: var(--space-md);
+    margin-top: var(--space-lg);
+}
+
+.stepNav .nextStepBtn,
+.stepNav .backStepBtn {
+    width: auto;
+    margin-top: 0;
+}
+
+/* Payment Options */
+.paymentOptions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.paymentOption {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    background: white;
+    border: 2px solid var(--color-platinum);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all var(--duration-fast);
+}
+
+.paymentOption:hover {
+    border-color: var(--color-champagne);
+}
+
+.paymentOption.selected {
+    border-color: var(--color-gold-24k);
+    background: rgba(212, 165, 116, 0.03);
+    box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.08);
+}
+
+.paymentOption input {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--color-gold-24k);
+}
+
+.paymentContent {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.paymentContent strong {
+    font-size: var(--text-base);
+    color: var(--color-obsidian);
+}
+
+.paymentContent span {
+    font-size: var(--text-sm);
+    color: var(--color-text-gray);
+}
+
+/* Review Section */
+.reviewSection {
+    padding: var(--space-md) 0;
+    border-bottom: 1px solid var(--color-platinum);
+}
+
+.reviewSection:last-child {
+    border-bottom: none;
+}
+
+.reviewSection h4 {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-text-gray);
+    margin-bottom: var(--space-sm);
+}
+
+.reviewSection p {
+    margin: 0;
+    color: var(--color-obsidian);
+    font-size: var(--text-base);
+}
+
+/* Summary Item Image */
+.itemImageSmall {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--color-pearl);
+}
+
+/* Discount text */
+.discount {
+    color: var(--color-emerald);
+    font-weight: 600;
+}
+
+/* Step wrapper for progress */
+.stepWrapper {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    justify-content: center;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    cursor: pointer;
+    transition: all var(--duration-fast);
+}
+
+.step.completed .stepNumber {
+    background: var(--color-emerald);
+    color: white;
+    border-color: var(--color-emerald);
+}
+
+.step.active .stepNumber {
+    background: var(--color-gold-24k);
+    color: white;
+    border-color: var(--color-gold-24k);
+    box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.2);
+}
+
+.step.completed .stepLabel {
+    color: var(--color-emerald);
+}
+
+.stepLine.completedLine {
+    background: var(--color-emerald);
+}
+
+@media (max-width: 1024px) {
+    .stepWrapper {
+        flex: none;
+    }
+    .stepLine {
+        display: none;
+    }
+    .progressSteps {
+        gap: var(--space-md);
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 768px) {
+    .stepNav {
+        flex-direction: column;
+    }
+    .stepNav .nextStepBtn,
+    .stepNav .backStepBtn {
+        width: 100%;
     }
 }

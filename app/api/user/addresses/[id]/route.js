@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@/app/api/auth/[...nextauth]/route'
+import { auth } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import User from '@/models/User'
 
 export async function PUT(request, { params }) {
     try {
-        const session = await getServerSession(authOptions)
+        const session = await auth()
 
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -50,7 +50,7 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
     try {
-        const session = await getServerSession(authOptions)
+        const session = await auth()
 
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@/app/api/auth/[...nextauth]/route'
+import { auth } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import Order from '@/models/Order'
 
 export async function PUT(request, { params }) {
     try {
-        const session = await getServerSession(authOptions)
+        const session = await auth()
 
         if (!session || session.user.role !== 'admin') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })

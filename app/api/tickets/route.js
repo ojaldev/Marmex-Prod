@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@/app/api/auth/[...nextauth]/route'
+import { auth } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import Ticket from '@/models/Ticket'
 
 // Get all tickets for user
 export async function GET(request) {
     try {
-        const session = await getServerSession(authOptions)
+        const session = await auth()
 
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -38,7 +38,7 @@ export async function GET(request) {
 // Create ticket
 export async function POST(request) {
     try {
-        const session = await getServerSession(authOptions)
+        const session = await auth()
 
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

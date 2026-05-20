@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@/app/api/auth/[...nextauth]/route'
+import { auth } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import Order from '@/models/Order'
 import { sendOrderConfirmationEmail } from '@/lib/email'
@@ -7,7 +7,7 @@ import { sendOrderConfirmationEmail } from '@/lib/email'
 // Get user's order history
 export async function GET(request) {
     try {
-        const session = await getServerSession(authOptions)
+        const session = await auth()
 
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -52,7 +52,7 @@ export async function GET(request) {
 // Create new order
 export async function POST(request) {
     try {
-        const session = await getServerSession(authOptions)
+        const session = await auth()
         const body = await request.json()
 
         const {

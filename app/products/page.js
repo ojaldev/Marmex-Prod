@@ -2,22 +2,34 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { motion, AnimatePresence } from 'framer-motion'
 import ProductCard from '@/components/ui/ProductCard'
 import { ProductListSkeleton } from '@/components/ui/SkeletonLoader'
-import { Filter, Package } from 'lucide-react'
+import { Filter, Package, X, SlidersHorizontal, Grid3X3, LayoutGrid } from 'lucide-react'
+import { fadeInUp, staggerContainer } from '@/lib/animations'
 import styles from './products.module.css'
 
 export default function ProductsPage() {
     const searchParams = useSearchParams()
-    const category = searchParams.get('category')
+    const categoryParam = searchParams.get('category')
+    const searchQuery = searchParams.get('search')
 
     const [products, setProducts] = useState([])
     const [categories, setCategories] = useState([])
     const [loading, setLoading] = useState(true)
-    const [selectedCategory, setSelectedCategory] = useState(category || 'all')
+    const [selectedCategory, setSelectedCategory] = useState(categoryParam || 'all')
+    const [sortBy, setSortBy] = useState('featured')
     const [gridColumns, setGridColumns] = useState(3)
+    const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+    const [priceRange, setPriceRange] = useState([0, 100000])
+
+    useEffect(() => {
+        if (categoryParam) {
+            setSelectedCategory(categoryParam)
+        }
+    }, [categoryParam])
 
     useEffect(() => {
         loadData()
@@ -33,9 +45,7 @@ export default function ProductsPage() {
             const productsData = await productsRes.json()
             const categoriesData = await categoriesRes.json()
 
-            // Handle new MongoDB API format {products: [], pagination: {}}
             const productList = productsData.products || productsData
-
             setProducts(productList)
             setCategories(categoriesData)
         } catch (error) {
@@ -45,20 +55,156 @@ export default function ProductsPage() {
         }
     }
 
-    const filteredProducts = selectedCategory === 'all'
-        ? products
-        : products.filter(p => p.category === selectedCategory)
+    // Filter and sort
+    const filteredProducts = useMemo(() => {
+        let result = [...products]
 
-    return (
-        <main className={styles.productsPage}>
-            <div className={styles.hero}>
-                <div className="container">
-                    <h1>Our Products</h1>
-                    <p>Discover exquisite handcrafted marble and stone art</p>
+        // Category filter
+        if (selectedCategory !== 'all') {
+            result = result.filter(p =>
+                p.category === selectedCategory ||
+                p.category?.toLowerCase().includes(selectedCategory.toLowerCase())
+            )
+        }
+
+        // Search filter
+        if (searchQuery) {
+            const q = searchQuery.toLowerCase()
+            result = result.filter(p =>
+                p.name?.toLowerCase().includes(q) ||
+                p.category?.toLowerCase().includes(q) ||
+                p.tags?.some(t => t.toLowerCase().includes(q))
+            )
+        }
+
+        // Price filter
+        result = result.filter(p => {
+            const price = p.discount > 0 ? p.price * (100 - p.discount) / 100 : p.price
+            return price >= priceRange[0] && price <= priceRange[1]
+        })
+
+        // Sort
+        switch (sortBy) {
+            case 'price-low':
+                result.sort((a, b) => (a.price || 0) - (b.price || 0))
+                break
+            case 'price-high':
+                result.sort((a, b) => (b.price || 0) - (a.price || 0))
+                break
+            case 'name':
+                result.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+                break
+            case 'newest':
+                result.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+                break
+            default:
+                // Featured - no specific sort
+                break
+        }
+
+        return result
+    }, [products, selectedCategory, sortBy, searchQuery, priceRange])
+
+    const activeFiltersCount = (selectedCategory !== 'all' ? 1 : 0) + (searchQuery ? 1 : 0)
+
+    const clearFilters = () => {
+        setSelectedCategory('all')
+        setPriceRange([0, 100000])
+    }
+
+    // Filter sidebar content
+    const FilterContent = () => (
+        <>
+            <div className={styles.filterSection}>
+                <h3><Filter size={18} /> Categories</h3>
+                <div className={styles.filterList}>
+                    <button
+                        className={selectedCategory === 'all' ? styles.active : ''}
+                        onClick={() => setSelectedCategory('all')}
+                    >
+                        All Products
+                        <span className={styles.filterCount}>{products.length}</span>
+                    </button>
+                    {categories.map(cat => (
+                        <button
+                            key={cat.id || cat._id}
+                            className={selectedCategory === cat.name ? styles.active : ''}
+                            onClick={() => setSelectedCategory(cat.name)}
+                        >
+                            {cat.name}
+                            <span className={styles.filterCount}>
+                                {products.filter(p => p.category === cat.name).length}
+                            </span>
+                        </button>
+                    ))}
                 </div>
             </div>
 
+            {/* Active Filters */}
+            {activeFiltersCount > 0 && (
+                <motion.div
+                    className={styles.activeFilters}
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                >
+                    <div className={styles.filterChips}>
+                        {selectedCategory !== 'all' && (
+                            <span className={styles.chip}>
+                                {selectedCategory}
+                                <button onClick={() => setSelectedCategory('all')}>
+                                    <X size={14} />
+                                </button>
+                            </span>
+                        )}
+                        {searchQuery && (
+                            <span className={styles.chip}>
+                                Search: "{searchQuery}"
+                                <button onClick={() => { /* would need router */ }}>
+                                    <X size={14} />
+                                </button>
+                            </span>
+                        )}
+                    </div>
+                    <button className={styles.clearAll} onClick={clearFilters}>
+                        Clear all filters
+                    </button>
+                </motion.div>
+            )}
+        </>
+    )
+
+    return (
+        <div className={styles.productsPage}>
+            {/* Hero */}
+            <motion.div
+                className={styles.hero}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6 }}
+            >
+                <div className="container">
+                    <motion.h1
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2, duration: 0.6 }}
+                    >
+                        {searchQuery ? `Search: "${searchQuery}"` : 'Our Products'}
+                    </motion.h1>
+                    <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3, duration: 0.6 }}
+                    >
+                        {searchQuery
+                            ? `Found ${filteredProducts.length} result${filteredProducts.length !== 1 ? 's' : ''}`
+                            : 'Discover exquisite handcrafted marble and stone art'
+                        }
+                    </motion.p>
+                </div>
+            </motion.div>
+
             <div className="container">
+                {/* Toolbar */}
                 <div className={styles.toolbar}>
                     <div className={styles.toolbarLeft}>
                         <h2 className={styles.resultsCount}>
@@ -67,109 +213,136 @@ export default function ProductsPage() {
                     </div>
 
                     <div className={styles.toolbarRight}>
-                        {/* Sort Dropdown */}
-                        <select
-                            className={styles.sortSelect}
-                            onChange={(e) => {
-                                const sorted = [...filteredProducts].sort((a, b) => {
-                                    switch (e.target.value) {
-                                        case 'price-low': return (a.price || 0) - (b.price || 0)
-                                        case 'price-high': return (b.price || 0) - (a.price || 0)
-                                        case 'name': return (a.name || '').localeCompare(b.name || '')
-                                        default: return 0
-                                    }
-                                })
-                                setProducts(sorted)
-                            }}
-                        >
-                            <option value="featured">Featured</option>
-                            <option value="price-low">Price: Low to High</option>
-                            <option value="price-high">Price: High to Low</option>
-                            <option value="name">Name: A-Z</option>
-                        </select>
+                        {/* Sort */}
+                        <div className={styles.sortWrapper}>
+                            <SlidersHorizontal size={16} className="text-[var(--color-text-gray)]" />
+                            <select
+                                className={styles.sortSelect}
+                                value={sortBy}
+                                onChange={(e) => setSortBy(e.target.value)}
+                            >
+                                <option value="featured">Featured</option>
+                                <option value="newest">Newest</option>
+                                <option value="price-low">Price: Low to High</option>
+                                <option value="price-high">Price: High to Low</option>
+                                <option value="name">Name: A-Z</option>
+                            </select>
+                        </div>
 
-                        {/* Grid View Toggle */}
+                        {/* Grid Toggle */}
                         <div className={styles.viewToggle}>
                             <button
                                 className={`${styles.viewBtn} ${gridColumns === 2 ? styles.active : ''}`}
                                 onClick={() => setGridColumns(2)}
                                 aria-label="2 columns"
                             >
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <rect x="2" y="2" width="7" height="16" rx="1" fill="currentColor" />
-                                    <rect x="11" y="2" width="7" height="16" rx="1" fill="currentColor" />
-                                </svg>
+                                <LayoutGrid size={18} />
                             </button>
                             <button
                                 className={`${styles.viewBtn} ${gridColumns === 3 ? styles.active : ''}`}
                                 onClick={() => setGridColumns(3)}
                                 aria-label="3 columns"
                             >
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <rect x="2" y="2" width="5" height="16" rx="1" fill="currentColor" />
-                                    <rect x="8" y="2" width="5" height="16" rx="1" fill="currentColor" />
-                                    <rect x="14" y="2" width="4" height="16" rx="1" fill="currentColor" />
-                                </svg>
-                            </button>
-                            <button
-                                className={`${styles.viewBtn} ${gridColumns === 4 ? styles.active : ''}`}
-                                onClick={() => setGridColumns(4)}
-                                aria-label="4 columns"
-                            >
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <rect x="2" y="2" width="4" height="16" rx="1" fill="currentColor" />
-                                    <rect x="7" y="2" width="4" height="16" rx="1" fill="currentColor" />
-                                    <rect x="12" y="2" width="4" height="16" rx="1" fill="currentColor" />
-                                    <rect x="17" y="2" width="1" height="16" rx="0.5" fill="currentColor" />
-                                </svg>
+                                <Grid3X3 size={18} />
                             </button>
                         </div>
+
+                        {/* Mobile Filter Toggle */}
+                        <button
+                            className={styles.mobileFilterBtn}
+                            onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
+                        >
+                            <Filter size={18} />
+                            Filters
+                            {activeFiltersCount > 0 && (
+                                <span className={styles.filterBadge}>{activeFiltersCount}</span>
+                            )}
+                        </button>
                     </div>
                 </div>
 
                 <div className={styles.layout}>
+                    {/* Desktop Sidebar */}
                     <aside className={styles.sidebar}>
-                        <div className={styles.filterSection}>
-                            <h3><Filter size={18} /> Filter by Category</h3>
-                            <div className={styles.filterList}>
-                                <button
-                                    className={selectedCategory === 'all' ? styles.active : ''}
-                                    onClick={() => setSelectedCategory('all')}
-                                >
-                                    All Products ({products.length})
-                                </button>
-                                {categories.map(cat => (
-                                    <button
-                                        key={cat.id}
-                                        className={selectedCategory === cat.name ? styles.active : ''}
-                                        onClick={() => setSelectedCategory(cat.name)}
-                                    >
-                                        {cat.name}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
+                        <FilterContent />
                     </aside>
 
+                    {/* Mobile Filter Drawer */}
+                    <AnimatePresence>
+                        {mobileFiltersOpen && (
+                            <>
+                                <motion.div
+                                    className={styles.mobileOverlay}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    onClick={() => setMobileFiltersOpen(false)}
+                                />
+                                <motion.div
+                                    className={styles.mobileDrawer}
+                                    initial={{ x: '-100%' }}
+                                    animate={{ x: 0 }}
+                                    exit={{ x: '-100%' }}
+                                    transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                                >
+                                    <div className={styles.mobileDrawerHeader}>
+                                        <h3>Filters</h3>
+                                        <button onClick={() => setMobileFiltersOpen(false)}>
+                                            <X size={24} />
+                                        </button>
+                                    </div>
+                                    <FilterContent />
+                                </motion.div>
+                            </>
+                        )}
+                    </AnimatePresence>
+
+                    {/* Product Grid */}
                     <div className={styles.content}>
                         {loading ? (
-                            <ProductListSkeleton count={6} />
+                            <ProductListSkeleton count={9} columns={gridColumns} />
                         ) : filteredProducts.length === 0 ? (
-                            <div className={styles.empty}>
-                                <Package size={64} color="var(--color-text-light)" />
+                            <motion.div
+                                className={styles.empty}
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.5 }}
+                            >
+                                <Package size={64} className="text-[var(--color-platinum)] mx-auto mb-4" />
                                 <h3>No products found</h3>
-                                <p>Check back soon for new items or browse all categories</p>
-                            </div>
+                                <p>Try adjusting your filters or browse all categories</p>
+                                <button onClick={clearFilters} className="btn btn-primary mt-4">
+                                    Clear Filters
+                                </button>
+                            </motion.div>
                         ) : (
-                            <div className={styles.grid} style={{ gridTemplateColumns: `repeat(${gridColumns}, 1fr)` }}>
-                                {filteredProducts.map(product => (
-                                    <ProductCard key={product.id} product={product} />
-                                ))}
-                            </div>
+                            <motion.div
+                                className={styles.grid}
+                                style={{ gridTemplateColumns: `repeat(${gridColumns}, 1fr)` }}
+                                variants={staggerContainer}
+                                initial="hidden"
+                                animate="visible"
+                            >
+                                <AnimatePresence mode="popLayout">
+                                    {filteredProducts.map((product) => (
+                                        <motion.div
+                                            key={product._id || product.id}
+                                            variants={fadeInUp}
+                                            layout
+                                            initial={{ opacity: 0, scale: 0.9 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            exit={{ opacity: 0, scale: 0.9 }}
+                                            transition={{ duration: 0.3 }}
+                                        >
+                                            <ProductCard product={product} />
+                                        </motion.div>
+                                    ))}
+                                </AnimatePresence>
+                            </motion.div>
                         )}
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
     )
 }

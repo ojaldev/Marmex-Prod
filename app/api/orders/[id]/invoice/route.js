@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@/app/api/auth/[...nextauth]/route'
+import { auth } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import Order from '@/models/Order'
 import { generateInvoicePDF } from '@/lib/invoice'
 
 export async function GET(request, { params }) {
     try {
-        const session = await getServerSession(authOptions)
+        const session = await auth()
         const orderId = params.id
 
         await connectDB()

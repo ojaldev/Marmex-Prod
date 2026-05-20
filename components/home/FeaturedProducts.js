@@ -2,8 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
 import ProductCard from '@/components/ui/ProductCard'
-import { ChevronRight, Sparkles } from 'lucide-react'
+import SectionHeader from '@/components/ui/SectionHeader'
+import { ProductListSkeleton } from '@/components/ui/SkeletonLoader'
+import { fadeInUp, staggerContainer } from '@/lib/animations'
 import styles from './FeaturedProducts.module.css'
 
 export default function FeaturedProducts() {
@@ -18,18 +21,13 @@ export default function FeaturedProducts() {
         try {
             const res = await fetch('/api/products')
             const data = await res.json()
-
-            // Handle new API response format {products: [], pagination: {}}
             const productList = data.products || data
 
-            // Filter products with highlight="Featured" or "New" or just take first 6
             const featured = productList
                 .filter(p => p.highlight === 'Featured' || p.highlight === 'New' || p.discount > 0)
                 .slice(0, 6)
 
-            // If we don't have enough featured, just take the first 6 products
             const finalProducts = featured.length >= 4 ? featured : productList.slice(0, 6)
-
             setProducts(finalProducts)
         } catch (error) {
             console.error('Failed to load featured products:', error)
@@ -42,45 +40,43 @@ export default function FeaturedProducts() {
         return (
             <section className={styles.featured}>
                 <div className="container">
-                    <div className={styles.loading}>Loading featured products...</div>
+                    <ProductListSkeleton count={6} columns={3} />
                 </div>
             </section>
         )
     }
 
-    if (products.length === 0) {
-        return null
-    }
+    if (products.length === 0) return null
 
     return (
         <section className={styles.featured}>
             <div className="container">
-                <div className={styles.header}>
-                    <div className={styles.titleWrapper}>
-                        <Sparkles className={styles.sparkleIcon} size={32} />
-                        <h2 className="section-title">Featured Collection</h2>
-                    </div>
-                    <p className={styles.subtitle}>
-                        Handpicked masterpieces showcasing our finest craftsmanship
-                    </p>
-                    <Link href="/products" className={styles.viewAll}>
-                        View All Products <ChevronRight size={20} />
-                    </Link>
-                </div>
-
-                <div className={styles.grid}>
-                    {products.map((product, index) => (
-                        <ProductCard key={product._id || index} product={product} />
-                    ))}
-                </div>
-
-                {products.length > 0 && (
-                    <div className={styles.cta}>
+                <SectionHeader
+                    title="Featured Collection"
+                    subtitle="Handpicked masterpieces showcasing our finest craftsmanship"
+                    action={
                         <Link href="/products" className="btn btn-primary">
-                            Explore Full Collection
+                            View All Products
                         </Link>
-                    </div>
-                )}
+                    }
+                />
+
+                <motion.div
+                    className={styles.grid}
+                    variants={staggerContainer}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: '-50px' }}
+                >
+                    {products.map((product, index) => (
+                        <motion.div
+                            key={product._id || index}
+                            variants={fadeInUp}
+                        >
+                            <ProductCard product={product} />
+                        </motion.div>
+                    ))}
+                </motion.div>
             </div>
         </section>
     )

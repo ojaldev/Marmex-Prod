@@ -479,6 +479,201 @@
     gap: var(--space-xl);
 }
 
+/* ===== LIGHTBOX ===== */
+.lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+}
+
+.lightboxClose {
+    position: absolute;
+    top: var(--space-xl);
+    right: var(--space-xl);
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--duration-fast);
+    z-index: 10;
+}
+
+.lightboxClose:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.lightboxNav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--duration-fast);
+    z-index: 10;
+}
+
+.lightboxNav:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.lightboxPrev {
+    left: var(--space-xl);
+}
+
+.lightboxNext {
+    right: var(--space-xl);
+}
+
+.lightboxImage {
+    position: relative;
+    width: 90vw;
+    height: 85vh;
+}
+
+.lightboxCounter {
+    position: absolute;
+    bottom: var(--space-xl);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-full);
+    font-size: var(--text-sm);
+    font-weight: 600;
+}
+
+/* ===== STICKY MOBILE BAR ===== */
+.stickyBar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--color-platinum);
+    padding: var(--space-md) var(--space-lg);
+    z-index: 90;
+    display: none;
+}
+
+.stickyContent {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+}
+
+.stickyInfo {
+    flex: 1;
+    min-width: 0;
+}
+
+.stickyName {
+    font-weight: 600;
+    font-size: var(--text-sm);
+    color: var(--color-obsidian);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+}
+
+.stickyPrice {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-gold-24k);
+    margin: 0;
+}
+
+.stickyActions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.stickyAddToCart {
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, var(--color-obsidian), #1a1a1a);
+    color: var(--color-gold-24k);
+    border: 1px solid rgba(212, 165, 116, 0.2);
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: var(--text-sm);
+    cursor: pointer;
+    transition: all var(--duration-fast);
+    white-space: nowrap;
+}
+
+.stickyAddToCart:hover {
+    border-color: var(--color-gold-24k);
+    box-shadow: var(--shadow-gold);
+}
+
+.stickyAddToCart.added {
+    background: var(--color-emerald);
+    color: white;
+    border-color: var(--color-emerald);
+}
+
+/* ===== ZOOM HINT ===== */
+.zoomHint {
+    position: absolute;
+    bottom: var(--space-md);
+    right: var(--space-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border-radius: var(--radius-md);
+    font-size: var(--text-xs);
+    opacity: 0;
+    transition: opacity var(--duration-fast);
+    pointer-events: none;
+    z-index: 3;
+}
+
+.mainImage:hover .zoomHint {
+    opacity: 1;
+}
+
+/* ===== OUT OF STOCK ===== */
+.outOfStock {
+    color: var(--color-ruby);
+    font-weight: 600;
+    font-size: var(--text-sm);
+}
+
+.addToCart.added {
+    background: var(--color-emerald) !important;
+    color: white !important;
+    border-color: var(--color-emerald) !important;
+}
+
 /* ===== STATES ===== */
 .loading,
 .notFound {
@@ -534,6 +729,18 @@
 
     .relatedGrid {
         grid-template-columns: 1fr;
+    }
+
+    .lightboxNav {
+        display: none;
+    }
+
+    .stickyBar {
+        display: block;
+    }
+
+    .main {
+        padding-bottom: 80px;
     }
 }
 

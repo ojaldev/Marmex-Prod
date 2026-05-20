@@ -1,10 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Heart, ShoppingCart, Trash2 } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { Heart, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
+import ProductCard from '@/components/ui/ProductCard'
+import { ProductListSkeleton } from '@/components/ui/SkeletonLoader'
 import { useCart } from '@/contexts/CartContext'
 import { useWishlist } from '@/contexts/WishlistContext'
+import { fadeInUp, staggerContainer } from '@/lib/animations'
 import styles from './wishlist.module.css'
 
 export default function WishlistPage() {
@@ -27,13 +31,15 @@ export default function WishlistPage() {
         }
 
         try {
-            // Get all products
             const productsRes = await fetch('/api/products')
-            const allProducts = await productsRes.json()
+            const productsData = await productsRes.json()
+            const allProducts = productsData.products || productsData || []
 
             // Filter products that are in wishlist (handle both id and _id)
             const wishlistProducts = allProducts.filter(p =>
-                wishlist.includes(p.id) || wishlist.includes(p._id)
+                wishlist.includes(p._id?.toString()) ||
+                wishlist.includes(p.id) ||
+                wishlist.includes(p._id)
             )
 
             setProducts(wishlistProducts)
@@ -44,87 +50,77 @@ export default function WishlistPage() {
         }
     }
 
-    const handleRemove = async (productId) => {
-        await removeFromWishlist(productId)
-        setProducts(prev => prev.filter(p => p.id !== productId && p._id !== productId))
-    }
-
     const handleAddToCart = (product) => {
         addToCart(product, 1)
     }
 
     if (loading || wishlistLoading) {
-        return <div className={styles.loading}>Loading wishlist...</div>
+        return (
+            <div className={styles.wishlistPage}>
+                <div className="container">
+                    <div className="section-title">My Wishlist</div>
+                    <ProductListSkeleton count={6} columns={3} />
+                </div>
+            </div>
+        )
     }
 
     return (
         <div className={styles.wishlistPage}>
             <div className="container">
-                <h1>My Wishlist</h1>
-                <p className={styles.count}>{products.length} {products.length === 1 ? 'item' : 'items'}</p>
+                <motion.div
+                    className={styles.header}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <h1 className="section-title" style={{ marginBottom: 'var(--space-sm)' }}>
+                        My Wishlist
+                    </h1>
+                    <p className={styles.count}>
+                        {products.length} {products.length === 1 ? 'item' : 'items'} saved
+                    </p>
+                </motion.div>
 
                 {products.length === 0 ? (
-                    <div className={styles.empty}>
-                        <Heart size={64} />
+                    <motion.div
+                        className={styles.empty}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <div className={styles.emptyIcon}>
+                            <Heart size={56} />
+                        </div>
                         <h2>Your wishlist is empty</h2>
-                        <p>Start adding items you love!</p>
+                        <p>Save your favorite pieces and find them here anytime.</p>
                         <Link href="/products" className="btn btn-primary">
+                            <ShoppingBag size={18} />
                             Browse Products
                         </Link>
-                    </div>
+                    </motion.div>
                 ) : (
-                    <div className={styles.grid}>
+                    <motion.div
+                        className={styles.grid}
+                        variants={staggerContainer}
+                        initial="hidden"
+                        animate="visible"
+                    >
                         {products.map(product => (
-                            <div key={product._id || product.id} className={styles.card}>
-                                <button
-                                    className={styles.removeBtn}
-                                    onClick={() => handleRemove(product._id || product.id)}
-                                >
-                                    <Trash2 size={18} />
-                                </button>
-
-                                <Link href={`/products/${product._id || product.id}`} className={styles.imageWrapper}>
-                                    {(product.mainImage || product.images?.[0]) && (
-                                        <img src={product.mainImage || product.images?.[0]} alt={product.name} />
-                                    )}
-                                </Link>
-
-                                <div className={styles.info}>
-                                    <Link href={`/products/${product._id || product.id}`}>
-                                        <h3>{product.name}</h3>
-                                    </Link>
-
-                                    <div className={styles.price}>
-                                        {product.discount > 0 ? (
-                                            <>
-                                                <span className={styles.currentPrice}>
-                                                    ₹{Math.round(product.price * (1 - product.discount / 100)).toLocaleString()}
-                                                </span>
-                                                <span className={styles.originalPrice}>
-                                                    ₹{product.price?.toLocaleString()}
-                                                </span>
-                                            </>
-                                        ) : (
-                                            <span className={styles.currentPrice}>
-                                                ₹{product.price?.toLocaleString()}
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    <button
-                                        onClick={() => handleAddToCart(product)}
-                                        className={styles.addToCartBtn}
-                                    >
-                                        <ShoppingCart size={18} />
-                                        Add to Cart
-                                    </button>
-                                </div>
-                            </div>
+                            <motion.div
+                                key={product._id || product.id}
+                                variants={fadeInUp}
+                                layout
+                            >
+                                <ProductCard
+                                    product={product}
+                                    onAddToCart={handleAddToCart}
+                                />
+                            </motion.div>
                         ))}
-                    </div>
+                    </motion.div>
                 )}
             </div>
         </div>
     )
 }
-

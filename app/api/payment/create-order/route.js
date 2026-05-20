@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@/app/api/auth/[...nextauth]/route'
+import { auth } from '@/lib/auth'
 import { createRazorpayOrder } from '@/lib/razorpay'
 
 export async function POST(request) {
     try {
-        const session = await getServerSession(authOptions)
+        const session = await auth()
         const { amount, orderId, customerInfo } = await request.json()
 
         if (!amount || !orderId) {

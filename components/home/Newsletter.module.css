@@ -1,0 +1,107 @@
+.section {
+    padding: var(--space-4xl) 0;
+    background: linear-gradient(180deg, var(--color-surface-muted) 0%, var(--color-pearl) 100%);
+}
+
+.wrapper {
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.iconWrapper {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(135deg, rgba(212, 165, 116, 0.1), rgba(212, 165, 116, 0.05));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--space-lg);
+    color: var(--color-gold-24k);
+}
+
+.title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    color: var(--color-obsidian);
+    margin-bottom: var(--space-md);
+}
+
+.description {
+    font-size: var(--text-base);
+    color: var(--color-text-gray);
+    line-height: 1.7;
+    margin-bottom: var(--space-2xl);
+}
+
+.form {
+    width: 100%;
+}
+
+.inputWrapper {
+    display: flex;
+    gap: var(--space-sm);
+    background: var(--color-surface);
+    border: 2px solid var(--color-platinum);
+    border-radius: var(--radius-xl);
+    padding: 0.5rem;
+    transition: all var(--duration-fast) var(--ease-smooth);
+}
+
+.inputWrapper:focus-within {
+    border-color: var(--color-gold-24k);
+    box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.1);
+}
+
+.input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: var(--space-md) var(--space-lg);
+    font-size: var(--text-base);
+    color: var(--color-obsidian);
+    outline: none;
+}
+
+.input::placeholder {
+    color: var(--color-text-muted);
+}
+
+.submitBtn {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    background: var(--color-obsidian);
+    color: var(--color-gold-24k);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-smooth);
+    flex-shrink: 0;
+}
+
+.submitBtn:hover {
+    background: var(--color-gold-24k);
+    color: var(--color-obsidian);
+}
+
+.successMessage {
+    margin-top: var(--space-md);
+    color: var(--color-emerald);
+    font-size: var(--text-sm);
+    font-weight: 600;
+}
+
+@media (max-width: 640px) {
+    .inputWrapper {
+        flex-direction: column;
+    }
+    .submitBtn {
+        width: 100%;
+        height: 48px;
+    }
+}
