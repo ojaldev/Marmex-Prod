@@ -25,6 +25,25 @@ export default function ProductsPage() {
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
     const [priceRange, setPriceRange] = useState([0, 100000])
 
+    // Resolve category param to actual category name (handles both slug and name)
+    const resolvedCategoryName = useMemo(() => {
+        if (!selectedCategory || selectedCategory === 'all') return 'all'
+        const decoded = decodeURIComponent(selectedCategory)
+        // Try exact match first
+        const exactMatch = categories.find(c => c.name === decoded)
+        if (exactMatch) return exactMatch.name
+        // Try slug match
+        const slugMatch = categories.find(c => c.slug === decoded)
+        if (slugMatch) return slugMatch.name
+        // Try case-insensitive match
+        const caseMatch = categories.find(c =>
+            c.name.toLowerCase() === decoded.toLowerCase()
+        )
+        if (caseMatch) return caseMatch.name
+        // Fallback: return decoded (for direct name matches from products)
+        return decoded
+    }, [selectedCategory, categories])
+
     useEffect(() => {
         if (categoryParam) {
             setSelectedCategory(categoryParam)
@@ -60,10 +79,10 @@ export default function ProductsPage() {
         let result = [...products]
 
         // Category filter
-        if (selectedCategory !== 'all') {
+        if (resolvedCategoryName !== 'all') {
             result = result.filter(p =>
-                p.category === selectedCategory ||
-                p.category?.toLowerCase().includes(selectedCategory.toLowerCase())
+                p.category === resolvedCategoryName ||
+                p.category?.toLowerCase() === resolvedCategoryName.toLowerCase()
             )
         }
 
@@ -105,11 +124,17 @@ export default function ProductsPage() {
         return result
     }, [products, selectedCategory, sortBy, searchQuery, priceRange])
 
-    const activeFiltersCount = (selectedCategory !== 'all' ? 1 : 0) + (searchQuery ? 1 : 0)
+    const activeFiltersCount = (resolvedCategoryName !== 'all' ? 1 : 0) + (searchQuery ? 1 : 0)
 
     const clearFilters = () => {
         setSelectedCategory('all')
         setPriceRange([0, 100000])
+        // Also clear the URL param by replacing history
+        if (typeof window !== 'undefined') {
+            const url = new URL(window.location.href)
+            url.searchParams.delete('category')
+            window.history.replaceState({}, '', url)
+        }
     }
 
     // Filter sidebar content
@@ -128,7 +153,7 @@ export default function ProductsPage() {
                     {categories.map(cat => (
                         <button
                             key={cat.id || cat._id}
-                            className={selectedCategory === cat.name ? styles.active : ''}
+                            className={resolvedCategoryName === cat.name ? styles.active : ''}
                             onClick={() => setSelectedCategory(cat.name)}
                         >
                             {cat.name}
@@ -148,9 +173,9 @@ export default function ProductsPage() {
                     animate={{ opacity: 1, height: 'auto' }}
                 >
                     <div className={styles.filterChips}>
-                        {selectedCategory !== 'all' && (
+                        {resolvedCategoryName !== 'all' && (
                             <span className={styles.chip}>
-                                {selectedCategory}
+                                {resolvedCategoryName}
                                 <button onClick={() => setSelectedCategory('all')}>
                                     <X size={14} />
                                 </button>

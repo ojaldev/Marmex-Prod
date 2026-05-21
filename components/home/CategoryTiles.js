@@ -78,7 +78,7 @@ export default function CategoryTiles() {
                                 variants={fadeInUp}
                             >
                                 <Link
-                                    href={`/products?category=${category.slug || category.name}`}
+                                    href={`/products?category=${encodeURIComponent(category.name)}`}
                                     className={styles.tile}
                                 >
                                     {/* Background Image */}
