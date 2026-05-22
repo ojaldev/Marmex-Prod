@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server'
+import { isAdmin } from '@/lib/admin-auth'
 import connectDB from '@/lib/mongodb'
 import Review from '@/models/Review'
 
 // Get all reviews for admin (including pending)
 export async function GET(request) {
     try {
+        if (!await isAdmin(request)) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+        }
+
         await connectDB()
 
         const { searchParams } = new URL(request.url)

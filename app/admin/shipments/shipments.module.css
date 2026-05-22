@@ -1,0 +1,315 @@
+.page {
+    padding-bottom: var(--space-3xl);
+}
+
+.header {
+    margin-bottom: var(--space-2xl);
+}
+
+.header h1 {
+    font-size: var(--text-3xl);
+    font-family: var(--font-display);
+    color: var(--color-obsidian);
+    margin-bottom: var(--space-xs);
+}
+
+.header p {
+    color: var(--color-text-gray);
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-lg);
+    margin-bottom: var(--space-2xl);
+}
+
+.statCard {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-platinum);
+}
+
+.statIcon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.statContent h3 {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-obsidian);
+    margin: 0;
+}
+
+.statContent p {
+    font-size: var(--text-sm);
+    color: var(--color-text-gray);
+    margin: 0;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.searchBox {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+    background: white;
+    border: 2px solid var(--color-platinum);
+    border-radius: var(--radius-lg);
+    max-width: 500px;
+    flex: 1;
+}
+
+.searchBox svg {
+    color: var(--color-text-gray);
+    flex-shrink: 0;
+}
+
+.searchBox input {
+    border: none;
+    background: none;
+    outline: none;
+    font-size: var(--text-base);
+    width: 100%;
+    color: var(--color-obsidian);
+}
+
+.searchBox input::placeholder {
+    color: var(--color-text-muted);
+}
+
+.refreshBtn {
+    padding: var(--space-md);
+    background: white;
+    border: 1px solid var(--color-platinum);
+    border-radius: var(--radius-md);
+    color: var(--color-text-gray);
+    cursor: pointer;
+    transition: all var(--duration-fast);
+}
+
+.refreshBtn:hover {
+    border-color: var(--color-gold-24k);
+    color: var(--color-gold-24k);
+}
+
+.tableWrapper {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-platinum);
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+}
+
+.table thead th {
+    text-align: left;
+    padding: var(--space-md) var(--space-lg);
+    background: var(--color-pearl);
+    color: var(--color-obsidian);
+    font-weight: 700;
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.table tbody tr {
+    border-bottom: 1px solid var(--color-platinum);
+    transition: background var(--duration-fast);
+}
+
+.table tbody tr:hover {
+    background: var(--color-pearl);
+}
+
+.table tbody td {
+    padding: var(--space-md) var(--space-lg);
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.orderCell strong {
+    display: block;
+    color: var(--color-obsidian);
+    font-size: var(--text-sm);
+}
+
+.orderCell span {
+    font-size: var(--text-xs);
+    color: var(--color-text-gray);
+}
+
+.awb {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    color: var(--color-obsidian);
+}
+
+.statusBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-full);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.pickupBadge {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    border-radius: var(--radius-full);
+    font-size: 11px;
+    font-weight: 700;
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.destinationCell {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--color-text-gray);
+}
+
+.destinationCell svg {
+    color: var(--color-text-light);
+    flex-shrink: 0;
+}
+
+.actionCell {
+    display: flex;
+    gap: var(--space-xs);
+}
+
+.iconBtn {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-platinum);
+    background: white;
+    color: var(--color-text-gray);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--duration-fast);
+    text-decoration: none;
+}
+
+.iconBtn:hover {
+    border-color: var(--color-gold-24k);
+    color: var(--color-gold-24k);
+    background: var(--color-pearl);
+}
+
+.loadingCell,
+.emptyCell {
+    text-align: center;
+    padding: var(--space-5xl) !important;
+    color: var(--color-text-gray);
+}
+
+.emptyCell svg {
+    color: var(--color-platinum);
+    margin-bottom: var(--space-md);
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+    margin-bottom: var(--space-md);
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-lg);
+    margin-top: var(--space-xl);
+}
+
+.pageBtn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-lg);
+    background: white;
+    border: 1px solid var(--color-platinum);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    color: var(--color-obsidian);
+    cursor: pointer;
+    transition: all var(--duration-fast);
+}
+
+.pageBtn:hover:not(:disabled) {
+    border-color: var(--color-gold-24k);
+}
+
+.pageBtn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.pageInfo {
+    font-size: var(--text-sm);
+    color: var(--color-text-gray);
+    font-weight: 500;
+}
+
+@media (max-width: 1200px) {
+    .statsGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .statsGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .tableWrapper {
+        overflow-x: scroll;
+    }
+
+    .table {
+        min-width: 800px;
+    }
+
+    .controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

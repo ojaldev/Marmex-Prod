@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Package, FileText, MessageSquare, TrendingUp, Home } from 'lucide-react'
+import { Package, FileText, MessageSquare, TrendingUp, Home, ShoppingCart, Truck, CheckCircle } from 'lucide-react'
 import styles from './dashboard.module.css'
 
 export default function AdminDashboard() {
@@ -10,7 +10,11 @@ export default function AdminDashboard() {
         products: 0,
         projects: 0,
         testimonials: 0,
-        recentProducts: []
+        orders: 0,
+        shipped: 0,
+        delivered: 0,
+        recentProducts: [],
+        courierStats: []
     })
 
     useEffect(() => {
@@ -18,17 +22,23 @@ export default function AdminDashboard() {
             fetch('/api/products').then(r => r.json()),
             fetch('/api/projects').then(r => r.json()),
             fetch('/api/testimonials').then(r => r.json()),
-        ]).then(([productsData, projectsData, testimonialsData]) => {
-            // Handle new MongoDB API format
+            fetch('/api/admin/orders?limit=1').then(r => r.json()).catch(() => ({ stats: {} }))
+        ]).then(([productsData, projectsData, testimonialsData, ordersData]) => {
             const products = productsData.products || productsData
             const projects = projectsData.projects || projectsData
             const testimonials = testimonialsData || testimonialsData
+            const orderStats = ordersData.stats || {}
+            const courierStats = ordersData.courierStats || []
 
             setStats({
                 products: products.length,
                 projects: projects.length,
                 testimonials: testimonials.length,
-                recentProducts: products.slice(-5).reverse()
+                orders: orderStats.totalOrders || 0,
+                shipped: orderStats.shipped || 0,
+                delivered: orderStats.delivered || 0,
+                recentProducts: products.slice(-5).reverse(),
+                courierStats
             })
         })
     }, [])
@@ -43,6 +53,36 @@ export default function AdminDashboard() {
             <div className={styles.statsGrid}>
                 <div className={styles.statCard}>
                     <div className={styles.statIcon} style={{ background: 'rgba(212, 175, 55, 0.1)' }}>
+                        <ShoppingCart size={24} color="var(--color-secondary)" />
+                    </div>
+                    <div className={styles.statContent}>
+                        <h3>{stats.orders}</h3>
+                        <p>Total Orders</p>
+                    </div>
+                </div>
+
+                <div className={styles.statCard}>
+                    <div className={styles.statIcon} style={{ background: 'rgba(6, 182, 212, 0.1)' }}>
+                        <Truck size={24} color="#06b6d4" />
+                    </div>
+                    <div className={styles.statContent}>
+                        <h3>{stats.shipped}</h3>
+                        <p>Shipped</p>
+                    </div>
+                </div>
+
+                <div className={styles.statCard}>
+                    <div className={styles.statIcon} style={{ background: 'rgba(16, 185, 129, 0.1)' }}>
+                        <CheckCircle size={24} color="#10b981" />
+                    </div>
+                    <div className={styles.statContent}>
+                        <h3>{stats.delivered}</h3>
+                        <p>Delivered</p>
+                    </div>
+                </div>
+
+                <div className={styles.statCard}>
+                    <div className={styles.statIcon} style={{ background: 'rgba(212, 175, 55, 0.1)' }}>
                         <Package size={24} color="var(--color-secondary)" />
                     </div>
                     <div className={styles.statContent}>
@@ -50,40 +90,17 @@ export default function AdminDashboard() {
                         <p>Total Products</p>
                     </div>
                 </div>
-
-                <div className={styles.statCard}>
-                    <div className={styles.statIcon} style={{ background: 'rgba(26, 26, 26, 0.05)' }}>
-                        <FileText size={24} color="var(--color-primary)" />
-                    </div>
-                    <div className={styles.statContent}>
-                        <h3>{stats.projects}</h3>
-                        <p>Portfolio Items</p>
-                    </div>
-                </div>
-
-                <div className={styles.statCard}>
-                    <div className={styles.statIcon} style={{ background: 'rgba(212, 175, 55, 0.1)' }}>
-                        <MessageSquare size={24} color="var(--color-secondary)" />
-                    </div>
-                    <div className={styles.statContent}>
-                        <h3>{stats.testimonials}</h3>
-                        <p>Testimonials</p>
-                    </div>
-                </div>
-
-                <div className={styles.statCard}>
-                    <div className={styles.statIcon} style={{ background: 'rgba(26, 26, 26, 0.05)' }}>
-                        <TrendingUp size={24} color="var(--color-primary)" />
-                    </div>
-                    <div className={styles.statContent}>
-                        <h3>Active</h3>
-                        <p>System Status</p>
-                    </div>
-                </div>
             </div>
 
             {/* Quick Actions */}
             <div className={styles.quickActions}>
+                <Link href="/admin/orders" className={styles.quickAction}>
+                    <ShoppingCart size={20} />
+                    <div>
+                        <h4>Manage Orders</h4>
+                        <p>View all orders, tracking, and shipments</p>
+                    </div>
+                </Link>
                 <Link href="/admin/homepage" className={styles.quickAction}>
                     <Home size={20} />
                     <div>
@@ -92,6 +109,40 @@ export default function AdminDashboard() {
                     </div>
                 </Link>
             </div>
+
+
+
+            {/* Courier Performance */}
+            {stats.courierStats?.length > 0 && (
+                <div className={styles.recentSection}>
+                    <h2>Courier Performance</h2>
+                    <div className={styles.courierList}>
+                        {stats.courierStats.map((courier, i) => {
+                            const deliveryRate = courier.count > 0
+                                ? Math.round((courier.delivered / courier.count) * 100)
+                                : 0
+                            return (
+                                <div key={i} className={styles.courierItem}>
+                                    <div className={styles.courierInfo}>
+                                        <h4>{courier.name}</h4>
+                                        <p>{courier.count} shipment{courier.count !== 1 ? 's' : ''}</p>
+                                    </div>
+                                    <div className={styles.courierBar}>
+                                        <div
+                                            className={styles.courierBarFill}
+                                            style={{
+                                                width: `${deliveryRate}%`,
+                                                background: deliveryRate >= 90 ? '#10b981' : deliveryRate >= 70 ? '#f59e0b' : '#ef4444'
+                                            }}
+                                        />
+                                    </div>
+                                    <span className={styles.courierRate}>{deliveryRate}% delivered</span>
+                                </div>
+                            )
+                        })}
+                    </div>
+                </div>
+            )}
 
             {stats.recentProducts.length > 0 && (
                 <div className={styles.recentSection}>

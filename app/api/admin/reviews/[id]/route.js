@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server'
+import { isAdmin } from '@/lib/admin-auth'
 import connectDB from '@/lib/mongodb'
 import Review from '@/models/Review'
 
 // Get single review
 export async function GET(request, { params }) {
     try {
+        if (!await isAdmin(request)) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+        }
+
         await connectDB()
 
         const review = await Review.findById(params.id)
@@ -26,6 +31,10 @@ export async function GET(request, { params }) {
 // Update review status (approve/reject)
 export async function PUT(request, { params }) {
     try {
+        if (!await isAdmin(request)) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+        }
+
         await connectDB()
 
         const body = await request.json()
@@ -68,6 +77,10 @@ export async function PUT(request, { params }) {
 // Delete review
 export async function DELETE(request, { params }) {
     try {
+        if (!await isAdmin(request)) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+        }
+
         await connectDB()
 
         const review = await Review.findByIdAndDelete(params.id)

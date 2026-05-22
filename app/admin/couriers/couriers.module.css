@@ -1,0 +1,313 @@
+.page {
+    padding-bottom: var(--space-3xl);
+}
+
+.header {
+    margin-bottom: var(--space-2xl);
+}
+
+.header h1 {
+    font-size: var(--text-3xl);
+    font-family: var(--font-display);
+    color: var(--color-obsidian);
+    margin-bottom: var(--space-xs);
+}
+
+.header p {
+    color: var(--color-text-gray);
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-lg);
+    margin-bottom: var(--space-2xl);
+}
+
+.statCard {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-platinum);
+}
+
+.statIcon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.statContent h3 {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-obsidian);
+    margin: 0;
+}
+
+.statContent p {
+    font-size: var(--text-sm);
+    color: var(--color-text-gray);
+    margin: 0;
+}
+
+.controls {
+    margin-bottom: var(--space-xl);
+}
+
+.refreshBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-lg);
+    background: white;
+    border: 1px solid var(--color-platinum);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    color: var(--color-obsidian);
+    cursor: pointer;
+    transition: all var(--duration-fast);
+}
+
+.refreshBtn:hover:not(:disabled) {
+    border-color: var(--color-gold-24k);
+    color: var(--color-gold-24k);
+}
+
+.refreshBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.loading,
+.empty {
+    text-align: center;
+    padding: var(--space-5xl);
+    color: var(--color-text-gray);
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-platinum);
+}
+
+.loading svg,
+.empty svg {
+    color: var(--color-platinum);
+    margin-bottom: var(--space-md);
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Courier Cards */
+.courierGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-lg);
+    margin-bottom: var(--space-3xl);
+}
+
+.courierCard {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-platinum);
+    padding: var(--space-xl);
+    transition: all var(--duration-fast);
+}
+
+.courierCard:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.courierHeader {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.courierRank {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: var(--text-sm);
+    flex-shrink: 0;
+}
+
+.courierTitle h3 {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-obsidian);
+    margin: 0;
+}
+
+.rateLabel {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.courierRate {
+    margin-bottom: var(--space-lg);
+}
+
+.rateNumber {
+    font-size: var(--text-3xl);
+    font-weight: 800;
+    margin-bottom: var(--space-sm);
+}
+
+.rateBarBg {
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.rateBarFill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    transition: width 0.6s ease;
+}
+
+.courierMetrics {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-sm);
+}
+
+.metric {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--text-sm);
+    color: var(--color-text-gray);
+}
+
+.metric svg {
+    color: var(--color-text-light);
+    flex-shrink: 0;
+}
+
+/* Table Section */
+.tableSection {
+    margin-top: var(--space-2xl);
+}
+
+.tableSection h2 {
+    font-size: var(--text-xl);
+    font-family: var(--font-display);
+    color: var(--color-obsidian);
+    margin-bottom: var(--space-lg);
+}
+
+.tableWrapper {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-platinum);
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+}
+
+.table thead th {
+    text-align: left;
+    padding: var(--space-md) var(--space-lg);
+    background: var(--color-pearl);
+    color: var(--color-obsidian);
+    font-weight: 700;
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.table tbody tr {
+    border-bottom: 1px solid var(--color-platinum);
+    transition: background var(--duration-fast);
+}
+
+.table tbody tr:hover {
+    background: var(--color-pearl);
+}
+
+.table tbody td {
+    padding: var(--space-md) var(--space-lg);
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.rankBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-md);
+    color: white;
+    font-weight: 700;
+    font-size: var(--text-xs);
+}
+
+.rateBadge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.6rem;
+    border-radius: var(--radius-full);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+@media (max-width: 1200px) {
+    .statsGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .courierGrid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .statsGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .courierGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .tableWrapper {
+        overflow-x: scroll;
+    }
+
+    .table {
+        min-width: 700px;
+    }
+}
