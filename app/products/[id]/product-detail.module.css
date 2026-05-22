@@ -386,6 +386,58 @@
     white-space: pre-line;
 }
 
+/* ===== SPECIFICATIONS SECTION ===== */
+.specsSection {
+    margin-top: var(--space-5xl);
+    padding: var(--space-3xl);
+    background: var(--color-pearl);
+    border-radius: var(--radius-xl);
+}
+
+.specsSection h2 {
+    text-align: center;
+    font-size: var(--text-2xl);
+    font-family: var(--font-display);
+    color: var(--color-obsidian);
+    margin-bottom: var(--space-2xl);
+}
+
+.specsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-lg);
+}
+
+.specItem {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-lg);
+    background: white;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-platinum);
+    transition: all var(--duration-fast) var(--ease-smooth);
+}
+
+.specItem:hover {
+    border-color: var(--color-champagne);
+    box-shadow: var(--shadow-md);
+}
+
+.specLabel {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--color-text-gray);
+    font-weight: 600;
+}
+
+.specValue {
+    font-size: var(--text-base);
+    color: var(--color-obsidian);
+    font-weight: 700;
+}
+
 /* ===== VIDEO SECTION ===== */
 .videoSection {
     margin-top: var(--space-5xl);

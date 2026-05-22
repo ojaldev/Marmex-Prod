@@ -234,7 +234,7 @@ export default function NewProductPage() {
                                 name="dimensions"
                                 value={formData.dimensions}
                                 onChange={handleChange}
-                                placeholder="e.g., 10×8×15 cm"
+                                placeholder="e.g., 10x8x6 inches"
                             />
                         </div>
 

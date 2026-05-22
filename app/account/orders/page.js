@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
-import { Package, Search, Filter } from 'lucide-react'
+import { Package, Search, Filter, Truck } from 'lucide-react'
 import styles from './orders.module.css'
 
 export default function OrdersPage() {
@@ -138,6 +138,16 @@ export default function OrdersPage() {
                                         </div>
                                     )}
                                 </div>
+
+                                {/* Tracking info on card */}
+                                {order.shiprocket?.awbCode && (
+                                    <div className={styles.trackingPreview}>
+                                        <Truck size={14} />
+                                        <span>AWB: {order.shiprocket.awbCode}</span>
+                                        <span className={styles.trackingDivider}>|</span>
+                                        <span>{order.shiprocket.courierName}</span>
+                                    </div>
+                                )}
 
                                 <div className={styles.orderFooter}>
                                     <div className={styles.orderTotal}>

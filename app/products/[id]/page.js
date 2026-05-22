@@ -436,6 +436,51 @@ export default function ProductDetailPage() {
                         </motion.div>
                     </div>
 
+                    {/* Product Specifications */}
+                    {(product.dimensions || product.material || product.color || product.weight) && (
+                        <motion.section
+                            className={styles.specsSection}
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6 }}
+                        >
+                            <h2>Product Specifications</h2>
+                            <div className={styles.specsGrid}>
+                                {product.dimensions && (
+                                    <div className={styles.specItem}>
+                                        <span className={styles.specLabel}>Dimensions</span>
+                                        <span className={styles.specValue}>{product.dimensions}</span>
+                                    </div>
+                                )}
+                                {product.material && (
+                                    <div className={styles.specItem}>
+                                        <span className={styles.specLabel}>Material</span>
+                                        <span className={styles.specValue}>{product.material}</span>
+                                    </div>
+                                )}
+                                {product.color && (
+                                    <div className={styles.specItem}>
+                                        <span className={styles.specLabel}>Color</span>
+                                        <span className={styles.specValue}>{product.color}</span>
+                                    </div>
+                                )}
+                                {product.weight && (
+                                    <div className={styles.specItem}>
+                                        <span className={styles.specLabel}>Weight</span>
+                                        <span className={styles.specValue}>{product.weight}</span>
+                                    </div>
+                                )}
+                                {product.category && (
+                                    <div className={styles.specItem}>
+                                        <span className={styles.specLabel}>Category</span>
+                                        <span className={styles.specValue}>{product.category}</span>
+                                    </div>
+                                )}
+                            </div>
+                        </motion.section>
+                    )}
+
                     {/* Video Showcase */}
                     {product.videoUrl && (
                         <motion.section

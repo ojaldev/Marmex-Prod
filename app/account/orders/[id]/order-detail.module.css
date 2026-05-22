@@ -288,6 +288,159 @@
     color: white;
 }
 
+/* ===== TRACKING CARD ===== */
+.trackingCard {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border: 1px solid var(--color-platinum);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+}
+
+.trackingHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--color-platinum);
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.awbLabel {
+    font-size: var(--text-xs);
+    color: var(--color-text-gray);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.awbValue {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--color-obsidian);
+    font-family: var(--font-mono);
+    letter-spacing: 2px;
+    margin: var(--space-xs) 0;
+}
+
+.courierName {
+    font-size: var(--text-sm);
+    color: var(--color-text-gray);
+}
+
+.trackBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-lg);
+    background: var(--color-obsidian);
+    color: var(--color-gold-24k);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: var(--text-sm);
+    transition: all var(--duration-fast);
+    border: 1px solid rgba(212, 165, 116, 0.2);
+}
+
+.trackBtn:hover {
+    border-color: var(--color-gold-24k);
+    box-shadow: var(--shadow-gold);
+    transform: translateY(-2px);
+}
+
+/* Tracking Timeline */
+.trackingTimeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.trackingEvent {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+    position: relative;
+    padding-bottom: var(--space-lg);
+}
+
+.trackingEvent:last-child {
+    padding-bottom: 0;
+}
+
+.trackingEvent:last-child .trackingLine {
+    display: none;
+}
+
+.trackingDot {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background: var(--color-platinum);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    z-index: 2;
+}
+
+.trackingEventActive .trackingDot {
+    background: var(--color-emerald);
+    box-shadow: 0 0 0 4px rgba(46, 125, 50, 0.2);
+}
+
+.trackingDotInner {
+    width: 10px;
+    height: 10px;
+    border-radius: var(--radius-full);
+    background: white;
+}
+
+.trackingLine {
+    position: absolute;
+    left: 15px;
+    top: 32px;
+    bottom: 0;
+    width: 2px;
+    background: var(--color-platinum);
+}
+
+.trackingContent {
+    flex: 1;
+    padding-top: 4px;
+}
+
+.trackingContent strong {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--color-obsidian);
+    margin-bottom: 2px;
+}
+
+.trackingContent p {
+    font-size: var(--text-sm);
+    color: var(--color-text-gray);
+    margin-bottom: 2px;
+}
+
+.trackingContent small {
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+}
+
+.trackingPlaceholder {
+    text-align: center;
+    padding: var(--space-2xl);
+    color: var(--color-text-gray);
+}
+
+.trackingPlaceholder p {
+    margin-top: var(--space-md);
+    font-size: var(--text-sm);
+}
+
 /* ===== LOADING ===== */
 .loading {
     padding: var(--space-5xl);

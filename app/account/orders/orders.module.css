@@ -154,6 +154,30 @@
     color: var(--color-text-gray);
 }
 
+/* ===== TRACKING PREVIEW ===== */
+.trackingPreview {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    border: 1px solid #a7f3d0;
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-md);
+    font-size: var(--text-sm);
+    color: #065f46;
+    font-weight: 500;
+}
+
+.trackingPreview svg {
+    color: #065f46;
+    flex-shrink: 0;
+}
+
+.trackingDivider {
+    color: #a7f3d0;
+}
+
 /* ===== ORDER FOOTER ===== */
 .orderFooter {
     display: flex;

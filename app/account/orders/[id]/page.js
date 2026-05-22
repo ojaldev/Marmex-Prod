@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Package, MapPin, CreditCard, Download, RotateCcw, X } from 'lucide-react'
+import { ArrowLeft, Package, MapPin, CreditCard, Download, RotateCcw, X, Truck, Box, CheckCircle, AlertCircle, Navigation } from 'lucide-react'
 import { useCart } from '@/contexts/CartContext'
 import styles from './order-detail.module.css'
 
@@ -147,6 +147,73 @@ export default function OrderDetailPage() {
                             ))}
                         </div>
                     </div>
+
+                    {/* Shipment Tracking */}
+                    {order.shiprocket?.awbCode && (
+                        <div className={styles.section}>
+                            <h2>
+                                <Truck size={20} />
+                                Shipment Tracking
+                            </h2>
+                            <div className={styles.trackingCard}>
+                                <div className={styles.trackingHeader}>
+                                    <div>
+                                        <div className={styles.awbLabel}>AWB Number</div>
+                                        <div className={styles.awbValue}>{order.shiprocket.awbCode}</div>
+                                        <div className={styles.courierName}>{order.shiprocket.courierName}</div>
+                                    </div>
+                                    <a
+                                        href={`https://shiprocket.co/tracking/${order.shiprocket.awbCode}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={styles.trackBtn}
+                                    >
+                                        <Navigation size={16} />
+                                        Track on Shiprocket
+                                    </a>
+                                </div>
+
+                                {/* Visual Timeline */}
+                                {order.tracking?.events && order.tracking.events.length > 0 && (
+                                    <div className={styles.trackingTimeline}>
+                                        {order.tracking.events.map((event, idx) => {
+                                            const isLast = idx === order.tracking.events.length - 1
+                                            const isDelivered = event.status?.toLowerCase().includes('delivered')
+                                            const isException = event.status?.toLowerCase().includes('exception') ||
+                                                event.status?.toLowerCase().includes('error')
+
+                                            return (
+                                                <div key={idx} className={`${styles.trackingEvent} ${isLast ? styles.trackingEventActive : ''}`}>
+                                                    <div className={styles.trackingDot}>
+                                                        {isDelivered ? <CheckCircle size={14} /> :
+                                                         isException ? <AlertCircle size={14} /> :
+                                                         isLast ? <Box size={14} /> :
+                                                         <div className={styles.trackingDotInner} />}
+                                                    </div>
+                                                    <div className={styles.trackingLine} />
+                                                    <div className={styles.trackingContent}>
+                                                        <strong>{event.status}</strong>
+                                                        <p>{event.description || event.location}</p>
+                                                        <small>{new Date(event.timestamp).toLocaleString('en-IN', {
+                                                            dateStyle: 'medium',
+                                                            timeStyle: 'short'
+                                                        })}</small>
+                                                    </div>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                )}
+
+                                {!order.tracking?.events?.length && (
+                                    <div className={styles.trackingPlaceholder}>
+                                        <Truck size={32} />
+                                        <p>Your order has been shipped. Tracking updates will appear here as the package moves.</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Items */}
                     <div className={styles.section}>
