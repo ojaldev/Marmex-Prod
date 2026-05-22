@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Save, Trash2, Upload, X } from 'lucide-react'
 import styles from '../product-editor.module.css'
+import { parseDimensions, parseWeight, validateDimensions, validateWeight, formatDimensions, formatWeight } from '@/lib/product-specs'
 
 export default function EditProductPage() {
     const params = useParams()
@@ -20,8 +21,8 @@ export default function EditProductPage() {
         detailedDescription: '',
         material: '',
         color: '',
-        dimensions: '',
-        weight: '',
+        dimensions: { length: '', width: '', height: '', unit: 'inch' },
+        weight: { value: '', unit: 'kg' },
         price: '',
         discount: 0,
         stock: 'In Stock',
@@ -41,6 +42,7 @@ export default function EditProductPage() {
         giftReady: false,
         exportGrade: false
     })
+    const [specErrors, setSpecErrors] = useState({})
 
     useEffect(() => {
         loadData()
@@ -57,8 +59,13 @@ export default function EditProductPage() {
             const cats = await categoriesRes.json()
 
             setCategories(cats)
+            const parsedDims = parseDimensions(product.dimensions)
+            const parsedWeight = parseWeight(product.weight)
+
             setFormData({
                 ...product,
+                dimensions: parsedDims || { length: '', width: '', height: '', unit: 'inch' },
+                weight: parsedWeight || { value: '', unit: 'kg' },
                 additionalImages: product.additionalImages || [],
                 lifestyleImages: product.lifestyleImages || [],
                 packagingImages: product.packagingImages || [],
@@ -151,13 +158,47 @@ export default function EditProductPage() {
         }))
     }
 
+    const handleSpecChange = (group, field, value) => {
+        setFormData(prev => ({
+            ...prev,
+            [group]: {
+                ...prev[group],
+                [field]: value
+            }
+        }))
+        // Clear error for this group when user starts typing
+        setSpecErrors(prev => {
+            if (!prev[group]) return prev
+            const next = { ...prev }
+            delete next[group]
+            return next
+        })
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         setSaving(true)
+        setSpecErrors({})
+
+        // Validate specs
+        const dimValidation = validateDimensions(formData.dimensions)
+        const weightValidation = validateWeight(formData.weight)
+        const errors = {}
+        if (!dimValidation.valid) errors.dimensions = dimValidation.error
+        if (!weightValidation.valid) errors.weight = weightValidation.error
+
+        if (Object.keys(errors).length > 0) {
+            setSpecErrors(errors)
+            setSaving(false)
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+            return
+        }
 
         try {
             const productData = {
                 ...formData,
+                dimensions: formatDimensions(formData.dimensions),
+                weight: formatWeight(formData.weight),
                 price: parseFloat(formData.price),
                 discount: parseFloat(formData.discount) || 0,
                 tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean)
@@ -173,11 +214,12 @@ export default function EditProductPage() {
                 alert('Product updated successfully!')
                 router.push('/admin/products')
             } else {
-                throw new Error('Failed to update product')
+                const data = await res.json()
+                throw new Error(data.error || 'Failed to update product')
             }
         } catch (error) {
             console.error('Save error:', error)
-            alert('Failed to update product')
+            alert(error.message || 'Failed to update product')
         } finally {
             setSaving(false)
         }
@@ -299,26 +341,89 @@ export default function EditProductPage() {
                             />
                         </div>
 
+                    </div>
+
+                    {/* Physical Specs — full width row for better UX */}
+                    <div className={styles.specsRow}>
                         <div className={styles.field}>
-                            <label>Dimensions</label>
-                            <input
-                                type="text"
-                                name="dimensions"
-                                value={formData.dimensions}
-                                onChange={handleChange}
-                                placeholder="e.g., 10x8x6 inches"
-                            />
+                            <label>Dimensions (L × W × H)</label>
+                            <div className={styles.specGroup}>
+                                <div className={styles.specInputWrap}>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        value={formData.dimensions.length}
+                                        onChange={(e) => handleSpecChange('dimensions', 'length', e.target.value)}
+                                        placeholder="Length"
+                                        className={specErrors.dimensions ? styles.inputError : ''}
+                                    />
+                                    <span className={styles.specHint}>L</span>
+                                </div>
+                                <div className={styles.specInputWrap}>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        value={formData.dimensions.width}
+                                        onChange={(e) => handleSpecChange('dimensions', 'width', e.target.value)}
+                                        placeholder="Width"
+                                        className={specErrors.dimensions ? styles.inputError : ''}
+                                    />
+                                    <span className={styles.specHint}>W</span>
+                                </div>
+                                <div className={styles.specInputWrap}>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        value={formData.dimensions.height}
+                                        onChange={(e) => handleSpecChange('dimensions', 'height', e.target.value)}
+                                        placeholder="Height"
+                                        className={specErrors.dimensions ? styles.inputError : ''}
+                                    />
+                                    <span className={styles.specHint}>H</span>
+                                </div>
+                                <select
+                                    value={formData.dimensions.unit}
+                                    onChange={(e) => handleSpecChange('dimensions', 'unit', e.target.value)}
+                                    className={styles.specSelect}
+                                >
+                                    <option value="inch">inch</option>
+                                    <option value="cm">cm</option>
+                                </select>
+                            </div>
+                            {specErrors.dimensions && (
+                                <span className={styles.errorText}>{specErrors.dimensions}</span>
+                            )}
                         </div>
 
                         <div className={styles.field}>
                             <label>Weight</label>
-                            <input
-                                type="text"
-                                name="weight"
-                                value={formData.weight}
-                                onChange={handleChange}
-                                placeholder="e.g., 2.5 kg"
-                            />
+                            <div className={styles.specGroup}>
+                                <div className={styles.specInputWrap}>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        value={formData.weight.value}
+                                        onChange={(e) => handleSpecChange('weight', 'value', e.target.value)}
+                                        placeholder="e.g. 2.5"
+                                        className={specErrors.weight ? styles.inputError : ''}
+                                    />
+                                </div>
+                                <select
+                                    value={formData.weight.unit}
+                                    onChange={(e) => handleSpecChange('weight', 'unit', e.target.value)}
+                                    className={styles.specSelect}
+                                >
+                                    <option value="kg">kg</option>
+                                    <option value="g">g</option>
+                                </select>
+                            </div>
+                            {specErrors.weight && (
+                                <span className={styles.errorText}>{specErrors.weight}</span>
+                            )}
                         </div>
                     </div>
                 </section>

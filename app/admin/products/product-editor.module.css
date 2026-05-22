@@ -102,6 +102,77 @@
     line-height: 1.6;
 }
 
+/* Structured spec inputs (dimensions / weight) */
+.specsRow {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--spacing-md);
+    margin: var(--spacing-md) 0;
+}
+
+.specGroup {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: flex-end;
+}
+
+.specInputWrap {
+    position: relative;
+    flex: 1;
+    min-width: 80px;
+}
+
+.specInputWrap input {
+    width: 100%;
+    padding: 0.75rem 0.75rem 0.75rem 1.5rem;
+}
+
+.specHint {
+    position: absolute;
+    left: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.75rem;
+    color: var(--color-text-gray);
+    font-weight: 600;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.specSelect {
+    min-width: 80px;
+    padding: 0.75rem;
+    height: fit-content;
+    align-self: stretch;
+}
+
+.inputError {
+    border-color: #c62828 !important;
+    box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.1) !important;
+}
+
+.errorText {
+    color: #c62828;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .specsRow {
+        grid-template-columns: 1fr;
+    }
+
+    .specGroup {
+        gap: 0.5rem;
+    }
+
+    .specInputWrap {
+        min-width: 70px;
+    }
+}
+
 .checkboxGroup {
     display: flex;
     gap: var(--spacing-md);

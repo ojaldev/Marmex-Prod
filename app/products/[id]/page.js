@@ -15,6 +15,7 @@ import ReviewList from '@/components/reviews/ReviewList'
 import { useCart } from '@/contexts/CartContext'
 import { useNotification } from '@/contexts/NotificationContext'
 import { convertGDriveUrl } from '@/lib/utils'
+import { normalizeDimensionsDisplay, normalizeWeightDisplay } from '@/lib/product-specs'
 import { fadeInUp, staggerContainer } from '@/lib/animations'
 import {
     ChevronLeft, ChevronRight, Heart, Share2, Truck, Shield,
@@ -450,7 +451,7 @@ export default function ProductDetailPage() {
                                 {product.dimensions && (
                                     <div className={styles.specItem}>
                                         <span className={styles.specLabel}>Dimensions</span>
-                                        <span className={styles.specValue}>{product.dimensions}</span>
+                                        <span className={styles.specValue}>{normalizeDimensionsDisplay(product.dimensions)}</span>
                                     </div>
                                 )}
                                 {product.material && (
@@ -468,7 +469,7 @@ export default function ProductDetailPage() {
                                 {product.weight && (
                                     <div className={styles.specItem}>
                                         <span className={styles.specLabel}>Weight</span>
-                                        <span className={styles.specValue}>{product.weight}</span>
+                                        <span className={styles.specValue}>{normalizeWeightDisplay(product.weight)}</span>
                                     </div>
                                 )}
                                 {product.category && (

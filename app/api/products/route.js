@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
+import { validateDimensions, validateWeight, formatDimensions, formatWeight } from '@/lib/product-specs'
 
 export async function GET(request) {
     try {
@@ -58,7 +59,25 @@ export async function POST(request) {
     try {
         await connectDB()
 
-        const productData = await request.json()
+        let productData = await request.json()
+
+        // Validate & normalize dimensions if provided as structured object
+        if (productData.dimensions && typeof productData.dimensions === 'object') {
+            const dimValidation = validateDimensions(productData.dimensions)
+            if (!dimValidation.valid) {
+                return NextResponse.json({ error: dimValidation.error }, { status: 400 })
+            }
+            productData.dimensions = formatDimensions(productData.dimensions)
+        }
+
+        // Validate & normalize weight if provided as structured object
+        if (productData.weight && typeof productData.weight === 'object') {
+            const weightValidation = validateWeight(productData.weight)
+            if (!weightValidation.valid) {
+                return NextResponse.json({ error: weightValidation.error }, { status: 400 })
+            }
+            productData.weight = formatWeight(productData.weight)
+        }
 
         // Create new product
         const product = await Product.create(productData)

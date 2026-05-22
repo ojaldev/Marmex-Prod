@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
+import { validateDimensions, validateWeight, formatDimensions, formatWeight } from '@/lib/product-specs'
 
 export async function GET(request, { params }) {
     try {
@@ -24,9 +25,27 @@ export async function GET(request, { params }) {
 export async function PUT(request, { params }) {
     try {
         const { id } = await params
-        const updateData = await request.json()
+        let updateData = await request.json()
 
         await connectDB()
+
+        // Validate & normalize dimensions if provided as structured object
+        if (updateData.dimensions && typeof updateData.dimensions === 'object') {
+            const dimValidation = validateDimensions(updateData.dimensions)
+            if (!dimValidation.valid) {
+                return NextResponse.json({ error: dimValidation.error }, { status: 400 })
+            }
+            updateData.dimensions = formatDimensions(updateData.dimensions)
+        }
+
+        // Validate & normalize weight if provided as structured object
+        if (updateData.weight && typeof updateData.weight === 'object') {
+            const weightValidation = validateWeight(updateData.weight)
+            if (!weightValidation.valid) {
+                return NextResponse.json({ error: weightValidation.error }, { status: 400 })
+            }
+            updateData.weight = formatWeight(updateData.weight)
+        }
 
         const product = await Product.findByIdAndUpdate(
             id,
