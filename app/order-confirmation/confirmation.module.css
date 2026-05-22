@@ -207,6 +207,59 @@
     margin-top: var(--space-2xl);
 }
 
+/* ===== TRACKING BOX ===== */
+.trackingBox {
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    border: 2px solid #a7f3d0;
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin: var(--space-xl) 0;
+    text-align: center;
+}
+
+.trackingLabel {
+    font-size: var(--text-sm);
+    color: #065f46;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.awbCode {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: #065f46;
+    font-family: var(--font-mono);
+    letter-spacing: 3px;
+    margin: var(--space-sm) 0;
+}
+
+.courierName {
+    font-size: var(--text-sm);
+    color: #047857;
+    margin-bottom: var(--space-md);
+}
+
+.trackBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 12px 30px;
+    background: #065f46;
+    color: white;
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: var(--text-sm);
+    transition: all var(--duration-fast);
+}
+
+.trackBtn:hover {
+    background: #047857;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
     .confirmationCard {

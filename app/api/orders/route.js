@@ -2,7 +2,9 @@ import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import Order from '@/models/Order'
-import { sendOrderConfirmationEmail } from '@/lib/email'
+import { sendOrderConfirmationEmail, sendShipmentConfirmationEmail } from '@/lib/email'
+import { createForwardShipment } from '@/lib/shiprocket'
+import { buildForwardShipmentPayload } from '@/lib/shiprocket-order'
 
 // Get user's order history
 export async function GET(request) {
@@ -120,8 +122,68 @@ export async function POST(request) {
                 await sendOrderConfirmationEmail(emailAddress, order)
             }
         } catch (emailError) {
-            // Log error but don't fail order creation
             console.error('Failed to send confirmation email:', emailError)
+        }
+
+        // ── SHIPROCKET: Auto-create shipment for COD orders ──
+        if (paymentMethod === 'cod') {
+            try {
+                const payload = buildForwardShipmentPayload(order)
+                const srResponse = await createForwardShipment(payload)
+
+                const orderData = srResponse.payload || srResponse.response?.data || srResponse
+                const shiprocketOrderId = orderData.order_id || orderData.sr_order_id
+                const shipmentId = orderData.shipment_id
+                const awbCode = orderData.awb_code || orderData.awb
+                const courierName = orderData.courier_name
+                const courierId = orderData.courier_company_id
+                const labelUrl = orderData.label_url
+
+                order.shiprocket = {
+                    orderId: String(shiprocketOrderId || ''),
+                    shipmentId: String(shipmentId || ''),
+                    awbCode: String(awbCode || ''),
+                    courierId: courierId || null,
+                    courierName: courierName || '',
+                    labelUrl: labelUrl || '',
+                    pickupStatus: 'scheduled',
+                    lastSyncedAt: new Date()
+                }
+
+                order.tracking = {
+                    ...order.tracking,
+                    carrier: courierName || '',
+                    trackingNumber: String(awbCode || '')
+                }
+
+                order.status = 'processing'
+                order.timeline.push({
+                    status: 'processing',
+                    timestamp: new Date(),
+                    note: `Shiprocket shipment created. AWB: ${awbCode}. Courier: ${courierName}`
+                })
+
+                await order.save()
+
+                // Send shipment confirmation with tracking
+                if (emailAddress && awbCode) {
+                    try {
+                        await sendShipmentConfirmationEmail(emailAddress, order)
+                    } catch (emailErr) {
+                        console.error('Failed to send shipment email:', emailErr)
+                    }
+                }
+
+                console.log(`✅ Shiprocket COD shipment created for order ${order.orderNumber}: AWB ${awbCode}`)
+            } catch (shiprocketErr) {
+                console.error('❌ Shiprocket COD shipment creation failed (non-blocking):', shiprocketErr.message)
+                order.timeline.push({
+                    status: 'pending',
+                    timestamp: new Date(),
+                    note: `Order placed. Shiprocket shipment failed: ${shiprocketErr.message}`
+                })
+                await order.save()
+            }
         }
 
         return NextResponse.json({
@@ -130,7 +192,8 @@ export async function POST(request) {
                 id: order._id,
                 orderNumber: order.orderNumber,
                 total: order.total,
-                status: order.status
+                status: order.status,
+                trackingNumber: order.shiprocket?.awbCode || null
             }
         }, { status: 201 })
 

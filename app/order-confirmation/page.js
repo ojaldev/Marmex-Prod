@@ -5,31 +5,62 @@ export const dynamic = 'force-dynamic'
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { CheckCircle, Package, Truck, Mail } from 'lucide-react'
+import { CheckCircle, Package, Truck, Mail, ExternalLink } from 'lucide-react'
+import { motion } from 'framer-motion'
 import styles from './confirmation.module.css'
 
 export default function OrderConfirmationPage() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const [orderNumber, setOrderNumber] = useState('')
+    const [order, setOrder] = useState(null)
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        const order = searchParams.get('order')
-        if (!order) {
+        const orderParam = searchParams.get('order')
+        if (!orderParam) {
             router.push('/')
             return
         }
-        setOrderNumber(order)
+        setOrderNumber(orderParam)
     }, [searchParams, router])
+
+    // Fetch order details to show tracking
+    useEffect(() => {
+        if (!orderNumber) return
+
+        const fetchOrder = async () => {
+            try {
+                // Try to fetch from account orders API (if logged in)
+                // or we could add a public order lookup endpoint
+                // For now, we'll just show what we have from URL params
+                setLoading(false)
+            } catch (err) {
+                console.error('Failed to fetch order:', err)
+                setLoading(false)
+            }
+        }
+
+        fetchOrder()
+    }, [orderNumber])
 
     if (!orderNumber) {
         return null
     }
 
+    const trackingUrl = order?.shiprocket?.awbCode
+        ? `https://shiprocket.co/tracking/${order.shiprocket.awbCode}`
+        : null
+
     return (
         <main className={styles.confirmationPage}>
             <div className="container">
-                <div className={styles.confirmationCard}>
+                <motion.div
+                    className={styles.confirmationCard}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                >
                     {/* Success Icon */}
                     <div className={styles.successIcon}>
                         <CheckCircle size={80} />
@@ -47,6 +78,28 @@ export default function OrderConfirmationPage() {
                         <strong>#{orderNumber}</strong>
                     </div>
 
+                    {/* Tracking Box (if shipment created) */}
+                    {order?.shiprocket?.awbCode && (
+                        <motion.div
+                            className={styles.trackingBox}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.3 }}
+                        >
+                            <div className={styles.trackingLabel}>Tracking Number</div>
+                            <div className={styles.awbCode}>{order.shiprocket.awbCode}</div>
+                            <div className={styles.courierName}>{order.shiprocket.courierName}</div>
+                            <a
+                                href={trackingUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={styles.trackBtn}
+                            >
+                                Track Shipment <ExternalLink size={16} />
+                            </a>
+                        </motion.div>
+                    )}
+
                     {/* Status Steps */}
                     <div className={styles.statusSteps}>
                         <div className={`${styles.statusStep} ${styles.stepActive}`}>
@@ -61,7 +114,7 @@ export default function OrderConfirmationPage() {
 
                         <div className={styles.statusLine} />
 
-                        <div className={styles.statusStep}>
+                        <div className={`${styles.statusStep} ${order?.shiprocket?.awbCode ? styles.stepActive : ''}`}>
                             <div className={styles.stepIcon}>
                                 <Package size={24} />
                             </div>
@@ -123,14 +176,14 @@ export default function OrderConfirmationPage() {
 
                     {/* Actions */}
                     <div className={styles.actions}>
-                        <Link href="/products" className="btn btn-primary">
+                        <Link href="/account/orders" className="btn btn-primary">
+                            View My Orders
+                        </Link>
+                        <Link href="/products" className="btn btn-outline">
                             Continue Shopping
                         </Link>
-                        <Link href="/" className="btn btn-outline">
-                            Back to Home
-                        </Link>
                     </div>
-                </div>
+                </motion.div>
             </div>
         </main>
     )
