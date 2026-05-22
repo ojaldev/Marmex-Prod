@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import ProductCard from '@/components/ui/ProductCard'
 import StarRating from '@/components/ui/StarRating'
 import QuantitySelector from '@/components/ui/QuantitySelector'
+import PincodeChecker from '@/components/checkout/PincodeChecker'
 import RatingsSummary from '@/components/reviews/RatingsSummary'
 import ReviewForm from '@/components/reviews/ReviewForm'
 import ReviewList from '@/components/reviews/ReviewList'
@@ -413,6 +414,12 @@ export default function ProductDetailPage() {
                                     <div><strong>30-Day Returns</strong><p>Hassle-free refunds</p></div>
                                 </div>
                             </div>
+
+                            {/* Pincode Delivery Check */}
+                            <PincodeChecker
+                                productWeight={product.weight ? parseFloat(product.weight.match(/[\d.]+/)?.[0] || 1) : 1}
+                                codAvailable={product.price < 50000}
+                            />
 
                             {/* Full Description */}
                             {product.detailedDescription && (

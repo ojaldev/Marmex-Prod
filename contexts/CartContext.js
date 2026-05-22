@@ -73,6 +73,15 @@ export function CartProvider({ children }) {
         return cart.reduce((count, item) => count + item.quantity, 0)
     }
 
+    const getCartWeight = () => {
+        return cart.reduce((total, item) => {
+            const weightStr = item.weight || '1 Kg'
+            const match = weightStr.match(/([\d.]+)/)
+            const weightKg = match ? parseFloat(match[1]) : 1
+            return total + (weightKg * item.quantity)
+        }, 0)
+    }
+
     const value = {
         cart,
         addToCart,
@@ -81,6 +90,7 @@ export function CartProvider({ children }) {
         clearCart,
         getCartTotal,
         getCartCount,
+        getCartWeight,
         isCartOpen,
         setIsCartOpen
     }

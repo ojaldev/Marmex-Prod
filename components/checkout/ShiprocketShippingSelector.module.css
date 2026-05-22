@@ -1,0 +1,233 @@
+.shippingSelector {
+    margin-bottom: var(--space-2xl);
+}
+
+.label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-weight: 700;
+    margin-bottom: var(--space-lg);
+    color: var(--color-obsidian);
+    font-size: var(--text-xl);
+    font-family: var(--font-display);
+}
+
+/* Loading */
+.loadingState {
+    padding: var(--space-xl);
+    text-align: center;
+}
+
+.skeletonRow {
+    height: 72px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-md);
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Error */
+.errorState,
+.notServiceable {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: var(--radius-lg);
+    color: #dc2626;
+    font-size: var(--text-sm);
+    font-weight: 500;
+}
+
+.notServiceable {
+    background: #fff7ed;
+    border-color: #fed7aa;
+    color: #c2410c;
+}
+
+/* Courier Grid */
+.courierGrid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.courierCard {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    border: 2px solid var(--color-platinum);
+    border-radius: var(--radius-lg);
+    background: white;
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-smooth);
+    position: relative;
+}
+
+.courierCard:hover {
+    border-color: var(--color-gold-24k);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.courierCard.selected {
+    border-color: var(--color-gold-24k);
+    background: linear-gradient(135deg, #fffbf5, #fff);
+    box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.12);
+}
+
+.courierCard.recommended {
+    border-color: var(--color-emerald);
+}
+
+.courierCard.recommended::before {
+    content: 'Recommended';
+    position: absolute;
+    top: -10px;
+    right: var(--space-md);
+    background: var(--color-emerald);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 10px;
+    border-radius: var(--radius-full);
+}
+
+/* Radio */
+.radio {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: var(--radius-full);
+    border: 2px solid var(--color-platinum);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--duration-fast);
+}
+
+.courierCard.selected .radio {
+    border-color: var(--color-gold-24k);
+    background: var(--color-gold-24k);
+}
+
+.radioDot {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--radius-full);
+    background: white;
+}
+
+/* Info */
+.courierInfo {
+    flex: 1;
+    min-width: 0;
+}
+
+.courierName {
+    font-weight: 700;
+    font-size: var(--text-base);
+    color: var(--color-obsidian);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.badge {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+}
+
+.badgeRecommended {
+    background: var(--color-emerald);
+    color: white;
+}
+
+.badgeFastest {
+    background: #3b82f6;
+    color: white;
+}
+
+.badgeCheapest {
+    background: var(--color-gold-24k);
+    color: white;
+}
+
+.courierMeta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-top: 4px;
+    font-size: var(--text-sm);
+    color: var(--color-text-gray);
+    flex-wrap: wrap;
+}
+
+.courierMeta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.rating {
+    color: var(--color-gold-24k);
+}
+
+/* Cost */
+.courierCost {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.courierCost strong {
+    display: block;
+    font-size: var(--text-lg);
+    color: var(--color-obsidian);
+    font-weight: 700;
+}
+
+.courierCost span {
+    font-size: var(--text-sm);
+    color: var(--color-text-gray);
+}
+
+/* Free shipping banner */
+.freeShippingBanner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    border: 1px solid #a7f3d0;
+    border-radius: var(--radius-lg);
+    color: #065f46;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    margin-bottom: var(--space-lg);
+}
+
+/* Info footer */
+.infoFooter {
+    margin-top: var(--space-md);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-platinum);
+    font-size: var(--text-sm);
+    color: var(--color-text-gray);
+    text-align: center;
+}

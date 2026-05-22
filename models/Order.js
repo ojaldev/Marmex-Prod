@@ -110,6 +110,27 @@ const orderSchema = new mongoose.Schema({
         }]
     },
 
+    // Shiprocket integration fields
+    shiprocket: {
+        orderId: { type: String, index: true },       // Shiprocket order ID
+        shipmentId: { type: String, index: true },    // Shiprocket shipment ID
+        awbCode: { type: String, index: true },       // AWB / tracking number
+        courierId: Number,                            // Courier company ID
+        courierName: String,                          // e.g. "Delhivery"
+        labelUrl: String,                             // Shipping label PDF URL
+        manifestUrl: String,                          // Manifest PDF URL
+        invoiceUrl: String,                           // Shiprocket invoice URL
+        pickupScheduled: Date,                        // When pickup is scheduled
+        pickupStatus: {                               // pickup status
+            type: String,
+            enum: ['pending', 'scheduled', 'picked_up', 'failed', 'rescheduled'],
+            default: 'pending'
+        },
+        channelId: Number,                            // Custom channel ID
+        statusCode: Number,                           // Shiprocket status code
+        lastSyncedAt: Date                            // Last webhook sync
+    },
+
     invoice: {
         number: String,
         gstNumber: String,

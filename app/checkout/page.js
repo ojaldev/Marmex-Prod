@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '@/contexts/CartContext'
 import AddressSelector from '@/components/checkout/AddressSelector'
 import DeliveryDatePicker from '@/components/checkout/DeliveryDatePicker'
-import ShippingMethodSelector from '@/components/checkout/ShippingMethodSelector'
+import ShiprocketShippingSelector from '@/components/checkout/ShiprocketShippingSelector'
 import GiftOptions from '@/components/checkout/GiftOptions'
 import GSTInvoice from '@/components/checkout/GSTInvoice'
 import PromoCodeInput from '@/components/checkout/PromoCodeInput'
@@ -32,7 +32,7 @@ const loadRazorpay = () => {
 export default function CheckoutPage() {
     const router = useRouter()
     const { data: session } = useSession()
-    const { cart, getCartTotal, clearCart } = useCart()
+    const { cart, getCartTotal, getCartWeight, clearCart } = useCart()
     const [loading, setLoading] = useState(false)
     const [razorpayLoaded, setRazorpayLoaded] = useState(false)
     const [currentStep, setCurrentStep] = useState(1)
@@ -45,6 +45,11 @@ export default function CheckoutPage() {
     })
     const [deliveryDate, setDeliveryDate] = useState(null)
     const [shippingMethod, setShippingMethod] = useState(null)
+
+    const cartWeight = getCartWeight()
+
+    // Get destination pincode from selected address
+    const destinationPincode = selectedAddress?.pincode || manualAddress.pincode || ''
     const [giftData, setGiftData] = useState({ isGift: false, message: '', cost: 0 })
     const [gstData, setGSTData] = useState({ needsGST: false })
     const [appliedPromo, setAppliedPromo] = useState(null)
@@ -331,7 +336,14 @@ export default function CheckoutPage() {
                                     exit={{ opacity: 0, x: -20 }}
                                 >
                                     <DeliveryDatePicker onSelect={setDeliveryDate} selectedDate={deliveryDate} />
-                                    <ShippingMethodSelector onSelect={setShippingMethod} selectedMethod={shippingMethod} cartTotal={subtotal} />
+                                    <ShiprocketShippingSelector
+                                        destinationPincode={destinationPincode}
+                                        cartTotal={subtotal}
+                                        cartWeight={cartWeight || 1}
+                                        isCod={paymentMethod === 'cod'}
+                                        onSelect={setShippingMethod}
+                                        selectedMethod={shippingMethod}
+                                    />
                                     <GiftOptions onUpdate={setGiftData} giftData={giftData} />
                                     <GSTInvoice onUpdate={setGSTData} gstData={gstData} />
                                     <div className={styles.stepNav}>
