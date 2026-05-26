@@ -1,9 +1,9 @@
 import mongoose from 'mongoose'
 
 const projectSchema = new mongoose.Schema({
-    title: {
+    name: {
         type: String,
-        required: [true, 'Project title is required'],
+        required: [true, 'Project name is required'],
         trim: true
     },
     client: {
@@ -23,12 +23,21 @@ const projectSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
-    images: [{
+    beforeImage: {
         type: String
-    }],
-    thumbnailImage: {
+    },
+    afterImage: {
+        type: String
+    },
+    installationVideo: {
+        type: String
+    },
+    clientTestimonial: {
         type: String,
-        required: [true, 'Thumbnail image is required']
+        trim: true
+    },
+    testimonialVideo: {
+        type: String
     },
     completionDate: {
         type: Date
@@ -37,10 +46,10 @@ const projectSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
-    materials: [{
+    materials: {
         type: String,
         trim: true
-    }],
+    },
     dimensions: {
         type: String,
         trim: true
@@ -58,7 +67,7 @@ const projectSchema = new mongoose.Schema({
 })
 
 // Indexes for query performance
-projectSchema.index({ title: 'text', description: 'text', tags: 'text' })
+projectSchema.index({ name: 'text', description: 'text', tags: 'text' })
 projectSchema.index({ category: 1 })
 projectSchema.index({ featured: 1, createdAt: -1 })
 projectSchema.index({ completionDate: -1 })

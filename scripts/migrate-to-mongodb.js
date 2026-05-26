@@ -52,16 +52,19 @@ const productSchema = new mongoose.Schema({
 }, { timestamps: true })
 
 const projectSchema = new mongoose.Schema({
-    title: String,
+    name: String,
     client: String,
     category: String,
     description: String,
     longDescription: String,
-    images: [String],
-    thumbnailImage: String,
+    beforeImage: String,
+    afterImage: String,
+    installationVideo: String,
+    clientTestimonial: String,
+    testimonialVideo: String,
     completionDate: Date,
     location: String,
-    materials: [String],
+    materials: String,
     dimensions: String,
     featured: Boolean,
     tags: [String]

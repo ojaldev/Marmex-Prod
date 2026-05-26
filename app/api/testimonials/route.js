@@ -19,7 +19,7 @@ export async function GET(request) {
         const testimonials = await Testimonial.find(query)
             .sort({ featured: -1, rating: -1, createdAt: -1 })
             .limit(limit)
-            .populate('projectReference', 'title thumbnailImage')
+            .populate('projectReference', 'name afterImage')
             .lean()
 
         return NextResponse.json(testimonials)

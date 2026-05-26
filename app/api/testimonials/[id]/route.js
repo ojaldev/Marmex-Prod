@@ -9,7 +9,7 @@ export async function GET(request, { params }) {
         await connectDB()
 
         const testimonial = await Testimonial.findById(id)
-            .populate('projectReference', 'title thumbnailImage')
+            .populate('projectReference', 'name afterImage')
             .lean()
 
         if (!testimonial) {
