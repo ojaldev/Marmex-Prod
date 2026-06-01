@@ -609,13 +609,11 @@ export default function ProductDetailPage() {
                             transition={{ duration: 0.2 }}
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <Image
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
                                 src={allImages[currentImageIndex]}
                                 alt={product.name}
-                                fill
-                                className="object-contain"
-                                sizes="90vw"
-                                priority
+                                className={styles.lightboxImg}
                             />
                         </motion.div>
                         <motion.button
