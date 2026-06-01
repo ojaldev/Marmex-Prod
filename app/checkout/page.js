@@ -90,7 +90,7 @@ export default function CheckoutPage() {
         try {
             const orderData = {
                 items: cart.map(item => ({
-                    productId: item.id, name: item.name, price: item.price,
+                    productId: item.id || item._id, name: item.name, price: item.price,
                     discount: item.discount || 0, quantity: item.quantity,
                     image: item.mainImage || item.image
                 })),
