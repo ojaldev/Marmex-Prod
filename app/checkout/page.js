@@ -8,7 +8,6 @@ import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '@/contexts/CartContext'
 import AddressSelector from '@/components/checkout/AddressSelector'
-import DeliveryDatePicker from '@/components/checkout/DeliveryDatePicker'
 import ShiprocketShippingSelector from '@/components/checkout/ShiprocketShippingSelector'
 import GiftOptions from '@/components/checkout/GiftOptions'
 import GSTInvoice from '@/components/checkout/GSTInvoice'
@@ -43,7 +42,6 @@ export default function CheckoutPage() {
         firstName: '', lastName: '', phone: '', email: '',
         line1: '', line2: '', city: '', state: '', pincode: ''
     })
-    const [deliveryDate, setDeliveryDate] = useState(null)
     const [shippingMethod, setShippingMethod] = useState(null)
 
     const cartWeight = getCartWeight()
@@ -86,7 +84,6 @@ export default function CheckoutPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        if (!deliveryDate) { alert('Please select a delivery date'); return }
         if (!shippingMethod) { alert('Please select a shipping method'); return }
 
         setLoading(true)
@@ -100,7 +97,7 @@ export default function CheckoutPage() {
                 shippingAddress: getShippingAddress(), billingAddress: getShippingAddress(),
                 paymentMethod: paymentMethod === 'cod' ? 'cod' : 'card',
                 guestEmail: !session ? manualAddress.email : undefined,
-                promoCode: appliedPromo?.code, deliveryDate, shippingMethod,
+                promoCode: appliedPromo?.code, shippingMethod,
                 giftOptions: giftData, gstInvoice: gstData,
                 subtotal, tax, shipping: shippingCost, discount: promoDiscount, total
             }
@@ -335,7 +332,6 @@ export default function CheckoutPage() {
                                     animate="visible"
                                     exit={{ opacity: 0, x: -20 }}
                                 >
-                                    <DeliveryDatePicker onSelect={setDeliveryDate} selectedDate={deliveryDate} />
                                     <ShiprocketShippingSelector
                                         destinationPincode={destinationPincode}
                                         cartTotal={subtotal}
@@ -436,8 +432,8 @@ export default function CheckoutPage() {
                                         </div>
                                         <div className={styles.reviewSection}>
                                             <h4>Delivery</h4>
-                                            <p>{deliveryDate ? new Date(deliveryDate).toLocaleDateString() : 'Not selected'}</p>
                                             <p>{shippingMethod?.name || 'Not selected'}</p>
+                                            <p>ETA: {shippingMethod?.estimatedDays || '3-5'} business days</p>
                                         </div>
                                         <div className={styles.reviewSection}>
                                             <h4>Payment</h4>
