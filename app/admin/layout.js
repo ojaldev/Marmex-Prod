@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { LayoutDashboard, Package, Briefcase, Star, MessageSquare, FolderOpen, Home, Settings, LogOut, ShoppingCart, RotateCcw, Truck, BarChart3 } from 'lucide-react'
+import { LayoutDashboard, Package, Briefcase, Star, MessageSquare, FolderOpen, Home, Settings, LogOut, ShoppingCart, RotateCcw, Truck, BarChart3, Tag } from 'lucide-react'
 import styles from './admin.module.css'
 
 export default function AdminLayout({ children }) {
@@ -54,6 +54,7 @@ export default function AdminLayout({ children }) {
         { href: '/admin/shipments', icon: Truck, label: 'Shipments' },
         { href: '/admin/returns', icon: RotateCcw, label: 'Returns' },
         { href: '/admin/couriers', icon: BarChart3, label: 'Couriers' },
+        { href: '/admin/promocodes', icon: Tag, label: 'Promo Codes' },
         { href: '/admin/products', icon: Package, label: 'Products', count: counts.products },
         { href: '/admin/categories', icon: FolderOpen, label: 'Categories' },
         { href: '/admin/projects', icon: Briefcase, label: 'Portfolio', count: counts.projects },
