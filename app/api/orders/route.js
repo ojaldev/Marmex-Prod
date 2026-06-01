@@ -134,15 +134,26 @@ export async function POST(request) {
         if (paymentMethod === 'cod') {
             try {
                 const payload = buildForwardShipmentPayload(order)
-                const srResponse = await createForwardShipment(payload)
+                console.log('📦 Shiprocket forward payload:', JSON.stringify(payload, null, 2))
 
-                const orderData = srResponse.payload || srResponse.response?.data || srResponse
-                const shiprocketOrderId = orderData.order_id || orderData.sr_order_id
-                const shipmentId = orderData.shipment_id
-                const awbCode = orderData.awb_code || orderData.awb
-                const courierName = orderData.courier_name
-                const courierId = orderData.courier_company_id
-                const labelUrl = orderData.label_url
+                const srResponse = await createForwardShipment(payload)
+                console.log('📦 Shiprocket raw response:', JSON.stringify(srResponse, null, 2))
+
+                // Shiprocket may return nested or flat structure
+                const orderData = srResponse.payload || srResponse.data || srResponse.response?.data || srResponse
+                console.log('📦 Shiprocket extracted orderData:', JSON.stringify(orderData, null, 2))
+
+                const shiprocketOrderId = orderData.order_id || orderData.sr_order_id || orderData.id
+                const shipmentId = orderData.shipment_id || orderData.shipmentId
+                const awbCode = orderData.awb_code || orderData.awb || orderData.awbCode
+                const courierName = orderData.courier_name || orderData.courierName
+                const courierId = orderData.courier_company_id || orderData.courierId
+                const labelUrl = orderData.label_url || orderData.labelUrl
+
+                if (!awbCode) {
+                    console.warn('⚠️ Shiprocket returned success but no AWB. Full response:', JSON.stringify(srResponse))
+                    throw new Error('Shiprocket did not return an AWB code')
+                }
 
                 order.shiprocket = {
                     orderId: String(shiprocketOrderId || ''),
