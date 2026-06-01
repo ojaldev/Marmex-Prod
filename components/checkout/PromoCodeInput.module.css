@@ -11,6 +11,7 @@
     border-radius: var(--radius-md);
     background: white;
     transition: border-color var(--duration-fast) ease;
+    overflow: hidden;
 }
 
 .inputWrapper:focus-within {
@@ -24,6 +25,7 @@
 
 .input {
     flex: 1;
+    min-width: 0;
     border: none;
     outline: none;
     font-size: var(--text-base);
@@ -46,6 +48,7 @@
     cursor: pointer;
     transition: all var(--duration-fast) ease;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .applyBtn:hover:not(:disabled) {
@@ -121,4 +124,21 @@
     border-color: var(--color-ruby);
     color: var(--color-ruby);
     transform: scale(1.1);
+}
+
+/* Responsive: stack button below input on narrow containers */
+@media (max-width: 400px) {
+    .inputWrapper {
+        flex-wrap: wrap;
+    }
+
+    .input {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .applyBtn {
+        width: 100%;
+        text-align: center;
+    }
 }
