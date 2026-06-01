@@ -45,6 +45,19 @@ export async function GET(request) {
             weight
         })
 
+        // DEBUG: Log full Shiprocket response for troubleshooting
+        console.log('Shiprocket serviceability response:', {
+            pickupPincode,
+            deliveryPincode,
+            cod,
+            weight,
+            hasData: !!data.data,
+            availableCouriersCount: data.data?.available_courier_companies?.length || 0,
+            recommendedCourierCount: data.data?.recommended_courier_company_id || 0,
+            responseKeys: Object.keys(data),
+            fullResponse: JSON.stringify(data).slice(0, 2000)
+        })
+
         // Format response for frontend
         const availableCouriers = data.data?.available_courier_companies || []
         const isServiceable = availableCouriers.length > 0
@@ -62,6 +75,12 @@ export async function GET(request) {
             isRecommended: !!c.is_recommended
         })).sort((a, b) => a.rate - b.rate)
 
+        // Check if Shiprocket returned an error message instead of courier data
+        const shiprocketMessage = data.message || data.data?.message
+        if (shiprocketMessage && !isServiceable) {
+            console.warn('Shiprocket serviceability message:', shiprocketMessage)
+        }
+
         return NextResponse.json({
             serviceable: isServiceable,
             pickupPincode,
@@ -69,6 +88,7 @@ export async function GET(request) {
             couriers,
             cod,
             weight,
+            shiprocketMessage: shiprocketMessage || null,
             // Add a recommended option
             recommended: couriers.find(c => c.isRecommended) || couriers[0] || null
         })

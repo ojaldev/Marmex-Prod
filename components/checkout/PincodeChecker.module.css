@@ -97,6 +97,14 @@
     color: #c2410c;
 }
 
+.errorDetail {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    color: #9a3412;
+    opacity: 0.85;
+}
+
 .success {
     display: flex;
     align-items: flex-start;

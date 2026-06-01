@@ -105,7 +105,12 @@ export default function PincodeChecker({ productWeight = 1, codAvailable = true 
                         ) : (
                             <div className={styles.notAvailable}>
                                 <X size={16} />
-                                <span>Sorry, delivery not available to {result.pincode}</span>
+                                <div>
+                                    <span>Sorry, delivery not available to {result.pincode}</span>
+                                    {result.shiprocketMessage && (
+                                        <small className={styles.errorDetail}>{result.shiprocketMessage}</small>
+                                    )}
+                                </div>
                             </div>
                         )}
                     </motion.div>
