@@ -426,7 +426,7 @@ export default function ProductDetailPage() {
 
                             {/* Pincode Delivery Check */}
                             <PincodeChecker
-                                productWeight={product.weight ? parseFloat(product.weight.match(/[\d.]+/)?.[0] || 1) : 1}
+                                productWeight={product.weight || '1'}
                                 codAvailable={product.price < 50000}
                             />
 

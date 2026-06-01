@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect } from 'react'
+import { parseWeight } from '@/lib/shiprocket-order'
 
 const CartContext = createContext()
 
@@ -75,9 +76,7 @@ export function CartProvider({ children }) {
 
     const getCartWeight = () => {
         return cart.reduce((total, item) => {
-            const weightStr = item.weight || '1 Kg'
-            const match = weightStr.match(/([\d.]+)/)
-            const weightKg = match ? parseFloat(match[1]) : 1
+            const weightKg = parseWeight(item.weight)
             return total + (weightKg * item.quantity)
         }, 0)
     }

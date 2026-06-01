@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getShippingRates } from '@/lib/shiprocket'
+import { parseWeight } from '@/lib/shiprocket-order'
 
 /**
  * GET /api/shiprocket/rates?deliveryPincode=560064&cod=0&weight=1.5
@@ -12,7 +13,8 @@ export async function GET(request) {
         const { searchParams } = new URL(request.url)
         const deliveryPincode = searchParams.get('deliveryPincode')
         const cod = parseInt(searchParams.get('cod') || '0')
-        const weight = parseFloat(searchParams.get('weight') || '1')
+        const weightParam = searchParams.get('weight') || '1'
+        const weight = parseWeight(weightParam)
 
         const pickupPincode = process.env.SHIPROCKET_PICKUP_PINCODE
 
