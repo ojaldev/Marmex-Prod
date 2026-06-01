@@ -124,13 +124,24 @@ export default function ProductDetailPage() {
         })
     }
 
+    // Compute allImages early so callbacks can close over it safely
+    const allImages = product
+        ? [product.mainImage, ...(product.additionalImages || [])].filter(Boolean).map(convertGDriveUrl)
+        : []
+
     const nextImage = useCallback(() => {
-        setCurrentImageIndex(prev => (prev + 1) % allImages.length)
-    }, [])
+        setCurrentImageIndex(prev => {
+            const len = allImages.length || 1
+            return (prev + 1) % len
+        })
+    }, [allImages.length])
 
     const prevImage = useCallback(() => {
-        setCurrentImageIndex(prev => (prev - 1 + allImages.length) % allImages.length)
-    }, [])
+        setCurrentImageIndex(prev => {
+            const len = allImages.length || 1
+            return (prev - 1 + len) % len
+        })
+    }, [allImages.length])
 
     // Keyboard navigation for lightbox
     useEffect(() => {
@@ -183,9 +194,6 @@ export default function ProductDetailPage() {
             </main>
         )
     }
-
-    const allImages = [product.mainImage, ...(product.additionalImages || [])]
-        .filter(Boolean).map(convertGDriveUrl)
 
     const discountedPrice = product.discount > 0
         ? (product.price * (100 - product.discount) / 100).toFixed(0)
