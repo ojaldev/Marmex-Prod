@@ -51,7 +51,7 @@ export default function CheckoutPage() {
     const [giftData, setGiftData] = useState({ isGift: false, message: '', cost: 0 })
     const [gstData, setGSTData] = useState({ needsGST: false })
     const [appliedPromo, setAppliedPromo] = useState(null)
-    const [paymentMethod, setPaymentMethod] = useState('razorpay')
+    const [paymentMethod, setPaymentMethod] = useState('cod')
 
     useEffect(() => {
         loadRazorpay().then(setRazorpayLoaded)
@@ -372,15 +372,14 @@ export default function CheckoutPage() {
                                         <h2><CreditCard size={20} /> Payment Method</h2>
                                         <div className={styles.paymentOptions}>
                                             <motion.label
-                                                className={`${styles.paymentOption} ${paymentMethod === 'razorpay' ? styles.selected : ''}`}
-                                                whileHover={{ scale: 1.01 }}
-                                                whileTap={{ scale: 0.99 }}
+                                                className={`${styles.paymentOption} ${styles.disabledOption}`}
                                             >
-                                                <input type="radio" name="payment" value="razorpay" checked={paymentMethod === 'razorpay'} onChange={(e) => setPaymentMethod(e.target.value)} />
+                                                <input type="radio" name="payment" value="razorpay" disabled checked={false} onChange={() => {}} />
                                                 <div className={styles.paymentContent}>
                                                     <strong>Online Payment</strong>
                                                     <span>UPI, Cards, Wallets, Net Banking</span>
                                                 </div>
+                                                <span className={styles.comingSoonBadge}>Coming Soon</span>
                                             </motion.label>
                                             <motion.label
                                                 className={`${styles.paymentOption} ${paymentMethod === 'cod' ? styles.selected : ''}`}
@@ -437,7 +436,7 @@ export default function CheckoutPage() {
                                         </div>
                                         <div className={styles.reviewSection}>
                                             <h4>Payment</h4>
-                                            <p>{paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment (Razorpay)'}</p>
+                                            <p>{paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment (Coming Soon)'}</p>
                                         </div>
                                     </section>
                                     <div className={styles.stepNav}>
@@ -502,14 +501,16 @@ export default function CheckoutPage() {
                             <motion.button
                                 type="submit"
                                 className={`btn btn-primary w-full mt-6 ${styles.checkoutBtn}`}
-                                disabled={loading}
+                                disabled={loading || currentStep !== 4}
                                 whileHover={{ y: -2 }}
                                 whileTap={{ scale: 0.98 }}
                             >
                                 {loading ? (
                                     <><Loader2 size={18} className="animate-spin" /> Processing...</>
+                                ) : currentStep !== 4 ? (
+                                    <><Lock size={18} /> Complete Steps to Place Order</>
                                 ) : (
-                                    <><Lock size={18} /> {paymentMethod === 'cod' ? 'Place Order' : 'Proceed to Payment'}</>
+                                    <><Lock size={18} /> Place Order</>
                                 )}
                             </motion.button>
 
