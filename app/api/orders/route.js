@@ -119,10 +119,10 @@ export async function POST(request) {
         }
 
         const order = await Order.create(orderData)
+        const emailAddress = session?.user?.email || guestEmail
 
         // Send order confirmation email
         try {
-            const emailAddress = session?.user?.email || guestEmail
             if (emailAddress) {
                 await sendOrderConfirmationEmail(emailAddress, order)
             }
