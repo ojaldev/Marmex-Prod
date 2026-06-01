@@ -4,6 +4,7 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import ScrollProgress from '@/components/layout/ScrollProgress'
 import ScrollToTop from '@/components/layout/ScrollToTop'
+import RouteScrollToTop from '@/components/layout/RouteScrollToTop'
 import PageTransition from '@/components/layout/PageTransition'
 
 export const metadata = {
@@ -22,6 +23,7 @@ export default function RootLayout({ children }) {
         <html lang="en">
             <body>
                 <Providers>
+                    <RouteScrollToTop />
                     <ScrollProgress />
                     <Header />
                     <PageTransition>

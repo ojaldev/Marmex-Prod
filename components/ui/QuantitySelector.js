@@ -18,28 +18,43 @@ export default function QuantitySelector({
     if (value < max) onChange?.(value + 1)
   }
 
-  const sizeClass = size === 'small'
-    ? 'h-8 w-8'
-    : size === 'large'
-    ? 'h-12 w-12'
-    : 'h-10 w-10'
+  const sizes = {
+    small: {
+      wrap: 'h-8 gap-1',
+      btn: 'w-7 h-7',
+      icon: 12,
+      num: 'w-7 text-sm',
+    },
+    medium: {
+      wrap: 'h-11 gap-1.5',
+      btn: 'w-10 h-10',
+      icon: 16,
+      num: 'w-10 text-base',
+    },
+    large: {
+      wrap: 'h-14 gap-2',
+      btn: 'w-12 h-12',
+      icon: 18,
+      num: 'w-12 text-lg',
+    },
+  }
 
-  const iconSize = size === 'small' ? 14 : size === 'large' ? 20 : 16
+  const s = sizes[size] || sizes.medium
 
   return (
-    <div className="inline-flex items-center border-2 border-[var(--color-platinum)] rounded-lg overflow-hidden bg-white">
+    <div className={`inline-flex items-center ${s.wrap}`}>
       <motion.button
         type="button"
         onClick={decrement}
         disabled={value <= min}
-        className={`${sizeClass} flex items-center justify-center text-[var(--color-obsidian)] hover:bg-[var(--color-pearl)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors`}
+        className={`${s.btn} flex items-center justify-center rounded-full border-2 border-[var(--color-platinum)] bg-white text-[var(--color-obsidian)] transition-all duration-200 hover:border-[var(--color-gold-24k)] hover:bg-[var(--color-gold-24k)] hover:text-white disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-[var(--color-platinum)] disabled:hover:bg-white disabled:hover:text-[var(--color-obsidian)]`}
         whileTap={{ scale: 0.9 }}
         aria-label="Decrease quantity"
       >
-        <Minus size={iconSize} />
+        <Minus size={s.icon} strokeWidth={2.5} />
       </motion.button>
 
-      <span className={`${sizeClass} flex items-center justify-center font-semibold text-[var(--color-obsidian)] border-x-2 border-[var(--color-platinum)] min-w-[3rem]`}>
+      <span className={`${s.num} flex items-center justify-center font-bold text-[var(--color-obsidian)] tabular-nums select-none`}>
         {value}
       </span>
 
@@ -47,11 +62,11 @@ export default function QuantitySelector({
         type="button"
         onClick={increment}
         disabled={value >= max}
-        className={`${sizeClass} flex items-center justify-center text-[var(--color-obsidian)] hover:bg-[var(--color-pearl)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors`}
+        className={`${s.btn} flex items-center justify-center rounded-full border-2 border-[var(--color-platinum)] bg-white text-[var(--color-obsidian)] transition-all duration-200 hover:border-[var(--color-gold-24k)] hover:bg-[var(--color-gold-24k)] hover:text-white disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-[var(--color-platinum)] disabled:hover:bg-white disabled:hover:text-[var(--color-obsidian)]`}
         whileTap={{ scale: 0.9 }}
         aria-label="Increase quantity"
       >
-        <Plus size={iconSize} />
+        <Plus size={s.icon} strokeWidth={2.5} />
       </motion.button>
     </div>
   )
