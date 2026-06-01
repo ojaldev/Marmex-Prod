@@ -561,7 +561,7 @@ export default function ProductDetailPage() {
                                 viewport={{ once: true }}
                             >
                                 {relatedProducts.map(related => (
-                                    <motion.div key={related.id} variants={fadeInUp}>
+                                    <motion.div key={related._id || related.id} variants={fadeInUp}>
                                         <ProductCard product={related} />
                                     </motion.div>
                                 ))}
@@ -575,6 +575,7 @@ export default function ProductDetailPage() {
             <AnimatePresence>
                 {lightboxOpen && (
                     <motion.div
+                        key="lightbox"
                         className={styles.lightbox}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -592,10 +593,12 @@ export default function ProductDetailPage() {
                             <ChevronLeft size={32} />
                         </motion.button>
                         <motion.div
+                            key={currentImageIndex}
                             className={styles.lightboxImage}
-                            initial={{ scale: 0.9 }}
-                            animate={{ scale: 1 }}
-                            exit={{ scale: 0.9 }}
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            transition={{ duration: 0.2 }}
                             onClick={(e) => e.stopPropagation()}
                         >
                             <Image
