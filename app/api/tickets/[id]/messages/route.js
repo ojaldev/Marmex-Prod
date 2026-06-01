@@ -11,7 +11,8 @@ export async function POST(request, { params }) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const ticketId = params.id
+        const { id } = await params
+        const ticketId = id
         const { message, attachments } = await request.json()
 
         if (!message) {

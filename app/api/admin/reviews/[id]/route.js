@@ -10,9 +10,11 @@ export async function GET(request, { params }) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
         }
 
+        const { id } = await params
+
         await connectDB()
 
-        const review = await Review.findById(params.id)
+        const review = await Review.findById(id)
             .populate('user', 'name email')
             .lean()
 
@@ -35,6 +37,8 @@ export async function PUT(request, { params }) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
         }
 
+        const { id } = await params
+
         await connectDB()
 
         const body = await request.json()
@@ -47,7 +51,7 @@ export async function PUT(request, { params }) {
         }
 
         const review = await Review.findByIdAndUpdate(
-            params.id,
+            id,
             {
                 status,
                 adminNote: adminNote || '',
@@ -60,7 +64,7 @@ export async function PUT(request, { params }) {
             return NextResponse.json({ error: 'Review not found' }, { status: 404 })
         }
 
-        console.log(`Review ${params.id} status updated to: ${status}`)
+        console.log(`Review ${id} status updated to: ${status}`)
 
         return NextResponse.json({
             success: true,
@@ -81,9 +85,11 @@ export async function DELETE(request, { params }) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
         }
 
+        const { id } = await params
+
         await connectDB()
 
-        const review = await Review.findByIdAndDelete(params.id)
+        const review = await Review.findByIdAndDelete(id)
 
         if (!review) {
             return NextResponse.json({ error: 'Review not found' }, { status: 404 })

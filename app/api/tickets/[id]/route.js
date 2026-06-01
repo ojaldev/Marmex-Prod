@@ -12,7 +12,8 @@ export async function GET(request, { params }) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const ticketId = params.id
+        const { id } = await params
+        const ticketId = id
 
         await connectDB()
 
@@ -46,7 +47,8 @@ export async function PUT(request, { params }) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const ticketId = params.id
+        const { id } = await params
+        const ticketId = id
         const { status, priority, assignedTo, tags, rating, feedback } = await request.json()
 
         await connectDB()

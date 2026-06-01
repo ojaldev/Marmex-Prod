@@ -9,11 +9,12 @@ export async function PUT(request, { params }) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
         }
 
+        const { id } = await params
         const body = await request.json()
         await connectDB()
 
         const promo = await PromoCode.findByIdAndUpdate(
-            params.id,
+            id,
             {
                 ...body,
                 validFrom: body.validFrom ? new Date(body.validFrom) : undefined,
@@ -39,8 +40,9 @@ export async function DELETE(request, { params }) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
         }
 
+        const { id } = await params
         await connectDB()
-        const promo = await PromoCode.findByIdAndDelete(params.id)
+        const promo = await PromoCode.findByIdAndDelete(id)
 
         if (!promo) {
             return NextResponse.json({ error: 'Promo code not found' }, { status: 404 })

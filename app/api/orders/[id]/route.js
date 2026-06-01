@@ -7,7 +7,8 @@ import Order from '@/models/Order'
 export async function GET(request, { params }) {
     try {
         const session = await auth()
-        const orderId = params.id
+        const { id } = await params
+        const orderId = id
 
         await connectDB()
 
@@ -44,7 +45,8 @@ export async function PUT(request, { params }) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
         }
 
-        const orderId = params.id
+        const { id } = await params
+        const orderId = id
         const body = await request.json()
 
         await connectDB()
@@ -94,7 +96,8 @@ export async function DELETE(request, { params }) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const orderId = params.id
+        const { id } = await params
+        const orderId = id
 
         await connectDB()
 

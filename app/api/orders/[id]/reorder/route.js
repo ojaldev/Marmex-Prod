@@ -11,7 +11,8 @@ export async function POST(request, { params }) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const orderId = params.id
+        const { id } = await params
+        const orderId = id
 
         await connectDB()
 

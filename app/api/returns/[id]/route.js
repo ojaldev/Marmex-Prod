@@ -15,7 +15,8 @@ export async function GET(request, { params }) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const returnId = params.id
+        const { id } = await params
+        const returnId = id
 
         await connectDB()
 
@@ -49,7 +50,8 @@ export async function PUT(request, { params }) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
         }
 
-        const returnId = params.id
+        const { id } = await params
+        const returnId = id
         const { status, adminNotes, pickupScheduled, initiateRefund: shouldInitiateRefund } = await request.json()
 
         await connectDB()
@@ -199,7 +201,8 @@ export async function DELETE(request, { params }) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const returnId = params.id
+        const { id } = await params
+        const returnId = id
 
         await connectDB()
 

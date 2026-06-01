@@ -11,8 +11,9 @@ export async function PUT(request, { params }) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
+        const { id } = await params
         const body = await request.json()
-        const addressId = params.id
+        const addressId = id
 
         await connectDB()
 
@@ -56,7 +57,8 @@ export async function DELETE(request, { params }) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const addressId = params.id
+        const { id } = await params
+        const addressId = id
 
         await connectDB()
 

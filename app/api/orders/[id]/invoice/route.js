@@ -7,7 +7,8 @@ import { generateInvoicePDF } from '@/lib/invoice'
 export async function GET(request, { params }) {
     try {
         const session = await auth()
-        const orderId = params.id
+        const { id } = await params
+        const orderId = id
 
         await connectDB()
 

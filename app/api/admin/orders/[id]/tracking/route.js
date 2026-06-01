@@ -9,7 +9,8 @@ export async function PUT(request, { params }) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
         }
 
-        const orderId = params.id
+        const { id } = await params
+        const orderId = id
         const { carrier, trackingNumber, estimatedDelivery, currentLocation, event } = await request.json()
 
         await connectDB()
