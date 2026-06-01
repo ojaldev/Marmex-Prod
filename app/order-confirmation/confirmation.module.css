@@ -66,6 +66,7 @@
     background: var(--color-pearl);
     border-radius: var(--radius-lg);
     margin-bottom: var(--space-2xl);
+    max-width: 100%;
 }
 
 .orderNumber span {
@@ -80,6 +81,8 @@
     color: var(--color-gold-24k);
     font-weight: 700;
     font-family: var(--font-mono);
+    word-break: break-all;
+    overflow-wrap: anywhere;
 }
 
 /* ===== STATUS STEPS ===== */
