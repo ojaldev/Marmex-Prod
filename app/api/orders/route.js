@@ -150,9 +150,31 @@ export async function POST(request) {
                 const courierId = orderData.courier_company_id || orderData.courierId
                 const labelUrl = orderData.label_url || orderData.labelUrl
 
+                const shiprocketError = orderData.awb_assign_error || orderData.error || orderData.message
+
                 if (!awbCode) {
-                    console.warn('⚠️ Shiprocket returned success but no AWB. Full response:', JSON.stringify(srResponse))
-                    throw new Error('Shiprocket did not return an AWB code')
+                    console.warn('⚠️ Shiprocket returned success but no AWB. Reason:', shiprocketError)
+
+                    // Still save Shiprocket order/shipment IDs for retry
+                    order.shiprocket = {
+                        orderId: String(shiprocketOrderId || ''),
+                        shipmentId: String(shipmentId || ''),
+                        awbCode: '',
+                        courierId: null,
+                        courierName: '',
+                        labelUrl: '',
+                        pickupStatus: 'pending',
+                        lastSyncedAt: new Date()
+                    }
+
+                    order.timeline.push({
+                        status: 'pending',
+                        timestamp: new Date(),
+                        note: `Shiprocket: Order created but AWB failed — ${shiprocketError || 'Unknown error'}`
+                    })
+
+                    await order.save()
+                    throw new Error(shiprocketError || 'Shiprocket did not return an AWB code')
                 }
 
                 order.shiprocket = {
