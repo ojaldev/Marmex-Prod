@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Save, Trash2, Upload, X } from 'lucide-react'
+import { ArrowLeft, Save, Trash2, Upload, X, Video, Play } from 'lucide-react'
 import styles from '../product-editor.module.css'
 import { parseDimensions, parseWeight, validateDimensions, validateWeight, formatDimensions, formatWeight } from '@/lib/product-specs'
 
@@ -13,6 +13,7 @@ export default function EditProductPage() {
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [uploadingImage, setUploadingImage] = useState(null)
+    const [uploadingVideo, setUploadingVideo] = useState(false)
     const [categories, setCategories] = useState([])
     const [formData, setFormData] = useState({
         name: '',
@@ -35,6 +36,7 @@ export default function EditProductPage() {
         videoThumbnail: '',
         videoUrl: '',
         instagramReel: '',
+        videos: [],
         metaTitle: '',
         metaDescription: '',
         tags: '',
@@ -69,6 +71,7 @@ export default function EditProductPage() {
                 additionalImages: product.additionalImages || [],
                 lifestyleImages: product.lifestyleImages || [],
                 packagingImages: product.packagingImages || [],
+                videos: product.videos || [],
                 tags: (product.tags || []).join(', '),
                 discount: product.discount || 0
             })
@@ -80,7 +83,7 @@ export default function EditProductPage() {
         }
     }
 
-    const uploadToCloudinary = async (file, folder = 'marmex/products') => {
+    const uploadToCloudinary = async (file, folder = 'marmex/products', type = 'image') => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader()
             reader.onloadend = async () => {
@@ -89,14 +92,15 @@ export default function EditProductPage() {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            image: reader.result,
-                            folder
+                            file: reader.result,
+                            folder,
+                            type
                         })
                     })
 
                     const data = await res.json()
                     if (res.ok) {
-                        resolve(data.url)
+                        resolve({ url: data.url, publicId: data.publicId })
                     } else {
                         reject(new Error(data.error || 'Upload failed'))
                     }
@@ -115,17 +119,17 @@ export default function EditProductPage() {
 
         setUploadingImage(imageType)
         try {
-            const url = await uploadToCloudinary(file)
+            const result = await uploadToCloudinary(file)
 
             if (imageType === 'mainImage' || imageType === 'videoThumbnail') {
                 setFormData(prev => ({
                     ...prev,
-                    [imageType]: url
+                    [imageType]: result.url
                 }))
             } else {
                 setFormData(prev => ({
                     ...prev,
-                    [imageType]: [...prev[imageType], url]
+                    [imageType]: [...prev[imageType], result.url]
                 }))
             }
         } catch (error) {
@@ -134,6 +138,54 @@ export default function EditProductPage() {
         } finally {
             setUploadingImage(null)
         }
+    }
+
+    const handleVideoUpload = async (e) => {
+        const file = e.target.files[0]
+        if (!file) return
+
+        if (!file.type.startsWith('video/')) {
+            alert('Please upload a valid video file (MP4, WebM, MOV)')
+            return
+        }
+
+        if (file.size > 100 * 1024 * 1024) {
+            alert('Video file size must be less than 100MB')
+            return
+        }
+
+        setUploadingVideo(true)
+        try {
+            const result = await uploadToCloudinary(file, 'marmex/products/videos', 'video')
+            setFormData(prev => ({
+                ...prev,
+                videos: [...prev.videos, {
+                    url: result.url,
+                    publicId: result.publicId,
+                    title: '',
+                    order: prev.videos.length
+                }]
+            }))
+        } catch (error) {
+            console.error('Video upload error:', error)
+            alert(`Failed to upload video: ${error.message}`)
+        } finally {
+            setUploadingVideo(false)
+        }
+    }
+
+    const removeVideo = (index) => {
+        setFormData(prev => ({
+            ...prev,
+            videos: prev.videos.filter((_, i) => i !== index)
+        }))
+    }
+
+    const updateVideoTitle = (index, title) => {
+        setFormData(prev => ({
+            ...prev,
+            videos: prev.videos.map((v, i) => i === index ? { ...v, title } : v)
+        }))
     }
 
     const removeImage = (imageType, index = null) => {
@@ -603,6 +655,55 @@ export default function EditProductPage() {
                             </label>
                         </div>
                         {uploadingImage === 'packagingImages' && <p>Uploading...</p>}
+                    </div>
+
+                    {/* Product Videos — Cloudinary Upload */}
+                    <div className={styles.field}>
+                        <label><Video size={16} /> Product Videos (Cloudinary)</label>
+                        <div className={styles.helpText}>
+                            <p>📌 Upload short product showcase videos. Max 100MB per file. Supported: MP4, WebM, MOV.</p>
+                        </div>
+                        <label className={styles.videoUploadArea}>
+                            <Upload size={28} />
+                            <span>{uploadingVideo ? 'Uploading video...' : 'Click to upload video'}</span>
+                            <input
+                                type="file"
+                                accept="video/mp4,video/webm,video/quicktime"
+                                onChange={handleVideoUpload}
+                                disabled={uploadingVideo}
+                                style={{ display: 'none' }}
+                            />
+                        </label>
+
+                        {formData.videos.length > 0 && (
+                            <div className={styles.videoGrid}>
+                                {formData.videos.map((video, index) => (
+                                    <div key={video.publicId || index} className={styles.videoCard}>
+                                        <div className={styles.videoPreview}>
+                                            <video src={video.url} preload="metadata" />
+                                            <div className={styles.videoPlayOverlay}>
+                                                <Play size={32} color="white" />
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => removeVideo(index)}
+                                                className={styles.removeVideoBtn}
+                                            >
+                                                <X size={16} />
+                                            </button>
+                                        </div>
+                                        <div className={styles.videoInfo}>
+                                            <input
+                                                type="text"
+                                                value={video.title}
+                                                onChange={(e) => updateVideoTitle(index, e.target.value)}
+                                                placeholder="Video title (optional)"
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Video Thumbnail */}

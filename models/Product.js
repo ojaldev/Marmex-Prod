@@ -81,6 +81,12 @@ const productSchema = new mongoose.Schema({
     instagramReel: {
         type: String
     },
+    videos: [{
+        url: { type: String, required: true },
+        publicId: { type: String, required: true },
+        title: { type: String, default: '' },
+        order: { type: Number, default: 0 }
+    }],
     metaTitle: {
         type: String,
         trim: true

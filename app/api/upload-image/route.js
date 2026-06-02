@@ -18,26 +18,36 @@ export async function POST(request) {
         }
 
         const body = await request.json()
-        const { image, folder } = body
+        const { image, file, folder, type } = body
 
-        if (!image) {
-            return NextResponse.json({ error: 'No image provided' }, { status: 400 })
+        const fileData = image || file
+        if (!fileData) {
+            return NextResponse.json({ error: 'No file provided' }, { status: 400 })
         }
 
+        const isVideo = type === 'video'
+
         // Upload to Cloudinary
-        const result = await uploadImage(image, folder || 'marmex/products')
+        const result = await uploadImage(fileData, {
+            folder: folder || (isVideo ? 'marmex/products/videos' : 'marmex/products'),
+            transformation: isVideo ? undefined : [
+                { width: 1000, height: 1000, crop: 'limit' },
+                { quality: 'auto:good' }
+            ],
+            resource_type: isVideo ? 'video' : 'image'
+        })
 
         return NextResponse.json({
             url: result.url,
+            secure_url: result.secure_url,
             publicId: result.publicId
         })
 
     } catch (error) {
-        console.error('Image upload error:', error)
+        console.error('Upload error:', error)
         return NextResponse.json({
-            error: 'Failed to upload image',
+            error: 'Failed to upload file',
             message: error.message
         }, { status: 500 })
     }
 }
-

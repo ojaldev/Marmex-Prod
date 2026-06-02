@@ -19,7 +19,7 @@ import { normalizeDimensionsDisplay, normalizeWeightDisplay } from '@/lib/produc
 import { fadeInUp, staggerContainer } from '@/lib/animations'
 import {
     ChevronLeft, ChevronRight, Heart, Share2, Truck, Shield,
-    RotateCcw, Instagram, X, ZoomIn, Check, Package
+    RotateCcw, Instagram, X, ZoomIn, Check, Package, Play
 } from 'lucide-react'
 import styles from './product-detail.module.css'
 
@@ -33,7 +33,7 @@ export default function ProductDetailPage() {
     const [relatedProducts, setRelatedProducts] = useState([])
     const [reviewSummary, setReviewSummary] = useState(null)
     const [loading, setLoading] = useState(true)
-    const [currentImageIndex, setCurrentImageIndex] = useState(0)
+    const [currentMediaIndex, setCurrentMediaIndex] = useState(0)
     const [quantity, setQuantity] = useState(1)
     const [wishlisted, setWishlisted] = useState(false)
     const [imageZoom, setImageZoom] = useState(false)
@@ -129,19 +129,31 @@ export default function ProductDetailPage() {
         ? [product.mainImage, ...(product.additionalImages || [])].filter(Boolean).map(convertGDriveUrl)
         : []
 
+    // Build media items array: images + videos combined
+    const mediaItems = product
+        ? [
+            ...allImages.map(src => ({ type: 'image', src })),
+            ...(product.videos || []).map(v => ({
+                type: 'video',
+                src: v.url,
+                title: v.title
+            }))
+        ]
+        : []
+
     const nextImage = useCallback(() => {
-        setCurrentImageIndex(prev => {
-            const len = allImages.length || 1
+        setCurrentMediaIndex(prev => {
+            const len = mediaItems.length || 1
             return (prev + 1) % len
         })
-    }, [allImages.length])
+    }, [mediaItems.length])
 
     const prevImage = useCallback(() => {
-        setCurrentImageIndex(prev => {
-            const len = allImages.length || 1
+        setCurrentMediaIndex(prev => {
+            const len = mediaItems.length || 1
             return (prev - 1 + len) % len
         })
-    }, [allImages.length])
+    }, [mediaItems.length])
 
     // Keyboard navigation for lightbox
     useEffect(() => {
@@ -154,6 +166,11 @@ export default function ProductDetailPage() {
         window.addEventListener('keydown', handleKey)
         return () => window.removeEventListener('keydown', handleKey)
     }, [lightboxOpen, nextImage, prevImage])
+
+    // Reset media index when product changes
+    useEffect(() => {
+        setCurrentMediaIndex(0)
+    }, [product?._id || product?.id])
 
     if (loading) {
         return (
@@ -232,43 +249,55 @@ export default function ProductDetailPage() {
                             transition={{ duration: 0.6, delay: 0.2 }}
                         >
                             <div
-                                className={`${styles.mainImage} ${imageZoom ? styles.zoomed : ''}`}
-                                onMouseEnter={() => setImageZoom(true)}
+                                className={`${styles.mainImage} ${imageZoom && mediaItems[currentMediaIndex]?.type === 'image' ? styles.zoomed : ''}`}
+                                onMouseEnter={() => mediaItems[currentMediaIndex]?.type === 'image' && setImageZoom(true)}
                                 onMouseLeave={() => setImageZoom(false)}
                                 onMouseMove={handleImageMouseMove}
                                 onClick={() => setLightboxOpen(true)}
                             >
-                                {allImages[currentImageIndex] ? (
-                                    <Image
-                                        src={allImages[currentImageIndex]}
-                                        alt={product.name}
-                                        fill
-                                        sizes="(max-width: 768px) 100vw, 50vw"
-                                        className={styles.image}
-                                        style={imageZoom ? {
-                                            transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
-                                            transform: 'scale(1.8)',
-                                            transition: 'transform 0.1s ease-out',
-                                        } : {}}
-                                        priority
-                                    />
+                                {mediaItems.length > 0 ? (
+                                    mediaItems[currentMediaIndex]?.type === 'video' ? (
+                                        <video
+                                            src={mediaItems[currentMediaIndex].src}
+                                            className={styles.videoPlayer}
+                                            controls
+                                            autoPlay
+                                            playsInline
+                                        />
+                                    ) : (
+                                        <Image
+                                            src={mediaItems[currentMediaIndex].src}
+                                            alt={product.name}
+                                            fill
+                                            sizes="(max-width: 768px) 100vw, 50vw"
+                                            className={styles.image}
+                                            style={imageZoom ? {
+                                                transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
+                                                transform: 'scale(1.8)',
+                                                transition: 'transform 0.1s ease-out',
+                                            } : {}}
+                                            priority
+                                        />
+                                    )
                                 ) : (
                                     <div className={styles.imagePlaceholder}>No Image</div>
                                 )}
 
-                                {/* Zoom hint */}
-                                <div className={styles.zoomHint}>
-                                    <ZoomIn size={16} />
-                                    <span>Click to enlarge</span>
-                                </div>
+                                {/* Zoom hint - only for images */}
+                                {mediaItems[currentMediaIndex]?.type === 'image' && (
+                                    <div className={styles.zoomHint}>
+                                        <ZoomIn size={16} />
+                                        <span>Click to enlarge</span>
+                                    </div>
+                                )}
 
                                 {/* Navigation Arrows */}
-                                {allImages.length > 1 && (
+                                {mediaItems.length > 1 && (
                                     <>
                                         <motion.button
                                             className={`${styles.navBtn} ${styles.navPrev}`}
                                             onClick={(e) => { e.stopPropagation(); prevImage() }}
-                                            aria-label="Previous image"
+                                            aria-label="Previous media"
                                             whileHover={{ scale: 1.1 }}
                                             whileTap={{ scale: 0.9 }}
                                         >
@@ -277,7 +306,7 @@ export default function ProductDetailPage() {
                                         <motion.button
                                             className={`${styles.navBtn} ${styles.navNext}`}
                                             onClick={(e) => { e.stopPropagation(); nextImage() }}
-                                            aria-label="Next image"
+                                            aria-label="Next media"
                                             whileHover={{ scale: 1.1 }}
                                             whileTap={{ scale: 0.9 }}
                                         >
@@ -298,17 +327,26 @@ export default function ProductDetailPage() {
                             </div>
 
                             {/* Thumbnails */}
-                            {allImages.length > 1 && (
+                            {mediaItems.length > 1 && (
                                 <div className={styles.thumbnails}>
-                                    {allImages.map((img, index) => (
+                                    {mediaItems.map((item, index) => (
                                         <motion.button
                                             key={index}
-                                            className={`${styles.thumbnail} ${index === currentImageIndex ? styles.thumbnailActive : ''}`}
-                                            onClick={() => setCurrentImageIndex(index)}
+                                            className={`${styles.thumbnail} ${index === currentMediaIndex ? styles.thumbnailActive : ''}`}
+                                            onClick={() => setCurrentMediaIndex(index)}
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
                                         >
-                                            <Image src={img} alt={`View ${index + 1}`} fill className={styles.thumbImage} sizes="80px" />
+                                            {item.type === 'video' ? (
+                                                <div className={styles.thumbVideo}>
+                                                    <video src={item.src} preload="metadata" />
+                                                    <div className={styles.thumbPlayIcon}>
+                                                        <Play size={16} color="white" />
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <Image src={item.src} alt={`View ${index + 1}`} fill className={styles.thumbImage} sizes="80px" />
+                                            )}
                                         </motion.button>
                                     ))}
                                 </div>
@@ -601,7 +639,7 @@ export default function ProductDetailPage() {
                             <ChevronLeft size={32} />
                         </motion.button>
                         <motion.div
-                            key={currentImageIndex}
+                            key={currentMediaIndex}
                             className={styles.lightboxImage}
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
@@ -609,12 +647,22 @@ export default function ProductDetailPage() {
                             transition={{ duration: 0.2 }}
                             onClick={(e) => e.stopPropagation()}
                         >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                                src={allImages[currentImageIndex]}
-                                alt={product.name}
-                                className={styles.lightboxImg}
-                            />
+                            {mediaItems[currentMediaIndex]?.type === 'video' ? (
+                                <video
+                                    src={mediaItems[currentMediaIndex].src}
+                                    className={styles.lightboxImg}
+                                    controls
+                                    autoPlay
+                                    playsInline
+                                />
+                            ) : (
+                                /* eslint-disable-next-line @next/next/no-img-element */
+                                <img
+                                    src={mediaItems[currentMediaIndex]?.src}
+                                    alt={product.name}
+                                    className={styles.lightboxImg}
+                                />
+                            )}
                         </motion.div>
                         <motion.button
                             className={`${styles.lightboxNav} ${styles.lightboxNext}`}
@@ -624,7 +672,7 @@ export default function ProductDetailPage() {
                             <ChevronRight size={32} />
                         </motion.button>
                         <div className={styles.lightboxCounter}>
-                            {currentImageIndex + 1} / {allImages.length}
+                            {currentMediaIndex + 1} / {mediaItems.length}
                         </div>
                     </motion.div>
                 )}

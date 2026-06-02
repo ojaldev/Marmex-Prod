@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
 import { validateDimensions, validateWeight, formatDimensions, formatWeight } from '@/lib/product-specs'
+import { deleteResourceFromUrl } from '@/lib/cloudinary'
 
 export async function GET(request, { params }) {
     try {
@@ -47,6 +48,25 @@ export async function PUT(request, { params }) {
             updateData.weight = formatWeight(updateData.weight)
         }
 
+        // Fetch existing product to compare videos
+        const existingProduct = await Product.findById(id).lean()
+        if (!existingProduct) {
+            return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+        }
+
+        // Clean up removed videos from Cloudinary
+        const oldVideos = existingProduct.videos || []
+        const newVideos = updateData.videos || []
+        const removedVideos = oldVideos.filter(oldV =>
+            !newVideos.some(newV => newV.publicId === oldV.publicId)
+        )
+
+        if (removedVideos.length > 0) {
+            Promise.allSettled(removedVideos.map(v => deleteResourceFromUrl(v.url, 'video')))
+                .then(results => console.log(`🗑️ Deleted ${results.filter(r => r.status === 'fulfilled').length} videos from Cloudinary`))
+                .catch(err => console.error('Video cleanup error:', err))
+        }
+
         const product = await Product.findByIdAndUpdate(
             id,
             updateData,
@@ -80,25 +100,23 @@ export async function DELETE(request, { params }) {
         }
 
         // Clean up images from Cloudinary
-        const { deleteImageFromUrl } = await import('@/lib/cloudinary');
-        
-        // Collect all image URLs
-        const imagesToDelete = [];
-        if (product.mainImage) imagesToDelete.push(product.mainImage);
-        if (product.additionalImages && product.additionalImages.length > 0) {
-            imagesToDelete.push(...product.additionalImages);
-        }
-        if (product.lifestyleImages && product.lifestyleImages.length > 0) {
-            imagesToDelete.push(...product.lifestyleImages);
-        }
-        if (product.packagingImages && product.packagingImages.length > 0) {
-            imagesToDelete.push(...product.packagingImages);
-        }
+        const imagesToDelete = []
+        if (product.mainImage) imagesToDelete.push(product.mainImage)
+        if (product.additionalImages?.length) imagesToDelete.push(...product.additionalImages)
+        if (product.lifestyleImages?.length) imagesToDelete.push(...product.lifestyleImages)
+        if (product.packagingImages?.length) imagesToDelete.push(...product.packagingImages)
+        if (product.videoThumbnail) imagesToDelete.push(product.videoThumbnail)
 
-        // Delete all images without blocking the response
-        Promise.allSettled(imagesToDelete.map(url => deleteImageFromUrl(url)))
-            .then(results => console.log(`Deleted ${results.filter(r => r.status === 'fulfilled').length} images for product ${id}`))
-            .catch(err => console.error('Error during product image cleanup:', err));
+        Promise.allSettled(imagesToDelete.map(url => deleteResourceFromUrl(url, 'image')))
+            .then(results => console.log(`🗑️ Deleted ${results.filter(r => r.status === 'fulfilled').length} images from Cloudinary`))
+            .catch(err => console.error('Image cleanup error:', err))
+
+        // Clean up videos from Cloudinary
+        if (product.videos?.length) {
+            Promise.allSettled(product.videos.map(v => deleteResourceFromUrl(v.url, 'video')))
+                .then(results => console.log(`🗑️ Deleted ${results.filter(r => r.status === 'fulfilled').length} videos from Cloudinary`))
+                .catch(err => console.error('Video cleanup error:', err))
+        }
 
         return NextResponse.json({ message: 'Product deleted successfully' })
     } catch (error) {
