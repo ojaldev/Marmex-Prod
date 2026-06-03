@@ -1,6 +1,11 @@
 import { Palette, MessageSquare, CheckCircle, Clock, Sparkles } from 'lucide-react'
 import styles from './custom.module.css'
 
+export const metadata = {
+    title: 'Custom Orders | MarmexIndia',
+    description: 'Bring your vision to life with bespoke marble craftsmanship. Request custom marble products tailored to your unique requirements.',
+}
+
 export default function CustomOrdersPage() {
     return (
         <main className={styles.customPage}>
