@@ -2,10 +2,9 @@ import './globals.css'
 import Providers from '@/components/providers/Providers'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
-import ScrollProgress from '@/components/layout/ScrollProgress'
-import ScrollToTop from '@/components/layout/ScrollToTop'
 import RouteScrollToTop from '@/components/layout/RouteScrollToTop'
 import PageTransition from '@/components/layout/PageTransition'
+import DynamicLayoutExtras from '@/components/layout/DynamicLayoutExtras'
 
 export const metadata = {
     title: 'Marmex India - Premium Marble Art & Sculptures',
@@ -24,13 +23,12 @@ export default function RootLayout({ children }) {
             <body>
                 <Providers>
                     <RouteScrollToTop />
-                    <ScrollProgress />
+                    <DynamicLayoutExtras />
                     <Header />
                     <PageTransition>
                         <main>{children}</main>
                     </PageTransition>
                     <Footer />
-                    <ScrollToTop />
                 </Providers>
             </body>
         </html>

@@ -1,14 +1,16 @@
 'use client'
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ShoppingCart, Heart, Eye } from 'lucide-react'
 import { useWishlist } from '@/contexts/WishlistContext'
 import StarRating from './StarRating'
-import QuickViewModal from './QuickViewModal'
 import styles from './ProductCard.module.css'
+
+const QuickViewModal = dynamic(() => import('./QuickViewModal'), { ssr: false })
 
 export default function ProductCard({ product, onAddToCart }) {
     const { toggleWishlist, isInWishlist } = useWishlist()

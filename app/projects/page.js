@@ -1,11 +1,13 @@
 'use client'
 
 import { useEffect, useState, useMemo } from 'react'
+import dynamic from 'next/dynamic'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MapPin, Play, FileText, Filter, Star, Grid3X3, LayoutGrid } from 'lucide-react'
 import ProjectCard from '@/components/projects/ProjectCard'
-import ProjectDetailModal from '@/components/projects/ProjectDetailModal'
 import SectionHeader from '@/components/ui/SectionHeader'
+
+const ProjectDetailModal = dynamic(() => import('@/components/projects/ProjectDetailModal'), { ssr: false })
 import { fadeInUp, staggerContainer, easing } from '@/lib/animations'
 import styles from './projects.module.css'
 

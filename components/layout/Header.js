@@ -11,8 +11,10 @@ import {
 } from 'lucide-react'
 import { useCart } from '@/contexts/CartContext'
 import { useWishlist } from '@/contexts/WishlistContext'
-import MiniCart from '@/components/cart/MiniCart'
+import dynamic from 'next/dynamic'
 import { navDropdown, fadeIn } from '@/lib/animations'
+
+const MiniCart = dynamic(() => import('@/components/cart/MiniCart'), { ssr: false })
 import styles from './Header.module.css'
 
 export default function Header() {
