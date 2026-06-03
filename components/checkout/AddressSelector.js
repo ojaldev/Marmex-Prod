@@ -238,7 +238,7 @@ export default function AddressSelector({ onSelect, selectedAddress }) {
                                     name="phone"
                                     value={formData.phone}
                                     onChange={handleChange}
-                                    placeholder="+91 XXXXX XXXXX"
+                                    placeholder="+91 95821 34493"
                                     required
                                 />
                             </div>

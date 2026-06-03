@@ -34,7 +34,7 @@ export default function ContactPage() {
                                 <Phone size={24} color="var(--color-secondary)" />
                                 <div>
                                     <h4>Phone</h4>
-                                    <p>+91 XXXXX XXXXX</p>
+                                    <p>+91 95821 34493</p>
                                 </div>
                             </div>
 
@@ -42,7 +42,7 @@ export default function ContactPage() {
                                 <Mail size={24} color="var(--color-secondary)" />
                                 <div>
                                     <h4>Email</h4>
-                                    <p>contact@marmexindia.com</p>
+                                    <p>Marmexindia@gmail.com</p>
                                 </div>
                             </div>
 
@@ -86,7 +86,7 @@ export default function ContactPage() {
 
                                 <div className={styles.field}>
                                     <label>Phone Number</label>
-                                    <input type="tel" placeholder="+91 XXXXX XXXXX" />
+                                    <input type="tel" placeholder="+91 95821 34493" />
                                 </div>
 
                                 <div className={styles.field}>
@@ -114,7 +114,7 @@ export default function ContactPage() {
                         Looking for bulk orders or custom marble installations? We specialize in large-scale projects
                         for hotels, restaurants, residential complexes, and commercial spaces. Contact us for a personalized quote.
                     </p>
-                    <a href="mailto:contact@marmexindia.com" className="btn btn-secondary">Request Bulk Quote</a>
+                    <a href="mailto:Marmexindia@gmail.com" className="btn btn-secondary">Request Bulk Quote</a>
                 </div>
             </div>
         </main>

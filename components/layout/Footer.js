@@ -132,7 +132,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <MapPin size={16} />
-                  <span>Jaipur, Rajasthan, India</span>
+                  <span>Noida, India</span>
                 </li>
               </ul>
             </motion.div>
