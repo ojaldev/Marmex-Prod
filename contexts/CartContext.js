@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react'
 import { parseWeight } from '@/lib/shiprocket-order'
 
 const CartContext = createContext()
@@ -22,7 +22,7 @@ export function CartProvider({ children }) {
         localStorage.setItem('marmex-cart', JSON.stringify(cart))
     }, [cart])
 
-    const addToCart = (product, quantity = 1) => {
+    const addToCart = useCallback((product, quantity = 1) => {
         setCart(prevCart => {
             const existingItem = prevCart.find(item => item.id === product.id)
 
@@ -38,15 +38,15 @@ export function CartProvider({ children }) {
         })
 
         setIsCartOpen(true) // Open mini cart when item added
-    }
+    }, [])
 
-    const removeFromCart = (productId) => {
+    const removeFromCart = useCallback((productId) => {
         setCart(prevCart => prevCart.filter(item => item.id !== productId))
-    }
+    }, [])
 
-    const updateQuantity = (productId, quantity) => {
+    const updateQuantity = useCallback((productId, quantity) => {
         if (quantity <= 0) {
-            removeFromCart(productId)
+            setCart(prevCart => prevCart.filter(item => item.id !== productId))
             return
         }
 
@@ -55,33 +55,33 @@ export function CartProvider({ children }) {
                 item.id === productId ? { ...item, quantity } : item
             )
         )
-    }
+    }, [])
 
-    const clearCart = () => {
+    const clearCart = useCallback(() => {
         setCart([])
-    }
+    }, [])
 
-    const getCartTotal = () => {
+    const getCartTotal = useCallback(() => {
         return cart.reduce((total, item) => {
             const price = item.discount > 0
                 ? item.price * (100 - item.discount) / 100
                 : item.price
             return total + (price * item.quantity)
         }, 0)
-    }
+    }, [cart])
 
-    const getCartCount = () => {
+    const getCartCount = useCallback(() => {
         return cart.reduce((count, item) => count + item.quantity, 0)
-    }
+    }, [cart])
 
-    const getCartWeight = () => {
+    const getCartWeight = useCallback(() => {
         return cart.reduce((total, item) => {
             const weightKg = parseWeight(item.weight)
             return total + (weightKg * item.quantity)
         }, 0)
-    }
+    }, [cart])
 
-    const value = {
+    const value = useMemo(() => ({
         cart,
         addToCart,
         removeFromCart,
@@ -92,7 +92,7 @@ export function CartProvider({ children }) {
         getCartWeight,
         isCartOpen,
         setIsCartOpen
-    }
+    }), [cart, addToCart, removeFromCart, updateQuantity, clearCart, getCartTotal, getCartCount, getCartWeight, isCartOpen])
 
     return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }
