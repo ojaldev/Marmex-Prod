@@ -41,12 +41,15 @@ export default function Newsletter() {
                         <motion.div className={styles.iconWrapper} variants={fadeInUp}>
                             <Mail size={32} />
                         </motion.div>
+                        <motion.div className={styles.badge} variants={fadeInUp}>
+                            🎁 Get 10% off your first order
+                        </motion.div>
                         <motion.h2 className={styles.title} variants={fadeInUp}>
                             Join Our Inner Circle
                         </motion.h2>
                         <motion.p className={styles.description} variants={fadeInUp}>
-                            Be the first to discover new collections, exclusive offers, and stories 
-                            from our master artisans. No spam, only beauty.
+                            Subscribe for exclusive early access to new collections, artisan stories,
+                            and a <strong>10% discount</strong> on your first purchase. No spam, only beauty.
                         </motion.p>
 
                         <motion.form
@@ -90,7 +93,7 @@ export default function Newsletter() {
                                     initial={{ opacity: 0, y: 5 }}
                                     animate={{ opacity: 1, y: 0 }}
                                 >
-                                    Welcome to the family! Check your inbox for a surprise.
+                                    🎉 Welcome! Your 10% off code is on its way to your inbox.
                                 </motion.p>
                             )}
                         </motion.form>

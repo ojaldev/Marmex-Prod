@@ -3,6 +3,8 @@ import { fontDisplay, fontBody, fontAccent } from './fonts'
 import Providers from '@/components/providers/Providers'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
+import AnnouncementBar from '@/components/layout/AnnouncementBar'
+import WhatsAppButton from '@/components/layout/WhatsAppButton'
 import RouteScrollToTop from '@/components/layout/RouteScrollToTop'
 import PageTransition from '@/components/layout/PageTransition'
 import DynamicLayoutExtras from '@/components/layout/DynamicLayoutExtras'
@@ -25,11 +27,13 @@ export default function RootLayout({ children }) {
                 <Providers>
                     <RouteScrollToTop />
                     <DynamicLayoutExtras />
+                    <AnnouncementBar />
                     <Header />
                     <PageTransition>
                         <main>{children}</main>
                     </PageTransition>
                     <Footer />
+                    <WhatsAppButton />
                 </Providers>
             </body>
         </html>

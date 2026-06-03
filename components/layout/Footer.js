@@ -73,7 +73,7 @@ export default function Footer() {
                 <a href="https://youtube.com/@stoneartwala" target="_blank" rel="noopener" aria-label="YouTube">
                   <Youtube size={20} />
                 </a>
-                <a href="mailto:contact@marmexindia.com" aria-label="Email">
+                <a href="mailto:Marmexindia@gmail.com" aria-label="Email">
                   <Mail size={20} />
                 </a>
               </div>
@@ -124,15 +124,15 @@ export default function Footer() {
               <ul className={styles.contactInfo}>
                 <li>
                   <Phone size={16} />
-                  <span>+91 XXXXX XXXXX</span>
+                  <a href="tel:+919582134493">+91 95821 34493</a>
                 </li>
                 <li>
                   <Mail size={16} />
-                  <span>contact@marmexindia.com</span>
+                  <a href="mailto:Marmexindia@gmail.com">Marmexindia@gmail.com</a>
                 </li>
                 <li>
                   <MapPin size={16} />
-                  <span>India</span>
+                  <span>Jaipur, Rajasthan, India</span>
                 </li>
               </ul>
             </motion.div>

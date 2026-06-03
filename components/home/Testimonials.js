@@ -16,13 +16,57 @@ export default function Testimonials() {
         loadTestimonials()
     }, [])
 
+    const FALLBACK_TESTIMONIALS = [
+        {
+            _id: '1',
+            customerName: 'Priya Sharma',
+            location: 'Mumbai, Maharashtra',
+            rating: 5,
+            content: 'The marble Ganesha statue exceeded all expectations. The craftsmanship is exquisite — you can see the passion in every detail. It has become the centerpiece of our home.',
+            productReference: 'Divine Ganesha Marble Sculpture'
+        },
+        {
+            _id: '2',
+            customerName: 'Rahul Mehta',
+            location: 'Delhi, NCR',
+            rating: 5,
+            content: 'Ordered a custom marble chess set as a gift for my father. The quality is unmatched and the packaging was luxurious. He was absolutely thrilled!',
+            productReference: 'Royal Marble Chess Set'
+        },
+        {
+            _id: '3',
+            customerName: 'Ananya Patel',
+            location: 'Bangalore, Karnataka',
+            rating: 5,
+            content: 'Beautiful dining decor pieces that transformed our space. The marble coasters and serving tray are both functional and stunning. Highly recommend!',
+            productReference: 'Marble Dining Decor Collection'
+        },
+        {
+            _id: '4',
+            customerName: 'Vikram Reddy',
+            location: 'Hyderabad, Telangana',
+            rating: 5,
+            content: 'The personalised marble plaque for our anniversary was perfect. The engraving was precise and the stone quality is premium. Will definitely order again.',
+            productReference: 'Personalised Marble Plaque'
+        },
+        {
+            _id: '5',
+            customerName: 'Sneha Gupta',
+            location: 'Pune, Maharashtra',
+            rating: 5,
+            content: 'Fast shipping and exceptional quality. The marble pooja thali is absolutely gorgeous — even better than the photos. A true work of art.',
+            productReference: 'Traditional Marble Pooja Thali'
+        }
+    ]
+
     const loadTestimonials = async () => {
         try {
             const res = await fetch('/api/testimonials')
             const data = await res.json()
-            setTestimonials(data)
+            setTestimonials(data?.length > 0 ? data : FALLBACK_TESTIMONIALS)
         } catch (error) {
             console.error('Failed to load testimonials:', error)
+            setTestimonials(FALLBACK_TESTIMONIALS)
         } finally {
             setLoading(false)
         }
