@@ -1,4 +1,5 @@
 import './globals.css'
+import { fontDisplay, fontBody, fontAccent } from './fonts'
 import Providers from '@/components/providers/Providers'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
@@ -19,8 +20,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
     return (
-        <html lang="en">
-            <body>
+        <html lang="en" className={`${fontDisplay.variable} ${fontBody.variable} ${fontAccent.variable}`}>
+            <body className={fontBody.className}>
                 <Providers>
                     <RouteScrollToTop />
                     <DynamicLayoutExtras />
