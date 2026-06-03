@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { auth } from '@/lib/auth'
 import { uploadImage } from '@/lib/cloudinary'
+import { isAdmin } from '@/lib/admin-auth'
 import { checkRateLimit, getClientIP } from '@/lib/rate-limit'
 
 export async function POST(request) {
@@ -16,15 +15,10 @@ export async function POST(request) {
             )
         }
 
-        // Check for NextAuth session OR admin cookie
-        const session = await auth()
-        const cookieStore = await cookies()
-        const adminAuth = cookieStore.get('admin-auth')
-
-        const isAuthenticated = session || (adminAuth && adminAuth.value === 'authenticated')
-
-        if (!isAuthenticated) {
-            console.log('Upload unauthorized: No session and no admin cookie')
+        // Check admin authentication (NextAuth session or JWT-signed cookie)
+        const admin = await isAdmin(request)
+        if (!admin) {
+            console.log('Upload unauthorized: No valid admin session or cookie')
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 

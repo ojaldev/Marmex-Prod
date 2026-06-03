@@ -1,4 +1,7 @@
 import { NextResponse } from 'next/server'
+import { jwtVerify } from 'jose'
+
+const secret = new TextEncoder().encode(process.env.NEXTAUTH_SECRET)
 
 const securityHeaders = {
     'X-Frame-Options': 'DENY',
@@ -8,7 +11,16 @@ const securityHeaders = {
     'X-DNS-Prefetch-Control': 'on',
 }
 
-export function middleware(request) {
+async function verifyAdminCookie(token) {
+    try {
+        const { payload } = await jwtVerify(token, secret, { clockTolerance: 60 })
+        return payload.admin === true
+    } catch {
+        return false
+    }
+}
+
+export async function middleware(request) {
     const response = NextResponse.next()
 
     // Apply security headers to all responses
@@ -22,7 +34,7 @@ export function middleware(request) {
 
         const authCookie = request.cookies.get('admin-auth')
 
-        if (!authCookie || authCookie.value !== 'authenticated') {
+        if (!authCookie?.value || !(await verifyAdminCookie(authCookie.value))) {
             return NextResponse.redirect(new URL('/admin/login', request.url))
         }
     }

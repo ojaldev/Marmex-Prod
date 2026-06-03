@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { checkRateLimit, getClientIP } from '@/lib/rate-limit'
+import { signAdminToken } from '@/lib/admin-jwt'
 
-const ADMIN_PASSWORD = 'Marmex@OmShanti'
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Marmex@OmShanti'
 
 export async function POST(request) {
     try {
@@ -18,10 +19,11 @@ export async function POST(request) {
         const { password } = await request.json()
 
         if (password === ADMIN_PASSWORD) {
+            const token = await signAdminToken()
             const response = NextResponse.json({ success: true })
 
-            // Set a secure cookie for authentication
-            response.cookies.set('admin-auth', 'authenticated', {
+            // Set a JWT-signed secure cookie for authentication
+            response.cookies.set('admin-auth', token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'strict',
