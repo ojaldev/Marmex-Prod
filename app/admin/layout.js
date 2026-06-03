@@ -3,13 +3,14 @@
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { LayoutDashboard, Package, Briefcase, Star, MessageSquare, FolderOpen, Home, Settings, LogOut, ShoppingCart, RotateCcw, Truck, BarChart3, Tag } from 'lucide-react'
+import { LayoutDashboard, Package, Briefcase, Star, MessageSquare, FolderOpen, Home, Settings, LogOut, ShoppingCart, RotateCcw, Truck, BarChart3, Tag, Menu, X } from 'lucide-react'
 import styles from './admin.module.css'
 
 export default function AdminLayout({ children }) {
     const pathname = usePathname()
     const router = useRouter()
     const [counts, setCounts] = useState({ products: 0, projects: 0, testimonials: 0, orders: 0 })
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
     useEffect(() => {
         const fetchCounts = async () => {
@@ -64,9 +65,29 @@ export default function AdminLayout({ children }) {
         { href: '/admin/settings', icon: Settings, label: 'Settings' }
     ]
 
+    const handleNavClick = () => {
+        if (window.innerWidth <= 768) {
+            setMobileMenuOpen(false)
+        }
+    }
+
     return (
         <div className={styles.adminLayout}>
-            <aside className={styles.sidebar}>
+            {/* Mobile hamburger */}
+            <button
+                className={styles.hamburger}
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label="Toggle menu"
+            >
+                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+
+            {/* Overlay backdrop */}
+            {mobileMenuOpen && (
+                <div className={styles.overlay} onClick={() => setMobileMenuOpen(false)} />
+            )}
+
+            <aside className={`${styles.sidebar} ${mobileMenuOpen ? styles.sidebarOpen : ''}`}>
                 <div className={styles.logo}>
                     <h2>Marmex CMS</h2>
                 </div>
@@ -76,6 +97,7 @@ export default function AdminLayout({ children }) {
                             key={item.href}
                             href={item.href}
                             className={`${styles.navItem} ${pathname === item.href ? styles.active : ''}`}
+                            onClick={handleNavClick}
                         >
                             <item.icon size={20} />
                             <span>{item.label}</span>

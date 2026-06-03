@@ -247,3 +247,24 @@
         text-align: left;
     }
 }
+@media (max-width: 480px) {
+    .dashboard {
+        padding: var(--spacing-md);
+    }
+
+    .statsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .quickActions {
+        grid-template-columns: 1fr;
+    }
+
+    .sectionGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .header h1 {
+        font-size: 1.75rem;
+    }
+}

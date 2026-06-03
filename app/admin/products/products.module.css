@@ -141,12 +141,22 @@
 }
 
 @media (max-width: 768px) {
+    .tableHeader {
+        display: none;
+    }
 
-    .tableHeader,
     .tableRow {
         grid-template-columns: 1fr;
         gap: 0.5rem;
+        padding: var(--spacing-md);
+        border-bottom: 1px solid var(--color-border);
     }
+
+    .tableRow > div:nth-child(1)::before { content: 'Product: '; font-weight: 600; color: var(--color-text-gray); }
+    .tableRow > div:nth-child(2)::before { content: 'Category: '; font-weight: 600; color: var(--color-text-gray); }
+    .tableRow > div:nth-child(3)::before { content: 'Price: '; font-weight: 600; color: var(--color-text-gray); }
+    .tableRow > div:nth-child(4)::before { content: 'Stock: '; font-weight: 600; color: var(--color-text-gray); }
+    .tableRow > div:nth-child(5)::before { content: 'Actions: '; font-weight: 600; color: var(--color-text-gray); }
 
     .productName {
         font-size: 1.1rem;
@@ -154,5 +164,22 @@
 
     .actions {
         justify-content: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .header a {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .productThumb {
+        width: 36px;
+        height: 36px;
     }
 }

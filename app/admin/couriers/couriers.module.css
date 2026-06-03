@@ -311,3 +311,33 @@
         min-width: 700px;
     }
 }
+
+@media (max-width: 480px) {
+    .statsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .courierGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .filterGroup {
+        overflow-x: auto;
+        padding-bottom: var(--space-sm);
+        flex-wrap: nowrap;
+    }
+
+    .tableWrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table {
+        min-width: 700px;
+    }
+
+    .modal {
+        padding: var(--space-md);
+        width: 95vw;
+    }
+}

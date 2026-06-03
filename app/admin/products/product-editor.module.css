@@ -440,3 +440,38 @@
         grid-template-columns: 1fr;
     }
 }
+@media (max-width: 480px) {
+    .editor {
+        padding: var(--spacing-md);
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .specsRow {
+        grid-template-columns: 1fr;
+    }
+
+    .multiImageUpload {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .uploadArea {
+        min-height: 140px;
+    }
+
+    .videoUpload {
+        min-height: 140px;
+    }
+
+    .actions {
+        flex-direction: column-reverse;
+        gap: var(--spacing-sm);
+    }
+
+    .actions button {
+        width: 100%;
+        justify-content: center;
+    }
+}

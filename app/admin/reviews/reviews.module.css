@@ -298,3 +298,27 @@
         flex-wrap: wrap;
     }
 }
+@media (max-width: 480px) {
+    .reviewsPage {
+        padding: var(--space-md);
+    }
+
+    .statsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .reviewCard {
+        padding: var(--space-lg);
+    }
+
+    .filterTabs {
+        overflow-x: auto;
+        padding-bottom: var(--space-sm);
+        flex-wrap: nowrap;
+    }
+
+    .modal {
+        padding: var(--space-md);
+        width: 95vw;
+    }
+}
