@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import User from '@/models/User'
 import { z } from 'zod'
+import { checkRateLimit, getClientIP } from '@/lib/rate-limit'
 
 const registerSchema = z.object({
     name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -12,6 +13,16 @@ const registerSchema = z.object({
 
 export async function POST(request) {
     try {
+        // Rate limit: 5 registrations per 15 minutes per IP
+        const ip = getClientIP(request)
+        const rateLimit = checkRateLimit(`register:${ip}`, 5, 15 * 60 * 1000)
+        if (!rateLimit.success) {
+            return NextResponse.json(
+                { error: 'Too many registration attempts. Please try again later.' },
+                { status: 429, headers: { 'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': String(rateLimit.reset) } }
+            )
+        }
+
         const body = await request.json()
 
         // Validate input

@@ -216,8 +216,71 @@ export default function ProductDetailPage() {
         ? (product.price * (100 - product.discount) / 100).toFixed(0)
         : null
 
+    // Product structured data for Google rich snippets
+    const productSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: product.name,
+        image: [
+            product.mainImage,
+            ...(product.additionalImages || [])
+        ].filter(Boolean),
+        description: product.shortDescription || product.detailedDescription || product.name,
+        sku: product._id || product.id,
+        brand: {
+            '@type': 'Brand',
+            name: 'Marmex India'
+        },
+        offers: {
+            '@type': 'Offer',
+            url: `https://marmex-prod-production.up.railway.app/products/${product._id || product.id}`,
+            priceCurrency: 'INR',
+            price: discountedPrice || product.price,
+            availability: product.stock === 'In Stock'
+                ? 'https://schema.org/InStock'
+                : product.stock === 'Made to Order'
+                    ? 'https://schema.org/PreOrder'
+                    : 'https://schema.org/OutOfStock',
+            itemCondition: 'https://schema.org/NewCondition',
+            shippingDetails: {
+                '@type': 'OfferShippingDetails',
+                shippingRate: {
+                    '@type': 'MonetaryAmount',
+                    value: '0',
+                    currency: 'INR'
+                },
+                shippingDestination: {
+                    '@type': 'DefinedRegion',
+                    addressCountry: 'IN'
+                }
+            },
+            hasMerchantReturnPolicy: {
+                '@type': 'MerchantReturnPolicy',
+                returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+                merchantReturnDays: 30,
+                returnMethod: 'https://schema.org/ReturnByMail',
+                returnFees: 'https://schema.org/FreeReturn'
+            }
+        },
+        aggregateRating: reviewSummary ? {
+            '@type': 'AggregateRating',
+            ratingValue: reviewSummary.averageRating || 0,
+            reviewCount: reviewSummary.totalReviews || 0,
+            bestRating: 5,
+            worstRating: 1
+        } : undefined,
+        ...(product.material && { material: product.material }),
+        ...(product.weight && { weight: { '@type': 'QuantitativeValue', value: product.weight } }),
+        ...(product.dimensions && { size: product.dimensions })
+    }
+
     return (
         <>
+            {/* Product Schema (JSON-LD) for Google rich snippets */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+            />
             <main className={styles.main}>
                 <div className="container">
                     {/* Breadcrumbs */}

@@ -2,9 +2,20 @@ import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { auth } from '@/lib/auth'
 import { uploadImage } from '@/lib/cloudinary'
+import { checkRateLimit, getClientIP } from '@/lib/rate-limit'
 
 export async function POST(request) {
     try {
+        // Rate limit: 10 uploads per 10 minutes per IP
+        const ip = getClientIP(request)
+        const rateLimit = checkRateLimit(`upload:${ip}`, 10, 10 * 60 * 1000)
+        if (!rateLimit.success) {
+            return NextResponse.json(
+                { error: 'Too many upload attempts. Please try again later.' },
+                { status: 429 }
+            )
+        }
+
         // Check for NextAuth session OR admin cookie
         const session = await auth()
         const cookieStore = await cookies()
