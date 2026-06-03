@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
     Package, Search, Filter, Truck, CheckCircle, XCircle, RotateCcw,
     Download, Eye, RefreshCw, Calendar, IndianRupee, Users,
-    TrendingUp, ChevronLeft, ChevronRight, X, ExternalLink
+    TrendingUp, ChevronLeft, ChevronRight, X, ExternalLink, Clock, Zap
 } from 'lucide-react'
 import styles from './orders.module.css'
 
@@ -32,6 +32,9 @@ export default function AdminOrdersPage() {
     const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, pages: 1 })
     const [selectedOrder, setSelectedOrder] = useState(null)
     const [detailOpen, setDetailOpen] = useState(false)
+    const [refreshingOrderId, setRefreshingOrderId] = useState(null)
+    const [syncingAll, setSyncingAll] = useState(false)
+    const [lastSynced, setLastSynced] = useState(null)
 
     const fetchOrders = useCallback(async () => {
         setLoading(true)
@@ -60,6 +63,20 @@ export default function AdminOrdersPage() {
     useEffect(() => {
         fetchOrders()
     }, [fetchOrders])
+
+    // Auto-poll tracking for active orders every 2 minutes
+    useEffect(() => {
+        const ACTIVE_STATUSES = ['pending', 'processing', 'shipped']
+        const hasActive = orders.some(o => ACTIVE_STATUSES.includes(o.status) && o.shiprocket?.awbCode)
+        if (!hasActive) return
+
+        const interval = setInterval(() => {
+            fetchOrders()
+            setLastSynced(new Date())
+        }, 2 * 60 * 1000) // 2 minutes
+
+        return () => clearInterval(interval)
+    }, [orders, fetchOrders])
 
     const handleDownloadLabel = async (order) => {
         if (!order.shiprocket?.shipmentId) {
@@ -113,6 +130,44 @@ export default function AdminOrdersPage() {
         setDetailOpen(true)
     }
 
+    const handleRefreshOrder = async (order) => {
+        if (!order.shiprocket?.awbCode) return
+        setRefreshingOrderId(order._id)
+        try {
+            const res = await fetch(`/api/admin/orders/${order._id}/refresh-tracking`)
+            const data = await res.json()
+            if (data.success) {
+                setLastSynced(new Date())
+                fetchOrders()
+                // If detail modal is open for this order, refresh it
+                if (selectedOrder?._id === order._id && data.order) {
+                    setSelectedOrder(prev => ({ ...prev, ...data.order }))
+                }
+            }
+        } catch (err) {
+            console.error('Refresh failed:', err)
+        } finally {
+            setRefreshingOrderId(null)
+        }
+    }
+
+    const handleSyncAll = async () => {
+        setSyncingAll(true)
+        try {
+            const res = await fetch('/api/admin/orders/refresh-all')
+            const data = await res.json()
+            if (data.success) {
+                setLastSynced(new Date())
+                fetchOrders()
+                alert(`Synced ${data.results.updated} orders. Failed: ${data.results.failed}`)
+            }
+        } catch (err) {
+            console.error('Bulk sync failed:', err)
+        } finally {
+            setSyncingAll(false)
+        }
+    }
+
     const statCards = stats ? [
         { label: 'Total Orders', value: stats.totalOrders, icon: Package, color: '#D4A574' },
         { label: 'Revenue', value: `₹${(stats.totalRevenue || 0).toLocaleString()}`, icon: IndianRupee, color: '#10b981' },
@@ -125,8 +180,27 @@ export default function AdminOrdersPage() {
     return (
         <div className={styles.ordersPage}>
             <div className={styles.header}>
-                <h1>Orders Management</h1>
-                <p>Manage all customer orders, shipments, and tracking</p>
+                <div>
+                    <h1>Orders Management</h1>
+                    <p>Manage all customer orders, shipments, and tracking</p>
+                </div>
+                <div className={styles.headerActions}>
+                    <button
+                        onClick={handleSyncAll}
+                        disabled={syncingAll}
+                        className={styles.syncBtn}
+                        title="Sync all active orders with Shiprocket"
+                    >
+                        <Zap size={16} />
+                        {syncingAll ? 'Syncing...' : 'Sync All Active'}
+                    </button>
+                    {lastSynced && (
+                        <span className={styles.lastSynced}>
+                            <Clock size={12} />
+                            Last sync: {lastSynced.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                    )}
+                </div>
             </div>
 
             {/* Stats */}
@@ -263,6 +337,14 @@ export default function AdminOrdersPage() {
                                                 </button>
                                                 {order.shiprocket?.awbCode && (
                                                     <>
+                                                        <button
+                                                            onClick={() => handleRefreshOrder(order)}
+                                                            className={`${styles.iconBtn} ${refreshingOrderId === order._id ? styles.spinning : ''}`}
+                                                            title="Refresh tracking"
+                                                            disabled={refreshingOrderId === order._id}
+                                                        >
+                                                            <RefreshCw size={16} />
+                                                        </button>
                                                         <button onClick={() => handleTrackOrder(order)} className={styles.iconBtn} title="Track">
                                                             <Truck size={16} />
                                                         </button>

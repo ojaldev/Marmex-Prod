@@ -18,6 +18,55 @@
     color: var(--color-text-gray);
 }
 
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.headerActions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-xs);
+}
+
+.syncBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 0.625rem 1.25rem;
+    background: linear-gradient(135deg, var(--color-obsidian), #1a1a1a);
+    color: var(--color-gold-24k);
+    border: 1px solid rgba(212, 165, 116, 0.2);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.syncBtn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-gold);
+    border-color: var(--color-gold-24k);
+}
+
+.syncBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.lastSynced {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--color-text-gray);
+}
+
 /* ===== STATS ===== */
 .statsGrid {
     display: grid;
@@ -290,6 +339,10 @@
 .spinner {
     animation: spin 1s linear infinite;
     margin-bottom: var(--space-md);
+}
+
+.spinning svg {
+    animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
