@@ -87,9 +87,8 @@ export async function POST(request) {
 
         await connectDB()
 
-        // Generate unique order number
-        const orderCount = await Order.countDocuments()
-        const orderNumber = `ORD${Date.now()}${String(orderCount + 1).padStart(4, '0')}`
+        // Generate unique order number (collision-resistant, no race condition)
+        const orderNumber = `ORD${Date.now()}${Math.random().toString(36).substring(2, 6).toUpperCase()}`
 
         // Create order
         const orderData = {

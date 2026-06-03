@@ -96,4 +96,8 @@ userSchema.methods.toJSON = function () {
     return obj
 }
 
+// Performance indexes
+userSchema.index({ role: 1 })
+userSchema.index({ resetPasswordToken: 1 }, { sparse: true })
+
 export default mongoose.models.User || mongoose.model('User', userSchema)

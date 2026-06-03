@@ -154,11 +154,16 @@ const orderSchema = new mongoose.Schema({
     timestamps: true
 })
 
-// Generate unique order number
+// Performance indexes (orderNumber already has unique: true in schema)
+orderSchema.index({ user: 1, createdAt: -1 })
+orderSchema.index({ user: 1, status: 1 })
+orderSchema.index({ status: 1, createdAt: -1 })
+orderSchema.index({ guestEmail: 1 })
+
+// Generate unique order number (collision-resistant)
 orderSchema.pre('save', async function () {
     if (!this.orderNumber) {
-        const count = await mongoose.model('Order').countDocuments()
-        this.orderNumber = `ORD${Date.now()}${String(count + 1).padStart(4, '0')}`
+        this.orderNumber = `ORD${Date.now()}${Math.random().toString(36).substring(2, 6).toUpperCase()}`
     }
 })
 

@@ -30,8 +30,9 @@ export async function GET(request) {
             query.highlight = highlight
         }
 
-        // Get products with pagination
+        // Get products with pagination — select only fields needed for listing
         const products = await Product.find(query)
+            .select('name category price discount mainImage stock highlight shortDescription createdAt updatedAt')
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)

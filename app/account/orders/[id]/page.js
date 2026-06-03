@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Package, MapPin, CreditCard, Download, RotateCcw, X, Truck, Box, CheckCircle, AlertCircle, Navigation } from 'lucide-react'
@@ -226,7 +227,7 @@ export default function OrderDetailPage() {
                                 <div key={index} className={styles.item}>
                                     {item.image && (
                                         <div className={styles.itemImage}>
-                                            <img src={item.image} alt={item.name} />
+                                            <Image src={item.image} alt={item.name} width={80} height={80} />
                                         </div>
                                     )}
                                     <div className={styles.itemInfo}>

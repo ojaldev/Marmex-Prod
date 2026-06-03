@@ -1,6 +1,16 @@
 import { Award, Users, Heart, Sparkles } from 'lucide-react'
 import styles from './about.module.css'
 
+export const metadata = {
+    title: 'About Us | Marmex India - Premium Marble Art & Sculptures',
+    description: 'Learn about Marmex India\'s legacy of crafting exquisite handcrafted marble art, sculptures, and luxury gifts since 2000. Discover our story, craftsmanship, and values.',
+    openGraph: {
+        title: 'About Marmex India',
+        description: 'Crafting timeless elegance in stone since 2000',
+        type: 'website',
+    },
+}
+
 export default function AboutPage() {
     return (
         <main className={styles.aboutPage}>

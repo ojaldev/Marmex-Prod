@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { Star, ThumbsUp } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import styles from './ReviewList.module.css'
@@ -106,7 +107,7 @@ export default function ReviewList({ reviews: initialReviews, productId }) {
                         <div className={styles.reviewHeader}>
                             <div className={styles.userInfo}>
                                 {review.user?.photo ? (
-                                    <img src={review.user.photo} alt={review.user.name} className={styles.avatar} />
+                                    <Image src={review.user.photo} alt={review.user.name} width={40} height={40} className={styles.avatar} />
                                 ) : (
                                     <div className={styles.avatarPlaceholder}>
                                         {review.user?.name?.charAt(0).toUpperCase()}
@@ -150,7 +151,7 @@ export default function ReviewList({ reviews: initialReviews, productId }) {
                         {review.media && review.media.length > 0 && (
                             <div className={styles.reviewMedia}>
                                 {review.media.map((url, index) => (
-                                    <img key={index} src={url} alt={`Review ${index + 1}`} />
+                                    <Image key={index} src={url} alt={`Review ${index + 1}`} width={120} height={120} className={styles.reviewMediaImage} />
                                 ))}
                             </div>
                         )}

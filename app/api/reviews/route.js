@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import mongoose from 'mongoose'
 import { auth } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import Review from '@/models/Review'
@@ -58,25 +59,38 @@ export async function GET(request) {
 
         const total = await Review.countDocuments(query)
 
-        // Calculate rating summary
-        const allReviews = await Review.find({ product: productId, status: 'approved' })
-        const avgRating = allReviews.length > 0
-            ? allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length
-            : 0
+        // Calculate rating summary using aggregation (single query, no N+1)
+        const summaryAgg = await Review.aggregate([
+            { $match: { product: new mongoose.Types.ObjectId(productId), status: 'approved' } },
+            {
+                $group: {
+                    _id: null,
+                    total: { $sum: 1 },
+                    avgRating: { $avg: '$rating' },
+                    five: { $sum: { $cond: [{ $eq: ['$rating', 5] }, 1, 0] } },
+                    four: { $sum: { $cond: [{ $eq: ['$rating', 4] }, 1, 0] } },
+                    three: { $sum: { $cond: [{ $eq: ['$rating', 3] }, 1, 0] } },
+                    two: { $sum: { $cond: [{ $eq: ['$rating', 2] }, 1, 0] } },
+                    one: { $sum: { $cond: [{ $eq: ['$rating', 1] }, 1, 0] } }
+                }
+            }
+        ])
+
+        const summaryData = summaryAgg[0] || { total: 0, avgRating: 0, five: 0, four: 0, three: 0, two: 0, one: 0 }
 
         const ratingDistribution = {
-            5: allReviews.filter(r => r.rating === 5).length,
-            4: allReviews.filter(r => r.rating === 4).length,
-            3: allReviews.filter(r => r.rating === 3).length,
-            2: allReviews.filter(r => r.rating === 2).length,
-            1: allReviews.filter(r => r.rating === 1).length
+            5: summaryData.five,
+            4: summaryData.four,
+            3: summaryData.three,
+            2: summaryData.two,
+            1: summaryData.one
         }
 
         return NextResponse.json({
             reviews,
             summary: {
-                total: allReviews.length,
-                average: Math.round(avgRating * 10) / 10,
+                total: summaryData.total,
+                average: Math.round(summaryData.avgRating * 10) / 10,
                 distribution: ratingDistribution
             },
             pagination: {

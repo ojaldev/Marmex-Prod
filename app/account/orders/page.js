@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { Package, Search, Filter, Truck } from 'lucide-react'
@@ -128,7 +129,7 @@ export default function OrdersPage() {
                                     {order.items.slice(0, 3).map((item, index) => (
                                         <div key={index} className={styles.orderItemPreview}>
                                             {item.image && (
-                                                <img src={item.image} alt={item.name} />
+                                                <Image src={item.image} alt={item.name} width={48} height={48} className={styles.itemThumb} />
                                             )}
                                         </div>
                                     ))}
