@@ -22,7 +22,11 @@ export async function GET(request) {
             .populate('projectReference', 'name afterImage')
             .lean()
 
-        return NextResponse.json(testimonials)
+        return NextResponse.json(testimonials, {
+            headers: {
+                'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400'
+            }
+        })
     } catch (error) {
         console.error('Error fetching testimonials:', error)
         return NextResponse.json({ error: 'Failed to fetch testimonials' }, { status: 500 })

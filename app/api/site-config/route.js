@@ -8,7 +8,11 @@ export async function GET() {
     try {
         const data = fs.readFileSync(dataPath, 'utf8')
         const config = JSON.parse(data)
-        return NextResponse.json(config)
+        return NextResponse.json(config, {
+            headers: {
+                'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400'
+            }
+        })
     } catch (error) {
         console.error('Error reading site config:', error)
         return NextResponse.json({}, { status: 500 })

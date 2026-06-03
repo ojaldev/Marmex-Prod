@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
@@ -8,13 +9,18 @@ import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '@/contexts/CartContext'
 import AddressSelector from '@/components/checkout/AddressSelector'
-import ShiprocketShippingSelector from '@/components/checkout/ShiprocketShippingSelector'
-import GiftOptions from '@/components/checkout/GiftOptions'
-import GSTInvoice from '@/components/checkout/GSTInvoice'
-import PromoCodeInput from '@/components/checkout/PromoCodeInput'
 import { ArrowLeft, Lock, Check, Loader2, CreditCard, Truck, Shield, ChevronRight } from 'lucide-react'
 import { fadeInUp, staggerContainer } from '@/lib/animations'
 import styles from './checkout.module.css'
+
+// Dynamic imports for heavy checkout components (not needed on initial load)
+const ShiprocketShippingSelector = dynamic(
+    () => import('@/components/checkout/ShiprocketShippingSelector'),
+    { ssr: false }
+)
+const GiftOptions = dynamic(() => import('@/components/checkout/GiftOptions'))
+const GSTInvoice = dynamic(() => import('@/components/checkout/GSTInvoice'))
+const PromoCodeInput = dynamic(() => import('@/components/checkout/PromoCodeInput'))
 
 // Load Razorpay script
 const loadRazorpay = () => {
