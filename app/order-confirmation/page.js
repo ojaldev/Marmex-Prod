@@ -167,8 +167,8 @@ export default function OrderConfirmationPage() {
                                 If you have any questions about your order, please don&apos;t hesitate to contact us:
                             </p>
                             <p>
-                                <strong>Email:</strong> support@marmexindia.com<br />
-                                <strong>Phone:</strong> +91 1234567890<br />
+                                <strong>Email:</strong> Marmexindia@gmail.com<br />
+                                <strong>Phone:</strong> +91 95821 34493<br />
                                 <strong>Hours:</strong> Mon-Sat, 9AM-6PM IST
                             </p>
                         </div>

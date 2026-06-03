@@ -133,6 +133,7 @@
     font-size: 0.95rem;
 }
 
+.input,
 .field input,
 .field textarea {
     padding: 0.875rem;
@@ -141,12 +142,62 @@
     font-size: 0.95rem;
     font-family: var(--font-sans);
     transition: var(--transition-fast);
+    width: 100%;
+    background: white;
 }
 
+.input:focus,
 .field input:focus,
 .field textarea:focus {
     border-color: var(--color-secondary);
     box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    outline: none;
+}
+
+.inputError,
+.field input.inputError,
+.field textarea.inputError {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.errorText {
+    color: #dc2626;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+.statusBox {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    border-radius: 8px;
+    color: #065f46;
+    margin-bottom: 1.25rem;
+    font-weight: 500;
+}
+
+.statusError {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #991b1b;
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
 }
 
 .bulkOrder {

@@ -12,28 +12,42 @@ export async function GET(request, { params }) {
 
         await connectDB()
 
-        const order = await Order.findById(orderId)
+        const order = await Order.findById(orderId).lean()
 
         if (!order) {
             return NextResponse.json({ error: 'Order not found' }, { status: 404 })
         }
 
-        // Check authorization
-        if (!session && !order.guestEmail) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-        }
-
-        if (session && order.user && order.user.toString() !== session.user.id) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+        // Authorization:
+        // - Guests: only if order has guestEmail (no session required)
+        // - Logged-in users: only their own orders
+        // - Admins: all orders
+        const isAdmin = session?.user?.role === 'admin'
+        if (!isAdmin) {
+            if (!session) {
+                // No session — only guest orders allowed
+                if (!order.guestEmail) {
+                    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+                }
+            } else {
+                // Has session — must be the order owner
+                if (!order.user || order.user.toString() !== session.user.id) {
+                    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+                }
+            }
         }
 
         // Generate PDF
         const pdfBuffer = await generateInvoicePDF(order)
 
+        // Sanitize filename
+        const safeOrderNumber = String(order.orderNumber).replace(/[^a-zA-Z0-9_-]/g, '')
+
         return new NextResponse(pdfBuffer, {
             headers: {
                 'Content-Type': 'application/pdf',
-                'Content-Disposition': `attachment; filename="Invoice-${order.orderNumber}.pdf"`
+                'Content-Disposition': `attachment; filename="Invoice-${safeOrderNumber}.pdf"`,
+                'Content-Length': String(pdfBuffer.length)
             }
         })
 

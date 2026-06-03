@@ -73,8 +73,26 @@ export default function OrderDetailPage() {
         }
     }
 
-    const handleDownloadInvoice = () => {
-        window.open(`/api/orders/${params.id}/invoice`, '_blank')
+    const handleDownloadInvoice = async () => {
+        try {
+            const res = await fetch(`/api/orders/${params.id}/invoice`)
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}))
+                alert(data.error || 'Failed to download invoice. Please try again.')
+                return
+            }
+            const blob = await res.blob()
+            const url = window.URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = `Invoice-${order.orderNumber}.pdf`
+            document.body.appendChild(a)
+            a.click()
+            a.remove()
+            window.URL.revokeObjectURL(url)
+        } catch {
+            alert('Failed to download invoice. Please try again.')
+        }
     }
 
     const getStatusColor = (status) => {

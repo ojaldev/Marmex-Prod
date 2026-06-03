@@ -1,17 +1,89 @@
-import { Mail, Phone, MapPin, Instagram, Youtube, Send } from 'lucide-react'
+'use client'
+
+import { useState } from 'react'
+import { Mail, Phone, MapPin, Instagram, Youtube, Send, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
 import styles from './contact.module.css'
 
-export const metadata = {
-    title: 'Contact Us | Marmex India',
-    description: 'Get in touch with Marmex India for inquiries about our handcrafted marble art, sculptures, and custom stone projects. We\'d love to hear from you.',
-    openGraph: {
-        title: 'Contact Marmex India',
-        description: 'Reach out for custom marble art and sculptures',
-        type: 'website',
-    },
-}
-
 export default function ContactPage() {
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        subject: '',
+        message: ''
+    })
+    const [errors, setErrors] = useState({})
+    const [status, setStatus] = useState('idle') // idle | loading | success | error
+    const [statusMessage, setStatusMessage] = useState('')
+
+    const handleChange = (e) => {
+        const { name, value } = e.target
+        setFormData(prev => ({ ...prev, [name]: value }))
+        // Clear field error when user types
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: '' }))
+        }
+    }
+
+    const validate = () => {
+        const newErrors = {}
+        if (!formData.name.trim() || formData.name.trim().length < 2) {
+            newErrors.name = 'Name must be at least 2 characters'
+        }
+        if (!formData.email.trim()) {
+            newErrors.email = 'Email is required'
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+            newErrors.email = 'Please enter a valid email address'
+        }
+        if (!formData.subject.trim() || formData.subject.trim().length < 3) {
+            newErrors.subject = 'Subject must be at least 3 characters'
+        }
+        if (!formData.message.trim() || formData.message.trim().length < 10) {
+            newErrors.message = 'Message must be at least 10 characters'
+        }
+        setErrors(newErrors)
+        return Object.keys(newErrors).length === 0
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        if (!validate()) return
+
+        setStatus('loading')
+        setStatusMessage('')
+
+        try {
+            const res = await fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: formData.name.trim(),
+                    email: formData.email.trim(),
+                    phone: formData.phone.trim(),
+                    subject: formData.subject.trim(),
+                    message: formData.message.trim()
+                })
+            })
+
+            const data = await res.json()
+
+            if (res.ok) {
+                setStatus('success')
+                setStatusMessage(data.message || 'Your message has been sent successfully!')
+                setFormData({ name: '', email: '', phone: '', subject: '', message: '' })
+            } else {
+                setStatus('error')
+                setStatusMessage(data.error || 'Something went wrong. Please try again.')
+            }
+        } catch {
+            setStatus('error')
+            setStatusMessage('Network error. Please check your connection and try again.')
+        }
+    }
+
+    const inputClass = (field) =>
+        errors[field] ? `${styles.input} ${styles.inputError}` : styles.input
+
     return (
         <main className={styles.contactPage}>
             <div className={styles.hero}>
@@ -50,7 +122,7 @@ export default function ContactPage() {
                                 <MapPin size={24} color="var(--color-secondary)" />
                                 <div>
                                     <h4>Location</h4>
-                                    <p>India</p>
+                                    <p>Noida, India</p>
                                 </div>
                             </div>
                         </div>
@@ -72,37 +144,114 @@ export default function ContactPage() {
 
                     <div className={styles.formContainer}>
                         <h2>Send Us a Message</h2>
-                        <form className={styles.form}>
+
+                        {status === 'success' && (
+                            <div className={styles.statusBox}>
+                                <CheckCircle size={20} />
+                                <span>{statusMessage}</span>
+                            </div>
+                        )}
+
+                        {status === 'error' && (
+                            <div className={`${styles.statusBox} ${styles.statusError}`}>
+                                <AlertCircle size={20} />
+                                <span>{statusMessage}</span>
+                            </div>
+                        )}
+
+                        <form className={styles.form} onSubmit={handleSubmit} noValidate>
                             <div className={styles.formGrid}>
                                 <div className={styles.field}>
-                                    <label>Your Name *</label>
-                                    <input type="text" required placeholder="John Doe" />
+                                    <label htmlFor="name">Your Name *</label>
+                                    <input
+                                        id="name"
+                                        name="name"
+                                        type="text"
+                                        value={formData.name}
+                                        onChange={handleChange}
+                                        placeholder="John Doe"
+                                        className={inputClass('name')}
+                                        disabled={status === 'loading'}
+                                    />
+                                    {errors.name && <span className={styles.errorText}>{errors.name}</span>}
                                 </div>
 
                                 <div className={styles.field}>
-                                    <label>Email Address *</label>
-                                    <input type="email" required placeholder="john@example.com" />
+                                    <label htmlFor="email">Email Address *</label>
+                                    <input
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        placeholder="john@example.com"
+                                        className={inputClass('email')}
+                                        disabled={status === 'loading'}
+                                    />
+                                    {errors.email && <span className={styles.errorText}>{errors.email}</span>}
                                 </div>
 
                                 <div className={styles.field}>
-                                    <label>Phone Number</label>
-                                    <input type="tel" placeholder="+91 95821 34493" />
+                                    <label htmlFor="phone">Phone Number</label>
+                                    <input
+                                        id="phone"
+                                        name="phone"
+                                        type="tel"
+                                        value={formData.phone}
+                                        onChange={handleChange}
+                                        placeholder="+91 95821 34493"
+                                        className={styles.input}
+                                        disabled={status === 'loading'}
+                                    />
                                 </div>
 
                                 <div className={styles.field}>
-                                    <label>Subject *</label>
-                                    <input type="text" required placeholder="Product Inquiry" />
+                                    <label htmlFor="subject">Subject *</label>
+                                    <input
+                                        id="subject"
+                                        name="subject"
+                                        type="text"
+                                        value={formData.subject}
+                                        onChange={handleChange}
+                                        placeholder="Product Inquiry"
+                                        className={inputClass('subject')}
+                                        disabled={status === 'loading'}
+                                    />
+                                    {errors.subject && <span className={styles.errorText}>{errors.subject}</span>}
                                 </div>
                             </div>
 
                             <div className={styles.field}>
-                                <label>Message *</label>
-                                <textarea required rows="5" placeholder="Tell us about your requirements..."></textarea>
+                                <label htmlFor="message">Message *</label>
+                                <textarea
+                                    id="message"
+                                    name="message"
+                                    value={formData.message}
+                                    onChange={handleChange}
+                                    rows="5"
+                                    placeholder="Tell us about your requirements..."
+                                    className={inputClass('message')}
+                                    disabled={status === 'loading'}
+                                />
+                                {errors.message && <span className={styles.errorText}>{errors.message}</span>}
                             </div>
 
-                            <button type="submit" className="btn btn-primary">
-                                <Send size={18} />
-                                Send Message
+                            <button
+                                type="submit"
+                                className="btn btn-primary"
+                                disabled={status === 'loading'}
+                            >
+                                {status === 'loading' ? (
+                                    <>
+                                        <Loader2 size={18} className={styles.spin} />
+                                        Sending...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Send size={18} />
+                                        Send Message
+                                    </>
+                                )}
                             </button>
                         </form>
                     </div>
