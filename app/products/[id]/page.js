@@ -16,6 +16,7 @@ import { useCart } from '@/contexts/CartContext'
 import { useNotification } from '@/contexts/NotificationContext'
 import { convertGDriveUrl } from '@/lib/utils'
 import { normalizeDimensionsDisplay, normalizeWeightDisplay } from '@/lib/product-specs'
+import { getCloudinarySrcSet } from '@/lib/cloudinary-responsive'
 import { fadeInUp, staggerContainer } from '@/lib/animations'
 import {
     ChevronLeft, ChevronRight, Heart, Share2, Truck, Shield,
@@ -724,6 +725,8 @@ export default function ProductDetailPage() {
                                     src={mediaItems[currentMediaIndex]?.src}
                                     alt={product.name}
                                     className={styles.lightboxImg}
+                                    srcSet={getCloudinarySrcSet(mediaItems[currentMediaIndex]?.src, [640, 1080, 1440, 1920])}
+                                    sizes="100vw"
                                 />
                             )}
                         </motion.div>

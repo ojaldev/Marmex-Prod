@@ -114,6 +114,7 @@ export default function MiniCart() {
                                                     alt={item.name}
                                                     fill
                                                     className={styles.image}
+                                                    sizes="80px"
                                                 />
                                             ) : (
                                                 <div className={styles.imagePlaceholder}>No Image</div>
