@@ -1,4 +1,5 @@
 import HeroSection from '@/components/home/HeroSection'
+import CategoryStrip from '@/components/home/CategoryStrip'
 import TrustBar from '@/components/home/TrustBar'
 import CategoryTiles from '@/components/home/CategoryTiles'
 import FeaturedProducts from '@/components/home/FeaturedProducts'
@@ -8,11 +9,11 @@ import BrandStory from '@/components/home/BrandStory'
 import VideoShowcase from '@/components/home/VideoShowcase'
 import Testimonials from '@/components/home/Testimonials'
 
-
 export default function Home() {
     return (
         <>
             <HeroSection />
+            <CategoryStrip />
             <TrustBar />
             <CategoryTiles />
             <FeaturedProducts />
@@ -21,7 +22,6 @@ export default function Home() {
             <BrandStory />
             <VideoShowcase />
             <Testimonials />
-
         </>
     )
 }

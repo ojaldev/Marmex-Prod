@@ -2,13 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { Sparkles, Palette, ArrowRight, Star, Users, Award, Loader2, MessageCircle } from 'lucide-react'
+import { Sparkles, ArrowRight, Star, Users, Award, Loader2, MessageCircle, ChevronDown } from 'lucide-react'
 import { heroTextReveal, staggerContainer } from '@/lib/animations'
 import styles from './HeroSection.module.css'
 
-const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop'
+const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&h=900&fit=crop'
 
 export default function HeroSection() {
     const [hero, setHero] = useState(null)
@@ -29,22 +28,9 @@ export default function HeroSection() {
         }
     }
 
-    if (hero === null) {
-        return (
-            <section className={styles.hero}>
-                <div className={styles.bentoGrid}>
-                    <div className={`${styles.block} ${styles.mainBlock} ${styles.skeleton}`}>
-                        <Loader2 className="animate-spin text-[var(--color-gold-24k)]" size={32} />
-                    </div>
-                    <div className={`${styles.block} ${styles.imageBlock} ${styles.skeleton}`} />
-                    <div className={`${styles.block} ${styles.accentBlock} ${styles.skeleton}`} />
-                    <div className={`${styles.block} ${styles.accentBlock} ${styles.skeleton}`} />
-                </div>
-            </section>
-        )
-    }
-
-    const heroImage = hero.image || FALLBACK_IMAGE
+    const heroImage = hero?.image || FALLBACK_IMAGE
+    const title = hero?.title || 'Luxury Marble & Stone Art'
+    const subtitle = hero?.subtitle || 'Handcrafted Perfection for Your Space'
 
     const stats = [
         { icon: Users, number: '5000+', label: 'Happy Customers' },
@@ -52,177 +38,129 @@ export default function HeroSection() {
         { icon: Star, number: '4.9', label: 'Average Rating' },
     ]
 
+    if (hero === null) {
+        return (
+            <section className={styles.hero}>
+                <div className={styles.skeletonOverlay}>
+                    <Loader2 className="animate-spin text-[var(--color-gold-24k)]" size={40} />
+                </div>
+            </section>
+        )
+    }
+
     return (
         <section className={styles.hero}>
-            <div className={styles.bentoGrid}>
-                {/* Main Content Block */}
+            {/* Background Image */}
+            <div
+                className={`${styles.bgImage} ${imageLoaded ? styles.loaded : ''}`}
+                style={{ backgroundImage: `url(${heroImage})` }}
+            />
+            <img
+                src={heroImage}
+                alt=""
+                style={{ display: 'none' }}
+                onLoad={() => setImageLoaded(true)}
+            />
+
+            {/* Dark Overlay */}
+            <div className={styles.overlay} />
+
+            {/* Content */}
+            <div className={styles.content}>
                 <motion.div
-                    className={`${styles.block} ${styles.mainBlock}`}
-                    initial={{ opacity: 0, scale: 0.97 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.8, ease: [0.33, 1, 0.68, 1] }}
+                    className={styles.badge}
+                    variants={heroTextReveal}
+                    custom={0}
+                    initial="hidden"
+                    animate="visible"
                 >
-                    <div className={styles.content}>
-                        <motion.div
-                            className={styles.badge}
-                            variants={heroTextReveal}
-                            custom={0}
-                            initial="hidden"
-                            animate="visible"
-                        >
-                            <Sparkles size={16} />
-                            <span>Premium Craftsmanship</span>
-                        </motion.div>
-
-                        <motion.h1
-                            className={styles.title}
-                            variants={heroTextReveal}
-                            custom={1}
-                            initial="hidden"
-                            animate="visible"
-                        >
-                            {hero.title || 'Luxury Marble & Stone Art'}
-                        </motion.h1>
-
-                        <motion.p
-                            className={styles.subtitle}
-                            variants={heroTextReveal}
-                            custom={2}
-                            initial="hidden"
-                            animate="visible"
-                        >
-                            {hero.subtitle || 'Handcrafted Perfection for Your Space'}
-                        </motion.p>
-
-                        <motion.div
-                            className={styles.stats}
-                            variants={staggerContainer}
-                            initial="hidden"
-                            animate="visible"
-                        >
-                            {stats.map((stat, i) => (
-                                <motion.div
-                                    key={stat.label}
-                                    className={styles.stat}
-                                    variants={heroTextReveal}
-                                    custom={3 + i}
-                                >
-                                    <div className={styles.statIcon}>
-                                        <stat.icon size={18} />
-                                    </div>
-                                    <div className={styles.statContent}>
-                                        <div className={styles.statNumber}>{stat.number}</div>
-                                        <div className={styles.statLabel}>{stat.label}</div>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </motion.div>
-
-                        <motion.div
-                            className={styles.actions}
-                            variants={heroTextReveal}
-                            custom={6}
-                            initial="hidden"
-                            animate="visible"
-                        >
-                            <Link href="/products" className={styles.primaryBtn}>
-                                Shop Now
-                                <ArrowRight size={18} />
-                            </Link>
-                            <Link href="/custom" className={styles.outlineBtn}>
-                                Custom Orders
-                            </Link>
-                            <a
-                                href="https://wa.me/919582134493?text=Hi%20Marmex%20India%2C%20I%20am%20interested%20in%20your%20marble%20products."
-                                className={styles.whatsappBtn}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                <MessageCircle size={18} />
-                                Chat on WhatsApp
-                            </a>
-                        </motion.div>
-                    </div>
+                    <Sparkles size={16} />
+                    <span>Premium Craftsmanship</span>
                 </motion.div>
 
-                {/* Featured Image Block */}
-                <motion.div
-                    className={`${styles.block} ${styles.imageBlock}`}
-                    initial={{ opacity: 0, x: 40 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.8, delay: 0.2, ease: [0.33, 1, 0.68, 1] }}
+                <motion.h1
+                    className={styles.title}
+                    variants={heroTextReveal}
+                    custom={1}
+                    initial="hidden"
+                    animate="visible"
                 >
-                    <div
-                        className={`${styles.heroImage} ${imageLoaded ? styles.loaded : ''}`}
-                        style={{ backgroundImage: `url(${heroImage})` }}
+                    {title}
+                </motion.h1>
+
+                <motion.p
+                    className={styles.subtitle}
+                    variants={heroTextReveal}
+                    custom={2}
+                    initial="hidden"
+                    animate="visible"
+                >
+                    {subtitle}
+                </motion.p>
+
+                <motion.div
+                    className={styles.stats}
+                    variants={staggerContainer}
+                    initial="hidden"
+                    animate="visible"
+                >
+                    {stats.map((stat) => (
+                        <motion.div
+                            key={stat.label}
+                            className={styles.stat}
+                            variants={heroTextReveal}
+                        >
+                            <div className={styles.statIcon}>
+                                <stat.icon size={18} />
+                            </div>
+                            <div className={styles.statContent}>
+                                <div className={styles.statNumber}>{stat.number}</div>
+                                <div className={styles.statLabel}>{stat.label}</div>
+                            </div>
+                        </motion.div>
+                    ))}
+                </motion.div>
+
+                <motion.div
+                    className={styles.actions}
+                    variants={heroTextReveal}
+                    custom={6}
+                    initial="hidden"
+                    animate="visible"
+                >
+                    <Link href="/products" className={styles.primaryBtn}>
+                        Shop Now
+                        <ArrowRight size={18} />
+                    </Link>
+                    <Link href="/custom" className={styles.outlineBtn}>
+                        Custom Orders
+                    </Link>
+                    <a
+                        href="https://wa.me/919582134493?text=Hi%20Marmex%20India%2C%20I%20am%20interested%20in%20your%20marble%20products."
+                        className={styles.whatsappBtn}
+                        target="_blank"
+                        rel="noopener noreferrer"
                     >
-                        <div className={styles.imageGradient} />
-                        <motion.div
-                            className={styles.imageLabel}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.8, duration: 0.6 }}
-                        >
-                            <span className={styles.labelTag}>Featured</span>
-                            <span className={styles.labelText}>Handcrafted Excellence</span>
-                        </motion.div>
-                    </div>
-                    <img
-                        src={heroImage}
-                        alt=""
-                        style={{ display: 'none' }}
-                        onLoad={() => setImageLoaded(true)}
-                    />
-                </motion.div>
-
-                {/* Accent Block 1 - New Arrivals */}
-                <motion.div
-                    className={`${styles.block} ${styles.accentBlock}`}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.4, ease: [0.33, 1, 0.68, 1] }}
-                >
-                    <Link href="/products?filter=new" className={styles.accentLink}>
-                        <div className={styles.accentIconWrapper}>
-                            <Sparkles size={24} />
-                        </div>
-                        <div className={styles.accentContent}>
-                            <h3>New Arrivals</h3>
-                            <p>Discover our latest designs</p>
-                        </div>
-                        <motion.div
-                            className={styles.accentArrow}
-                            whileHover={{ x: 4 }}
-                        >
-                            <ArrowRight size={20} />
-                        </motion.div>
-                    </Link>
-                </motion.div>
-
-                {/* Accent Block 2 - Custom Orders */}
-                <motion.div
-                    className={`${styles.block} ${styles.accentBlock} ${styles.accentAlt}`}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.5, ease: [0.33, 1, 0.68, 1] }}
-                >
-                    <Link href="/custom" className={styles.accentLink}>
-                        <div className={styles.accentIconWrapper}>
-                            <Palette size={24} />
-                        </div>
-                        <div className={styles.accentContent}>
-                            <h3>Custom Orders</h3>
-                            <p>Create your personalized art</p>
-                        </div>
-                        <motion.div
-                            className={styles.accentArrow}
-                            whileHover={{ x: 4 }}
-                        >
-                            <ArrowRight size={20} />
-                        </motion.div>
-                    </Link>
+                        <MessageCircle size={18} />
+                        Chat on WhatsApp
+                    </a>
                 </motion.div>
             </div>
+
+            {/* Scroll Indicator */}
+            <motion.div
+                className={styles.scrollIndicator}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.2 }}
+            >
+                <motion.div
+                    animate={{ y: [0, 8, 0] }}
+                    transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
+                >
+                    <ChevronDown size={24} />
+                </motion.div>
+            </motion.div>
         </section>
     )
 }
