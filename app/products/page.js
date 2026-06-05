@@ -19,6 +19,7 @@ export default function ProductsPage() {
     const [products, setProducts] = useState([])
     const [categories, setCategories] = useState([])
     const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
     const [selectedCategory, setSelectedCategory] = useState(categoryParam || 'all')
     const [sortBy, setSortBy] = useState('featured')
     const [gridColumns, setGridColumns] = useState(3)
@@ -55,11 +56,17 @@ export default function ProductsPage() {
     }, [])
 
     const loadData = async () => {
+        setLoading(true)
+        setError(null)
         try {
             const [productsRes, categoriesRes] = await Promise.all([
                 fetch('/api/products'),
                 fetch('/api/categories')
             ])
+
+            if (!productsRes.ok || !categoriesRes.ok) {
+                throw new Error('Failed to load products')
+            }
 
             const productsData = await productsRes.json()
             const categoriesData = await categoriesRes.json()
@@ -67,8 +74,9 @@ export default function ProductsPage() {
             const productList = productsData.products || productsData
             setProducts(productList)
             setCategories(categoriesData)
-        } catch (error) {
-            console.error('Failed to load data:', error)
+        } catch (err) {
+            console.error('Failed to load data:', err)
+            setError('Unable to load products. Please check your connection and try again.')
         } finally {
             setLoading(false)
         }
@@ -326,6 +334,20 @@ export default function ProductsPage() {
                     <div className={styles.content}>
                         {loading ? (
                             <ProductListSkeleton count={9} columns={gridColumns} />
+                        ) : error ? (
+                            <motion.div
+                                className={styles.empty}
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.5 }}
+                            >
+                                <Package size={64} className="text-[var(--color-platinum)] mx-auto mb-4" />
+                                <h3>Something went wrong</h3>
+                                <p>{error}</p>
+                                <button onClick={loadData} className="btn btn-primary mt-4">
+                                    Try Again
+                                </button>
+                            </motion.div>
                         ) : filteredProducts.length === 0 ? (
                             <motion.div
                                 className={styles.empty}

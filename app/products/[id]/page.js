@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -20,7 +20,8 @@ import { getCloudinarySrcSet } from '@/lib/cloudinary-responsive'
 import { fadeInUp, staggerContainer } from '@/lib/animations'
 import {
     ChevronLeft, ChevronRight, Heart, Share2, Truck, Shield,
-    RotateCcw, Instagram, X, ZoomIn, Check, Package, Play
+    RotateCcw, Instagram, X, ZoomIn, Check, Package, Play,
+    Eye, Clock, Flame
 } from 'lucide-react'
 import styles from './product-detail.module.css'
 
@@ -42,6 +43,8 @@ export default function ProductDetailPage() {
     const [lightboxOpen, setLightboxOpen] = useState(false)
     const [addedToCart, setAddedToCart] = useState(false)
     const [stickyVisible, setStickyVisible] = useState(false)
+    const [viewersCount, setViewersCount] = useState(0)
+    const [recentlyViewed, setRecentlyViewed] = useState([])
 
     useEffect(() => {
         const loadProduct = async () => {
@@ -61,6 +64,9 @@ export default function ProductDetailPage() {
                     const reviewsRes = await fetch(`/api/reviews?productId=${productId}`)
                     const reviewsData = await reviewsRes.json()
                     setReviewSummary(reviewsData.summary || null)
+
+                    // Track recently viewed
+                    trackRecentlyViewed(productData)
                 }
 
                 const productsArray = Array.isArray(allProductsData) ? allProductsData : (allProductsData.products || [])
@@ -69,6 +75,11 @@ export default function ProductDetailPage() {
                     .slice(0, 4)
 
                 setRelatedProducts(related)
+
+                // Load recently viewed (excluding current product)
+                const rv = getRecentlyViewed().filter(id => id !== (productData._id || productData.id))
+                const rvProducts = productsArray.filter(p => rv.includes(p._id || p.id)).slice(0, 4)
+                setRecentlyViewed(rvProducts)
             } catch (error) {
                 console.error('Failed to load product:', error)
             } finally {
@@ -78,6 +89,35 @@ export default function ProductDetailPage() {
 
         if (params.id) loadProduct()
     }, [params.id])
+
+    // Fake viewers count (randomized social proof)
+    useEffect(() => {
+        if (!product) return
+        const base = Math.floor(Math.random() * 12) + 3 // 3-15
+        setViewersCount(base)
+        const interval = setInterval(() => {
+            setViewersCount(prev => {
+                const change = Math.floor(Math.random() * 5) - 2 // -2 to +2
+                const next = prev + change
+                return Math.max(3, Math.min(18, next))
+            })
+        }, 5000)
+        return () => clearInterval(interval)
+    }, [product])
+
+    // Delivery countdown
+    const getDeliveryEstimate = () => {
+        const now = new Date()
+        const cutoff = new Date(now)
+        cutoff.setHours(16, 0, 0, 0) // 4 PM cutoff
+        const hoursLeft = cutoff > now ? Math.ceil((cutoff - now) / (1000 * 60 * 60)) : 0
+
+        const delivery = new Date(now)
+        delivery.setDate(delivery.getDate() + (hoursLeft > 0 ? 5 : 6))
+        const dayName = delivery.toLocaleDateString('en-IN', { weekday: 'short' })
+        const dateStr = delivery.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
+        return { hoursLeft, deliveryText: `${dayName}, ${dateStr}` }
+    }
 
     // Sticky ATC visibility
     useEffect(() => {
@@ -462,6 +502,35 @@ export default function ProductDetailPage() {
                                 <p className={styles.description}>{product.shortDescription}</p>
                             )}
 
+                            {/* Urgency Bar */}
+                            <div className={styles.urgencyBar}>
+                                {product.stock === 'Low Stock' && (
+                                    <div className={styles.urgencyItem + ' ' + styles.urgencyLowStock}>
+                                        <Flame size={14} />
+                                        <span>Only a few left — selling fast!</span>
+                                    </div>
+                                )}
+                                {product.stock === 'In Stock' && viewersCount > 0 && (
+                                    <div className={styles.urgencyItem + ' ' + styles.urgencyViewers}>
+                                        <Eye size={14} />
+                                        <span>{viewersCount} people viewing this item right now</span>
+                                    </div>
+                                )}
+                                {product.stock !== 'Out of Stock' && (() => {
+                                    const { hoursLeft, deliveryText } = getDeliveryEstimate()
+                                    return (
+                                        <div className={styles.urgencyItem + ' ' + styles.urgencyDelivery}>
+                                            <Clock size={14} />
+                                            <span>
+                                                {hoursLeft > 0
+                                                    ? `Order in ${hoursLeft}h for delivery by ${deliveryText}`
+                                                    : `Order now for delivery by ${deliveryText}`}
+                                            </span>
+                                        </div>
+                                    )
+                                })()}
+                            </div>
+
                             {/* Stock Status */}
                             <div className={styles.stock}>
                                 <span className={product.stock === 'Out of Stock' ? styles.outOfStock : product.stock === 'Low Stock' ? styles.lowStock : styles.inStock}>
@@ -791,4 +860,32 @@ function ShoppingCartIcon({ size }) {
             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
         </svg>
     )
+}
+
+// Recently viewed helpers
+const RV_STORAGE_KEY = 'marmex-recently-viewed'
+const RV_MAX_ITEMS = 8
+
+function getRecentlyViewed() {
+    if (typeof window === 'undefined') return []
+    try {
+        const raw = localStorage.getItem(RV_STORAGE_KEY)
+        return raw ? JSON.parse(raw) : []
+    } catch {
+        return []
+    }
+}
+
+function trackRecentlyViewed(product) {
+    if (typeof window === 'undefined') return
+    try {
+        const id = product._id || product.id
+        if (!id) return
+        const current = getRecentlyViewed()
+        const filtered = current.filter(item => item !== id)
+        const updated = [id, ...filtered].slice(0, RV_MAX_ITEMS)
+        localStorage.setItem(RV_STORAGE_KEY, JSON.stringify(updated))
+    } catch {
+        // ignore
+    }
 }

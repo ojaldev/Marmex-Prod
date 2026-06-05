@@ -1,10 +1,31 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { useNotification } from './NotificationContext'
 
 const WishlistContext = createContext()
+
+const STORAGE_KEY = 'marmex-wishlist'
+
+function getStoredWishlist() {
+    if (typeof window === 'undefined') return []
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY)
+        return raw ? JSON.parse(raw) : []
+    } catch {
+        return []
+    }
+}
+
+function setStoredWishlist(items) {
+    if (typeof window === 'undefined') return
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
+    } catch {
+        // ignore
+    }
+}
 
 export function WishlistProvider({ children }) {
     const { data: session } = useSession()
@@ -12,12 +33,13 @@ export function WishlistProvider({ children }) {
     const [wishlist, setWishlist] = useState([])
     const [loading, setLoading] = useState(false)
 
-    // Fetch wishlist when session changes
+    // Load wishlist on mount / session change
     useEffect(() => {
         if (session) {
             fetchWishlist()
         } else {
-            setWishlist([])
+            // Guest: load from localStorage
+            setWishlist(getStoredWishlist())
         }
     }, [session])
 
@@ -36,10 +58,49 @@ export function WishlistProvider({ children }) {
         }
     }
 
+    const syncGuestWishlistToServer = useCallback(async (guestItems) => {
+        if (!session || guestItems.length === 0) return
+        try {
+            // Bulk-add guest wishlist items to server
+            await Promise.all(
+                guestItems.map(id =>
+                    fetch('/api/user/wishlist', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ productId: id })
+                    }).catch(() => null)
+                )
+            )
+            // Clear localStorage after sync
+            localStorage.removeItem(STORAGE_KEY)
+            // Refresh from server
+            await fetchWishlist()
+        } catch (error) {
+            console.error('Failed to sync guest wishlist:', error)
+        }
+    }, [session])
+
+    // Sync guest wishlist when user logs in
+    useEffect(() => {
+        if (session) {
+            const guestItems = getStoredWishlist()
+            if (guestItems.length > 0) {
+                syncGuestWishlistToServer(guestItems)
+            }
+        }
+    }, [session, syncGuestWishlistToServer])
+
     const addToWishlist = async (productId) => {
         if (!session) {
-            notification.error('Please login to add to wishlist')
-            return false
+            // Guest: use localStorage
+            const current = getStoredWishlist()
+            if (!current.includes(productId)) {
+                const updated = [...current, productId]
+                setStoredWishlist(updated)
+                setWishlist(updated)
+                notification.success('Added to wishlist!')
+            }
+            return true
         }
 
         try {
@@ -66,7 +127,15 @@ export function WishlistProvider({ children }) {
     }
 
     const removeFromWishlist = async (productId) => {
-        if (!session) return false
+        if (!session) {
+            // Guest: use localStorage
+            const current = getStoredWishlist()
+            const updated = current.filter(id => id !== productId)
+            setStoredWishlist(updated)
+            setWishlist(updated)
+            notification.success('Removed from wishlist')
+            return true
+        }
 
         try {
             const res = await fetch(`/api/user/wishlist?productId=${productId}`, {

@@ -240,6 +240,61 @@
     margin-bottom: var(--space-lg);
 }
 
+/* ===== URGENCY BAR ===== */
+.urgencyBar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+
+.urgencyItem {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 0.5rem 0.875rem;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    width: fit-content;
+}
+
+.urgencyLowStock {
+    background: linear-gradient(135deg, #fef2f2, #fff7ed);
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+}
+
+.urgencyLowStock svg {
+    color: #ea580c;
+    animation: pulse 2s infinite;
+}
+
+.urgencyViewers {
+    background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+
+.urgencyViewers svg {
+    color: #16a34a;
+}
+
+.urgencyDelivery {
+    background: linear-gradient(135deg, #eff6ff, #eff6ff);
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+
+.urgencyDelivery svg {
+    color: #2563eb;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
 .inStock {
     color: var(--color-emerald);
     font-weight: 600;

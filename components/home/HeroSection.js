@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { Sparkles, Palette, ArrowRight, Star, Users, Award, Loader2 } from 'lucide-react'
+import { Sparkles, Palette, ArrowRight, Star, Users, Award, Loader2, MessageCircle } from 'lucide-react'
 import { heroTextReveal, staggerContainer } from '@/lib/animations'
 import styles from './HeroSection.module.css'
 
@@ -132,6 +132,15 @@ export default function HeroSection() {
                             <Link href="/custom" className={styles.outlineBtn}>
                                 Custom Orders
                             </Link>
+                            <a
+                                href="https://wa.me/919582134493?text=Hi%20Marmex%20India%2C%20I%20am%20interested%20in%20your%20marble%20products."
+                                className={styles.whatsappBtn}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <MessageCircle size={18} />
+                                Chat on WhatsApp
+                            </a>
                         </motion.div>
                     </div>
                 </motion.div>
