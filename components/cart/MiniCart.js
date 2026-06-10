@@ -109,6 +109,7 @@ export default function MiniCart() {
                     ) : (
                         <>
                             {cart.map((item, index) => {
+                                const itemId = item.id || item._id
                                 const itemPrice = item.discount > 0
                                     ? item.price * (100 - item.discount) / 100
                                     : item.price
@@ -116,7 +117,7 @@ export default function MiniCart() {
 
                                 return (
                                     <div
-                                        key={item.id}
+                                        key={itemId}
                                         className={`${styles.cartItem} ${isLast ? styles.lastItem : ''}`}
                                         ref={isLast ? itemsEndRef : null}
                                     >
@@ -136,7 +137,7 @@ export default function MiniCart() {
 
                                         <div className={styles.itemDetails}>
                                             <Link
-                                                href={`/products/${item.id}`}
+                                                href={`/products/${itemId}`}
                                                 className={styles.itemName}
                                                 onClick={() => setIsCartOpen(false)}
                                             >
@@ -152,7 +153,7 @@ export default function MiniCart() {
                                             <div className={styles.itemFooter}>
                                                 <div className={styles.quantityControl}>
                                                     <button
-                                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                        onClick={() => updateQuantity(itemId, item.quantity - 1)}
                                                         className={styles.quantityBtn}
                                                         aria-label="Decrease quantity"
                                                         disabled={item.quantity <= 1}
@@ -161,7 +162,7 @@ export default function MiniCart() {
                                                     </button>
                                                     <span className={styles.quantity}>{item.quantity}</span>
                                                     <button
-                                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                        onClick={() => updateQuantity(itemId, item.quantity + 1)}
                                                         className={styles.quantityBtn}
                                                         aria-label="Increase quantity"
                                                     >
@@ -176,7 +177,7 @@ export default function MiniCart() {
                                         </div>
 
                                         <button
-                                            onClick={() => removeFromCart(item.id)}
+                                            onClick={() => removeFromCart(itemId)}
                                             className={styles.removeBtn}
                                             aria-label="Remove item"
                                         >
