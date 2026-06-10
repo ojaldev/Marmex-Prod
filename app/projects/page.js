@@ -4,9 +4,8 @@ import { useEffect, useState, useMemo, useRef, Suspense } from 'react'
 import dynamic from 'next/dynamic'
 import { useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MapPin, Play, FileText, Filter, Star, Grid3X3, LayoutGrid, Home, Building2 } from 'lucide-react'
+import { FileText, Star, Grid3X3, LayoutGrid, Home, Building2 } from 'lucide-react'
 import ProjectCard from '@/components/projects/ProjectCard'
-import SectionHeader from '@/components/ui/SectionHeader'
 
 const ProjectDetailModal = dynamic(() => import('@/components/projects/ProjectDetailModal'), { ssr: false })
 import { fadeInUp, staggerContainer, easing } from '@/lib/animations'
@@ -19,7 +18,6 @@ function ProjectsContent() {
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedType, setSelectedType] = useState('all')
-  const [selectedCategory, setSelectedCategory] = useState('all')
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false)
   const [gridColumns, setGridColumns] = useState(2)
   const [selectedProject, setSelectedProject] = useState(null)
@@ -45,22 +43,9 @@ function ProjectsContent() {
       .finally(() => setLoading(false))
   }, [openId])
 
-  // Reset category filter when type changes
-  useEffect(() => {
-    setSelectedCategory('all')
-  }, [selectedType])
-
   // Counts per type
   const residentialCount = useMemo(() => projects.filter(p => p.projectType === 'residential').length, [projects])
   const commercialCount = useMemo(() => projects.filter(p => p.projectType === 'commercial').length, [projects])
-
-  // Extract unique categories within selected type
-  const categories = useMemo(() => {
-    const cats = new Set()
-    const base = selectedType === 'all' ? projects : projects.filter(p => p.projectType === selectedType)
-    base.forEach(p => { if (p.category) cats.add(p.category) })
-    return ['all', ...Array.from(cats).sort()]
-  }, [projects, selectedType])
 
   // Filter projects
   const filteredProjects = useMemo(() => {
@@ -68,10 +53,6 @@ function ProjectsContent() {
 
     if (selectedType !== 'all') {
       result = result.filter(p => p.projectType === selectedType)
-    }
-
-    if (selectedCategory !== 'all') {
-      result = result.filter(p => p.category === selectedCategory)
     }
 
     if (showFeaturedOnly) {
@@ -87,7 +68,7 @@ function ProjectsContent() {
     })
 
     return result
-  }, [projects, selectedType, selectedCategory, showFeaturedOnly])
+  }, [projects, selectedType, showFeaturedOnly])
 
   const featuredCount = projects.filter(p => p.featured).length
 
@@ -165,22 +146,6 @@ function ProjectsContent() {
                 <span className={styles.typeBtnCount}>{count}</span>
               </button>
             ))}
-          </div>
-
-          {/* Category Filters */}
-          <div className={styles.filters}>
-            <Filter size={16} className={styles.filterIcon} />
-            <div className={styles.filterChips}>
-              {categories.map(cat => (
-                <button
-                  key={cat}
-                  className={`${styles.filterChip} ${selectedCategory === cat ? styles.filterChipActive : ''}`}
-                  onClick={() => setSelectedCategory(cat)}
-                >
-                  {cat === 'all' ? 'All Categories' : cat}
-                </button>
-              ))}
-            </div>
           </div>
 
           {/* Right Side Controls */}
