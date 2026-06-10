@@ -7,11 +7,28 @@
     transition: all var(--duration-normal) var(--ease-smooth);
 }
 
+.header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(212, 165, 116, 0.4) 50%, transparent 100%);
+    opacity: 0;
+    transition: opacity var(--duration-normal) ease;
+}
+
 .header.scrolled {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     box-shadow: var(--shadow-md);
+    border-bottom-color: transparent;
+}
+
+.header.scrolled::after {
+    opacity: 1;
 }
 
 .headerContainer {

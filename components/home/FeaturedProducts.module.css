@@ -4,6 +4,16 @@
     position: relative;
 }
 
+.featured::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(212, 165, 116, 0.3), transparent);
+}
+
 .header {
     text-align: center;
     margin-bottom: var(--space-3xl);
@@ -73,6 +83,19 @@
     text-align: center;
     padding-top: var(--space-xl);
     border-top: 1px solid var(--color-platinum);
+    position: relative;
+}
+
+.cta::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background: var(--color-gold-24k);
+    border-radius: var(--radius-full);
 }
 
 .loading {
