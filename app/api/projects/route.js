@@ -62,11 +62,9 @@ export async function GET(request) {
                 .lean()
         }
 
-        // lean() skips Mongoose schema defaults — apply them manually so old
-        // documents created before projectType existed get the correct fallback.
+        // Filter null entries from deleted/unpopulated related products
         projects = projects.map(p => ({
             ...p,
-            projectType: p.projectType || 'residential',
             relatedProducts: (p.relatedProducts || []).filter(Boolean)
         }))
 

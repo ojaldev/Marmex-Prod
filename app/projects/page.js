@@ -43,16 +43,16 @@ function ProjectsContent() {
       .finally(() => setLoading(false))
   }, [openId])
 
-  // Counts per type
-  const residentialCount = useMemo(() => projects.filter(p => p.projectType === 'residential').length, [projects])
-  const commercialCount = useMemo(() => projects.filter(p => p.projectType === 'commercial').length, [projects])
+  // Counts per type — category field stores "Residential" / "Commercial" etc.
+  const residentialCount = useMemo(() => projects.filter(p => p.category?.toLowerCase() === 'residential').length, [projects])
+  const commercialCount = useMemo(() => projects.filter(p => p.category?.toLowerCase() === 'commercial').length, [projects])
 
   // Filter projects
   const filteredProjects = useMemo(() => {
     let result = [...projects]
 
     if (selectedType !== 'all') {
-      result = result.filter(p => p.projectType === selectedType)
+      result = result.filter(p => p.category?.toLowerCase() === selectedType)
     }
 
     if (showFeaturedOnly) {
