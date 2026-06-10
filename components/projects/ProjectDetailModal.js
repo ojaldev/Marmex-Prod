@@ -2,7 +2,9 @@
 
 import { useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, MapPin, Calendar, Ruler, Star, Tag, Play, Quote, User, Building2 } from 'lucide-react'
+import { X, MapPin, Calendar, Ruler, Star, Tag, Play, Quote, User, Building2, ShoppingBag } from 'lucide-react'
+import Link from 'next/link'
+import Image from 'next/image'
 import BeforeAfterSlider from './BeforeAfterSlider'
 import { modalOverlay, modalContent, easing } from '@/lib/animations'
 import styles from './ProjectDetailModal.module.css'
@@ -154,6 +156,42 @@ export default function ProjectDetailModal({ project, onClose }) {
                   </motion.div>
                 )}
               </div>
+
+              {/* Shop this look */}
+              {project.relatedProducts?.filter(Boolean).length > 0 && (
+                <motion.div
+                  className={styles.shopThisLook}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4, duration: 0.5, ease: easing.elegant }}
+                >
+                  <h3 className={styles.shopTitle}>
+                    <ShoppingBag size={18} />
+                    Shop this look
+                  </h3>
+                  <div className={styles.shopGrid}>
+                    {project.relatedProducts.filter(Boolean).map(prod => {
+                      const id = prod._id || prod.id
+                      const effectivePrice = prod.discount > 0
+                        ? Math.round(prod.price * (100 - prod.discount) / 100)
+                        : prod.price
+                      return (
+                        <Link key={id} href={`/products/${id}`} className={styles.shopCard}>
+                          <div className={styles.shopImage}>
+                            {prod.mainImage && (
+                              <Image src={prod.mainImage} alt={prod.name} fill sizes="120px" className={styles.shopImg} />
+                            )}
+                          </div>
+                          <div className={styles.shopInfo}>
+                            <p className={styles.shopName}>{prod.name}</p>
+                            <p className={styles.shopPrice}>₹{effectivePrice?.toLocaleString()}</p>
+                          </div>
+                        </Link>
+                      )
+                    })}
+                  </div>
+                </motion.div>
+              )}
 
               {/* Two Column Layout */}
               <div className={styles.twoColumn}>

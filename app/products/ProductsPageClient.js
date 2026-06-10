@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import ProductCard from '@/components/ui/ProductCard'
 import { ProductListSkeleton } from '@/components/ui/SkeletonLoader'
@@ -15,26 +15,17 @@ export default function ProductsPageClient({
     initialCategory = 'all',
     initialSearchQuery = ''
 }) {
-    const searchParams = useSearchParams()
-    const categoryParam = searchParams.get('category')
-    const searchQuery = searchParams.get('search')
+    const router = useRouter()
 
-    const [products, setProducts] = useState(initialProducts)
-    const [categories, setCategories] = useState(initialCategories)
+    const [products] = useState(initialProducts)
+    const [categories] = useState(initialCategories)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
-    const [selectedCategory, setSelectedCategory] = useState(categoryParam || initialCategory)
+    const [selectedCategory, setSelectedCategory] = useState(initialCategory)
     const [sortBy, setSortBy] = useState('featured')
     const [gridColumns, setGridColumns] = useState(3)
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
     const [priceRange, setPriceRange] = useState([0, 100000])
-
-    // Sync with URL params
-    useEffect(() => {
-        if (categoryParam) {
-            setSelectedCategory(categoryParam)
-        }
-    }, [categoryParam])
 
     // Resolve category param to actual category name
     const resolvedCategoryName = useMemo(() => {
@@ -65,8 +56,7 @@ export default function ProductsPageClient({
             }
             const productsData = await productsRes.json()
             const categoriesData = await categoriesRes.json()
-            setProducts(productsData.products || productsData)
-            setCategories(categoriesData)
+            window.location.reload()
         } catch (err) {
             setError('Unable to load products. Please check your connection and try again.')
         } finally {
@@ -85,8 +75,8 @@ export default function ProductsPageClient({
             )
         }
 
-        if (searchQuery) {
-            const q = searchQuery.toLowerCase()
+        if (initialSearchQuery) {
+            const q = initialSearchQuery.toLowerCase()
             result = result.filter(p =>
                 p.name?.toLowerCase().includes(q) ||
                 p.category?.toLowerCase().includes(q) ||
@@ -117,18 +107,24 @@ export default function ProductsPageClient({
         }
 
         return result
-    }, [products, selectedCategory, sortBy, searchQuery, priceRange])
+    }, [products, resolvedCategoryName, sortBy, initialSearchQuery, priceRange])
 
-    const activeFiltersCount = (resolvedCategoryName !== 'all' ? 1 : 0) + (searchQuery ? 1 : 0)
+    const activeFiltersCount = (resolvedCategoryName !== 'all' ? 1 : 0) + (initialSearchQuery ? 1 : 0)
+
+    const handleCategoryClick = (catName) => {
+        if (catName === 'all') {
+            setSelectedCategory('all')
+            router.replace('/products')
+        } else {
+            setSelectedCategory(catName)
+            router.replace(`/products?category=${encodeURIComponent(catName)}`)
+        }
+    }
 
     const clearFilters = () => {
         setSelectedCategory('all')
         setPriceRange([0, 100000])
-        if (typeof window !== 'undefined') {
-            const url = new URL(window.location.href)
-            url.searchParams.delete('category')
-            window.history.replaceState({}, '', url)
-        }
+        router.replace('/products')
     }
 
     // Filter sidebar content
@@ -139,23 +135,24 @@ export default function ProductsPageClient({
                 <div className={styles.filterList}>
                     <button
                         className={selectedCategory === 'all' ? styles.active : ''}
-                        onClick={() => setSelectedCategory('all')}
+                        onClick={() => handleCategoryClick('all')}
                     >
                         All Products
                         <span className={styles.filterCount}>{products.length}</span>
                     </button>
-                    {categories.map(cat => (
-                        <button
-                            key={cat.id || cat._id}
-                            className={resolvedCategoryName === cat.name ? styles.active : ''}
-                            onClick={() => setSelectedCategory(cat.name)}
-                        >
-                            {cat.name}
-                            <span className={styles.filterCount}>
-                                {products.filter(p => p.category === cat.name).length}
-                            </span>
-                        </button>
-                    ))}
+                    {categories
+                        .map(cat => ({ cat, count: products.filter(p => p.category === cat.name).length }))
+                        .filter(({ count }) => count > 0)
+                        .map(({ cat, count }) => (
+                            <button
+                                key={cat.id || cat._id}
+                                className={resolvedCategoryName === cat.name ? styles.active : ''}
+                                onClick={() => handleCategoryClick(cat.name)}
+                            >
+                                {cat.name}
+                                <span className={styles.filterCount}>{count}</span>
+                            </button>
+                        ))}
                 </div>
             </div>
 
@@ -169,15 +166,15 @@ export default function ProductsPageClient({
                         {resolvedCategoryName !== 'all' && (
                             <span className={styles.chip}>
                                 {resolvedCategoryName}
-                                <button onClick={() => setSelectedCategory('all')}>
+                                <button onClick={() => handleCategoryClick('all')}>
                                     <X size={14} />
                                 </button>
                             </span>
                         )}
-                        {searchQuery && (
+                        {initialSearchQuery && (
                             <span className={styles.chip}>
-                                Search: "{searchQuery}"
-                                <button onClick={() => { /* would need router */ }}>
+                                Search: "{initialSearchQuery}"
+                                <button onClick={clearFilters}>
                                     <X size={14} />
                                 </button>
                             </span>
@@ -205,14 +202,14 @@ export default function ProductsPageClient({
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2, duration: 0.6 }}
                     >
-                        {searchQuery ? `Search: "${searchQuery}"` : 'Our Products'}
+                        {initialSearchQuery ? `Search: "${initialSearchQuery}"` : 'Our Products'}
                     </motion.h1>
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3, duration: 0.6 }}
                     >
-                        {searchQuery
+                        {initialSearchQuery
                             ? `Found ${filteredProducts.length} result${filteredProducts.length !== 1 ? 's' : ''}`
                             : 'Discover exquisite handcrafted marble and stone art'
                         }
@@ -351,12 +348,11 @@ export default function ProductsPageClient({
                                     {filteredProducts.map((product) => (
                                         <motion.div
                                             key={product._id || product.id}
-                                            variants={fadeInUp}
                                             layout
-                                            initial={{ opacity: 0, scale: 0.9 }}
+                                            initial={{ opacity: 0, scale: 0.95 }}
                                             animate={{ opacity: 1, scale: 1 }}
-                                            exit={{ opacity: 0, scale: 0.9 }}
-                                            transition={{ duration: 0.3 }}
+                                            exit={{ opacity: 0, scale: 0.95 }}
+                                            transition={{ duration: 0.25 }}
                                         >
                                             <ProductCard product={product} />
                                         </motion.div>

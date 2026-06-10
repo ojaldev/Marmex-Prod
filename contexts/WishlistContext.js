@@ -7,6 +7,7 @@ import { useNotification } from './NotificationContext'
 const WishlistContext = createContext()
 
 const STORAGE_KEY = 'marmex-wishlist'
+const META_KEY = 'marmex-wishlist-meta'
 
 function getStoredWishlist() {
     if (typeof window === 'undefined') return []
@@ -22,6 +23,38 @@ function setStoredWishlist(items) {
     if (typeof window === 'undefined') return
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
+    } catch {
+        // ignore
+    }
+}
+
+function getStoredMeta() {
+    if (typeof window === 'undefined') return {}
+    try {
+        const raw = localStorage.getItem(META_KEY)
+        return raw ? JSON.parse(raw) : {}
+    } catch {
+        return {}
+    }
+}
+
+function setMetaEntry(productId, effectivePrice) {
+    if (typeof window === 'undefined') return
+    try {
+        const meta = getStoredMeta()
+        meta[productId] = { price: effectivePrice, savedAt: Date.now() }
+        localStorage.setItem(META_KEY, JSON.stringify(meta))
+    } catch {
+        // ignore
+    }
+}
+
+function removeMetaEntry(productId) {
+    if (typeof window === 'undefined') return
+    try {
+        const meta = getStoredMeta()
+        delete meta[productId]
+        localStorage.setItem(META_KEY, JSON.stringify(meta))
     } catch {
         // ignore
     }
@@ -90,7 +123,11 @@ export function WishlistProvider({ children }) {
         }
     }, [session, syncGuestWishlistToServer])
 
-    const addToWishlist = async (productId) => {
+    const addToWishlist = async (productId, effectivePrice = null) => {
+        if (effectivePrice != null) {
+            setMetaEntry(productId, effectivePrice)
+        }
+
         if (!session) {
             // Guest: use localStorage
             const current = getStoredWishlist()
@@ -127,6 +164,8 @@ export function WishlistProvider({ children }) {
     }
 
     const removeFromWishlist = async (productId) => {
+        removeMetaEntry(productId)
+
         if (!session) {
             // Guest: use localStorage
             const current = getStoredWishlist()
@@ -158,11 +197,11 @@ export function WishlistProvider({ children }) {
         }
     }
 
-    const toggleWishlist = async (productId) => {
+    const toggleWishlist = async (productId, effectivePrice = null) => {
         if (isInWishlist(productId)) {
             return removeFromWishlist(productId)
         } else {
-            return addToWishlist(productId)
+            return addToWishlist(productId, effectivePrice)
         }
     }
 
@@ -174,6 +213,8 @@ export function WishlistProvider({ children }) {
         return wishlist.length
     }
 
+    const getWishlistMeta = () => getStoredMeta()
+
     return (
         <WishlistContext.Provider value={{
             wishlist,
@@ -183,6 +224,7 @@ export function WishlistProvider({ children }) {
             toggleWishlist,
             isInWishlist,
             getWishlistCount,
+            getWishlistMeta,
             refreshWishlist: fetchWishlist
         }}>
             {children}

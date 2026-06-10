@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Save, Trash2, Upload, X } from 'lucide-react'
+import { ArrowLeft, Save, Trash2, Upload, X, Search } from 'lucide-react'
 import styles from '../../products/product-editor.module.css'
 
 export default function EditProjectPage() {
@@ -12,10 +12,13 @@ export default function EditProjectPage() {
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [uploadingImage, setUploadingImage] = useState(null)
+    const [allProducts, setAllProducts] = useState([])
+    const [productSearch, setProductSearch] = useState('')
     const [formData, setFormData] = useState({
         name: '',
         client: '',
         category: '',
+        projectType: 'residential',
         description: '',
         location: '',
         materials: '',
@@ -26,11 +29,16 @@ export default function EditProjectPage() {
         clientTestimonial: '',
         testimonialVideo: '',
         completionDate: '',
-        featured: false
+        featured: false,
+        relatedProducts: []
     })
 
     useEffect(() => {
         loadProject()
+        fetch('/api/products')
+            .then(r => r.json())
+            .then(d => setAllProducts(d.products || d || []))
+            .catch(() => {})
     }, [params.id])
 
     const loadProject = async () => {
@@ -41,14 +49,17 @@ export default function EditProjectPage() {
             if (res.ok) {
                 setFormData({
                     ...data,
-                    // Ensure fields exist
                     client: data.client || '',
                     category: data.category || '',
+                    projectType: data.projectType || 'residential',
                     location: data.location || '',
                     materials: data.materials || '',
                     dimensions: data.dimensions || '',
                     completionDate: data.completionDate ? new Date(data.completionDate).toISOString().split('T')[0] : '',
-                    featured: data.featured || false
+                    featured: data.featured || false,
+                    relatedProducts: (data.relatedProducts || []).map(p =>
+                        typeof p === 'object' ? (p._id || p.id) : p
+                    )
                 })
             } else {
                 alert('Failed to load project')
@@ -387,6 +398,23 @@ export default function EditProjectPage() {
                 {/* Options */}
                 <section className={styles.section}>
                     <h2>Options</h2>
+                    <div className={styles.field}>
+                        <label>Project Type</label>
+                        <div className={styles.radioGroup}>
+                            {['residential', 'commercial'].map(type => (
+                                <label key={type} className={styles.radioLabel}>
+                                    <input
+                                        type="radio"
+                                        name="projectType"
+                                        value={type}
+                                        checked={formData.projectType === type}
+                                        onChange={handleChange}
+                                    />
+                                    <span>{type.charAt(0).toUpperCase() + type.slice(1)}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
                     <div className={styles.checkboxGroup}>
                         <label className={styles.checkbox}>
                             <input
@@ -398,6 +426,61 @@ export default function EditProjectPage() {
                             <span>Feature this project on homepage</span>
                         </label>
                     </div>
+                </section>
+
+                {/* Linked Products */}
+                <section className={styles.section}>
+                    <h2>Linked Products</h2>
+                    <p style={{ color: 'var(--color-text-gray)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-md)' }}>
+                        Link products used in this project to enable "Shop this look"
+                    </p>
+                    <div className={styles.field}>
+                        <div style={{ position: 'relative' }}>
+                            <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-gray)', pointerEvents: 'none' }} />
+                            <input
+                                type="text"
+                                value={productSearch}
+                                onChange={e => setProductSearch(e.target.value)}
+                                placeholder="Search products to link..."
+                                style={{ paddingLeft: '36px', width: '100%' }}
+                            />
+                        </div>
+                        {productSearch && (
+                            <div style={{ border: '1px solid var(--color-platinum)', borderRadius: 'var(--radius-md)', marginTop: '4px', maxHeight: '200px', overflowY: 'auto', background: 'var(--color-surface)' }}>
+                                {allProducts
+                                    .filter(p => p.name?.toLowerCase().includes(productSearch.toLowerCase()) && !formData.relatedProducts.includes(p._id || p.id))
+                                    .slice(0, 8)
+                                    .map(p => (
+                                        <button
+                                            key={p._id || p.id}
+                                            type="button"
+                                            onClick={() => {
+                                                setFormData(prev => ({ ...prev, relatedProducts: [...prev.relatedProducts, p._id || p.id] }))
+                                                setProductSearch('')
+                                            }}
+                                            style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--text-sm)', borderBottom: '1px solid var(--color-platinum)' }}
+                                        >
+                                            {p.name} <span style={{ color: 'var(--color-text-gray)' }}>· {p.category}</span>
+                                        </button>
+                                    ))}
+                            </div>
+                        )}
+                    </div>
+                    {formData.relatedProducts.length > 0 && (
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-sm)', marginTop: 'var(--space-sm)' }}>
+                            {formData.relatedProducts.map(id => {
+                                const p = allProducts.find(pr => (pr._id || pr.id) === id)
+                                return (
+                                    <span key={id} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', background: 'var(--color-pearl)', border: '1px solid var(--color-platinum)', borderRadius: 'var(--radius-full)', fontSize: 'var(--text-sm)' }}>
+                                        {p?.name || id}
+                                        <button type="button" onClick={() => setFormData(prev => ({ ...prev, relatedProducts: prev.relatedProducts.filter(rid => rid !== id) }))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-gray)', lineHeight: 1 }}>
+                                            <X size={12} />
+                                        </button>
+                                    </span>
+                                )
+                            })}
+                        </div>
+                    )}
                 </section>
 
                 {/* Actions */}

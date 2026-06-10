@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import { MapPin, Star, Calendar, ExternalLink } from 'lucide-react'
 import BeforeAfterSlider from './BeforeAfterSlider'
@@ -10,6 +10,15 @@ import styles from './ProjectCard.module.css'
 export default function ProjectCard({ project, index, onViewDetails }) {
   const cardRef = useRef(null)
   const [isHovered, setIsHovered] = useState(false)
+  const [isTouch, setIsTouch] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(hover: none)')
+    setIsTouch(mq.matches)
+    const handler = (e) => setIsTouch(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
 
   // 3D Tilt motion values
   const x = useMotionValue(0)
@@ -20,13 +29,13 @@ export default function ProjectCard({ project, index, onViewDetails }) {
   const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-8, 8]), springConfig)
 
   const handleMouseMove = useCallback((e) => {
-    if (!cardRef.current) return
+    if (!cardRef.current || isTouch) return
     const rect = cardRef.current.getBoundingClientRect()
     const centerX = rect.left + rect.width / 2
     const centerY = rect.top + rect.height / 2
     x.set((e.clientX - centerX) / rect.width)
     y.set((e.clientY - centerY) / rect.height)
-  }, [x, y])
+  }, [x, y, isTouch])
 
   const handleMouseLeave = useCallback(() => {
     x.set(0)
@@ -63,14 +72,14 @@ export default function ProjectCard({ project, index, onViewDetails }) {
       <motion.div
         className={styles.card}
         style={{
-          rotateX,
-          rotateY,
+          rotateX: isTouch ? 0 : rotateX,
+          rotateY: isTouch ? 0 : rotateY,
           transformStyle: 'preserve-3d',
         }}
         onMouseMove={handleMouseMove}
-        onMouseEnter={() => setIsHovered(true)}
+        onMouseEnter={() => !isTouch && setIsHovered(true)}
         onMouseLeave={handleMouseLeave}
-        whileHover={{ z: 20 }}
+        whileHover={isTouch ? {} : { z: 20 }}
         transition={{ duration: 0.4 }}
       >
         {/* Gold border glow on hover */}

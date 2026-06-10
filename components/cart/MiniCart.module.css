@@ -125,6 +125,19 @@
     color: var(--color-obsidian);
 }
 
+.deliveryEstimate {
+    font-size: 11px;
+    color: var(--color-emerald);
+    margin: 6px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.deliveryEstimate strong {
+    font-weight: 600;
+}
+
 /* ===== ITEMS CONTAINER ===== */
 .itemsContainer {
     flex: 1;

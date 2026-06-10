@@ -288,6 +288,13 @@
     }
 }
 
+.specs {
+    font-size: 0.75rem;
+    color: var(--color-text-gray);
+    margin-top: 0.25rem;
+    line-height: 1.4;
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
     .productCard,

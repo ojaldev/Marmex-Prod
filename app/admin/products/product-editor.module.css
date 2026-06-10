@@ -206,6 +206,37 @@
     color: var(--color-text-dark);
 }
 
+.radioGroup {
+    display: flex;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+    margin: var(--spacing-sm) 0;
+}
+
+.radioLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.75rem var(--spacing-md);
+    background: var(--color-bg-light);
+    border-radius: 4px;
+    transition: var(--transition-fast);
+    font-weight: 500;
+    color: var(--color-text-dark);
+}
+
+.radioLabel:hover {
+    background: rgba(212, 175, 55, 0.1);
+}
+
+.radioLabel input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--color-gold-24k);
+}
+
 .actions {
     display: flex;
     gap: var(--spacing-md);

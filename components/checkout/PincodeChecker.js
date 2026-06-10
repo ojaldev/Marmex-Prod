@@ -1,14 +1,21 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { MapPin, Check, X, Truck, Clock } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { saveDeliveryEstimate, getDeliveryEstimate } from '@/lib/delivery'
 import styles from './PincodeChecker.module.css'
 
 export default function PincodeChecker({ productWeight = 1, codAvailable = true }) {
     const [pincode, setPincode] = useState('')
     const [result, setResult] = useState(null)
     const [loading, setLoading] = useState(false)
+
+    // Prefill from the last successful check
+    useEffect(() => {
+        const saved = getDeliveryEstimate()
+        if (saved?.pincode) setPincode(saved.pincode)
+    }, [])
 
     const checkPincode = async () => {
         if (!pincode || pincode.length !== 6) return
@@ -35,6 +42,14 @@ export default function PincodeChecker({ productWeight = 1, codAvailable = true 
                     recommended: data.recommended,
                     pincode
                 })
+                if (data.serviceable && data.recommended) {
+                    saveDeliveryEstimate({
+                        pincode,
+                        estimatedDays: data.recommended.estimatedDays,
+                        courierName: data.recommended.name,
+                        rate: data.recommended.rate
+                    })
+                }
             }
         } catch (err) {
             setResult({ error: err.message, serviceable: false })

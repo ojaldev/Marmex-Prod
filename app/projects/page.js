@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef, Suspense } from 'react'
 import dynamic from 'next/dynamic'
+import { useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MapPin, Play, FileText, Filter, Star, Grid3X3, LayoutGrid } from 'lucide-react'
+import { MapPin, Play, FileText, Filter, Star, Grid3X3, LayoutGrid, Home, Building2 } from 'lucide-react'
 import ProjectCard from '@/components/projects/ProjectCard'
 import SectionHeader from '@/components/ui/SectionHeader'
 
@@ -11,13 +12,18 @@ const ProjectDetailModal = dynamic(() => import('@/components/projects/ProjectDe
 import { fadeInUp, staggerContainer, easing } from '@/lib/animations'
 import styles from './projects.module.css'
 
-export default function ProjectsPage() {
+function ProjectsContent() {
+  const searchParams = useSearchParams()
+  const openId = searchParams.get('open')
+
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
+  const [selectedType, setSelectedType] = useState('all')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false)
   const [gridColumns, setGridColumns] = useState(2)
   const [selectedProject, setSelectedProject] = useState(null)
+  const openHandled = useRef(false)
 
   useEffect(() => {
     fetch('/api/projects')
@@ -25,23 +31,44 @@ export default function ProjectsPage() {
       .then(data => {
         const projectList = data.projects || data
         setProjects(projectList)
+
+        // Handle ?open= param — auto-open a project modal
+        if (openId && !openHandled.current) {
+          const match = projectList.find(p => (p._id || p.id) === openId)
+          if (match) {
+            setSelectedProject(match)
+            openHandled.current = true
+          }
+        }
       })
       .catch(err => console.error('Failed to load projects:', err))
       .finally(() => setLoading(false))
-  }, [])
+  }, [openId])
 
-  // Extract unique categories
+  // Reset category filter when type changes
+  useEffect(() => {
+    setSelectedCategory('all')
+  }, [selectedType])
+
+  // Counts per type
+  const residentialCount = useMemo(() => projects.filter(p => (p.projectType || 'residential') === 'residential').length, [projects])
+  const commercialCount = useMemo(() => projects.filter(p => (p.projectType || 'residential') === 'commercial').length, [projects])
+
+  // Extract unique categories within selected type
   const categories = useMemo(() => {
     const cats = new Set()
-    projects.forEach(p => {
-      if (p.category) cats.add(p.category)
-    })
+    const base = selectedType === 'all' ? projects : projects.filter(p => (p.projectType || 'residential') === selectedType)
+    base.forEach(p => { if (p.category) cats.add(p.category) })
     return ['all', ...Array.from(cats).sort()]
-  }, [projects])
+  }, [projects, selectedType])
 
   // Filter projects
   const filteredProjects = useMemo(() => {
     let result = [...projects]
+
+    if (selectedType !== 'all') {
+      result = result.filter(p => (p.projectType || 'residential') === selectedType)
+    }
 
     if (selectedCategory !== 'all') {
       result = result.filter(p => p.category === selectedCategory)
@@ -51,7 +78,6 @@ export default function ProjectsPage() {
       result = result.filter(p => p.featured)
     }
 
-    // Sort: featured first, then by completion date
     result.sort((a, b) => {
       if (a.featured && !b.featured) return -1
       if (!a.featured && b.featured) return 1
@@ -61,7 +87,7 @@ export default function ProjectsPage() {
     })
 
     return result
-  }, [projects, selectedCategory, showFeaturedOnly])
+  }, [projects, selectedType, selectedCategory, showFeaturedOnly])
 
   const featuredCount = projects.filter(p => p.featured).length
 
@@ -101,13 +127,13 @@ export default function ProjectsPage() {
               </div>
               <div className={styles.statDivider} />
               <div className={styles.statItem}>
-                <span className={styles.statValue}>{featuredCount}</span>
-                <span className={styles.statLabel}>Featured</span>
+                <span className={styles.statValue}>{residentialCount}</span>
+                <span className={styles.statLabel}>Residential</span>
               </div>
               <div className={styles.statDivider} />
               <div className={styles.statItem}>
-                <span className={styles.statValue}>{categories.length - 1}</span>
-                <span className={styles.statLabel}>Categories</span>
+                <span className={styles.statValue}>{commercialCount}</span>
+                <span className={styles.statLabel}>Commercial</span>
               </div>
             </motion.div>
           )}
@@ -122,6 +148,25 @@ export default function ProjectsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.5, ease: easing.elegant }}
         >
+          {/* Primary type toggle */}
+          <div className={styles.typeToggle}>
+            {[
+              { key: 'all', label: 'All', count: projects.length },
+              { key: 'residential', label: 'Residential', count: residentialCount, Icon: Home },
+              { key: 'commercial', label: 'Commercial', count: commercialCount, Icon: Building2 },
+            ].map(({ key, label, count, Icon }) => (
+              <button
+                key={key}
+                className={`${styles.typeBtn} ${selectedType === key ? styles.typeBtnActive : ''}`}
+                onClick={() => setSelectedType(key)}
+              >
+                {Icon && <Icon size={14} />}
+                {label}
+                <span className={styles.typeBtnCount}>{count}</span>
+              </button>
+            ))}
+          </div>
+
           {/* Category Filters */}
           <div className={styles.filters}>
             <Filter size={16} className={styles.filterIcon} />
@@ -132,7 +177,7 @@ export default function ProjectsPage() {
                   className={`${styles.filterChip} ${selectedCategory === cat ? styles.filterChipActive : ''}`}
                   onClick={() => setSelectedCategory(cat)}
                 >
-                  {cat === 'all' ? 'All Projects' : cat}
+                  {cat === 'all' ? 'All Categories' : cat}
                 </button>
               ))}
             </div>
@@ -241,5 +286,13 @@ export default function ProjectsPage() {
         )}
       </AnimatePresence>
     </main>
+  )
+}
+
+export default function ProjectsPage() {
+  return (
+    <Suspense fallback={null}>
+      <ProjectsContent />
+    </Suspense>
   )
 }

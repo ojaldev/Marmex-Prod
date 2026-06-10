@@ -6,7 +6,7 @@ import { Instagram, Youtube, Mail, MapPin, Phone, CreditCard, Shield, Truck, Awa
 import { fadeInUp, staggerContainer } from '@/lib/animations'
 import styles from './Footer.module.css'
 
-export default function Footer() {
+export default function Footer({ categories = [] }) {
   return (
     <footer className={styles.footer}>
       {/* Trust Bar */}
@@ -105,11 +105,17 @@ export default function Footer() {
             >
               <h4 className={styles.footerHeading}>Categories</h4>
               <ul className={styles.footerLinks}>
-                <li><Link href="/products?category=sculptures">Sculptures</Link></li>
-                <li><Link href="/products?category=carvings">Stone Carvings</Link></li>
-                <li><Link href="/products?category=dining">Dining Décor</Link></li>
-                <li><Link href="/products?category=gifts">Personalized Gifts</Link></li>
-                <li><Link href="/products?category=games">Marble Games</Link></li>
+                {categories.length > 0 ? (
+                  categories.map(cat => (
+                    <li key={cat._id || cat.id || cat.name}>
+                      <Link href={`/products?category=${encodeURIComponent(cat.name)}`}>
+                        {cat.name}
+                      </Link>
+                    </li>
+                  ))
+                ) : (
+                  <li><Link href="/products">All Products</Link></li>
+                )}
               </ul>
             </motion.div>
 

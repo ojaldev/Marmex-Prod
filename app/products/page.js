@@ -18,13 +18,20 @@ async function getProducts() {
     }
 }
 
-async function getCategories() {
+async function getCategories(products = []) {
     try {
         await connectDB()
         const categories = await Category.find({})
             .sort({ order: 1, name: 1 })
             .lean()
-        return JSON.parse(JSON.stringify(categories))
+
+        const catsWithCount = categories.map(cat => ({
+            ...cat,
+            count: products.filter(p => p.category === cat.name).length
+        }))
+
+        // Only return categories that have at least one product
+        return JSON.parse(JSON.stringify(catsWithCount.filter(c => c.count > 0)))
     } catch (error) {
         console.error('Server: failed to fetch categories:', error)
         return []
@@ -36,10 +43,8 @@ export default async function ProductsPage({ searchParams }) {
     const initialCategory = params?.category || 'all'
     const initialSearchQuery = params?.search || ''
 
-    const [products, categories] = await Promise.all([
-        getProducts(),
-        getCategories()
-    ])
+    const products = await getProducts()
+    const categories = await getCategories(products)
 
     return (
         <ProductsPageClient

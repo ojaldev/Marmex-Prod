@@ -39,7 +39,8 @@ export default function QuickViewModal({ isOpen, onClose, product, onAddToCart }
     const handleWishlistToggle = () => {
         setWishlistAnimating(true)
         setTimeout(() => setWishlistAnimating(false), 600)
-        toggleWishlist(productId)
+        const price = discountedPrice ? Number(discountedPrice) : product.price
+        toggleWishlist(productId, price)
     }
 
     return (

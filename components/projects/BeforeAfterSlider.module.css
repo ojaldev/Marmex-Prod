@@ -148,6 +148,22 @@
   white-space: nowrap;
 }
 
+/* Persistent labels on touch devices */
+@media (hover: none) {
+  .labelBefore {
+    left: var(--space-md) !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  .labelAfter {
+    right: var(--space-md);
+    left: auto !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .image,

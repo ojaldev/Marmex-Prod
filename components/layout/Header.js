@@ -17,7 +17,7 @@ import { navDropdown, fadeIn } from '@/lib/animations'
 const MiniCart = dynamic(() => import('@/components/cart/MiniCart'), { ssr: false })
 import styles from './Header.module.css'
 
-export default function Header() {
+export default function Header({ categories = [] }) {
   const pathname = usePathname()
   const router = useRouter()
   const { data: session } = useSession()
@@ -33,8 +33,30 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [searchLoading, setSearchLoading] = useState(false)
+  const [recentSearches, setRecentSearches] = useState([])
   const searchInputRef = useRef(null)
   const searchDebounce = useRef(null)
+  const productsCache = useRef(null)
+
+  const RS_KEY = 'marmex-recent-searches'
+
+  const loadRecentSearches = useCallback(() => {
+    try {
+      const raw = localStorage.getItem(RS_KEY)
+      return raw ? JSON.parse(raw) : []
+    } catch {
+      return []
+    }
+  }, [])
+
+  const saveRecentSearch = useCallback((term) => {
+    try {
+      const current = loadRecentSearches()
+      const updated = [term, ...current.filter(s => s !== term)].slice(0, 5)
+      localStorage.setItem(RS_KEY, JSON.stringify(updated))
+      setRecentSearches(updated)
+    } catch {}
+  }, [loadRecentSearches])
 
   // Scroll detection
   useEffect(() => {
@@ -49,14 +71,21 @@ export default function Header() {
     setSearchOpen(false)
   }, [pathname])
 
-  // Focus search input when opened
+  // Focus search input when opened; preload product cache + recent searches
   useEffect(() => {
-    if (searchOpen && searchInputRef.current) {
+    if (searchOpen) {
       setTimeout(() => searchInputRef.current?.focus(), 100)
+      setRecentSearches(loadRecentSearches())
+      if (!productsCache.current) {
+        fetch('/api/products')
+          .then(r => r.json())
+          .then(d => { productsCache.current = d.products || d || [] })
+          .catch(() => {})
+      }
     }
-  }, [searchOpen])
+  }, [searchOpen, loadRecentSearches])
 
-  // Debounced search
+  // Debounced search — filters productsCache when available, falls back to fetch
   const handleSearchInput = useCallback((value) => {
     setSearchQuery(value)
     clearTimeout(searchDebounce.current)
@@ -69,9 +98,13 @@ export default function Header() {
     setSearchLoading(true)
     searchDebounce.current = setTimeout(async () => {
       try {
-        const res = await fetch('/api/products')
-        const data = await res.json()
-        const products = data.products || data
+        const products = productsCache.current || await fetch('/api/products')
+          .then(r => r.json())
+          .then(d => {
+            const list = d.products || d || []
+            productsCache.current = list
+            return list
+          })
         const query = value.toLowerCase()
         const filtered = products
           .filter(p =>
@@ -90,27 +123,30 @@ export default function Header() {
   }, [])
 
   const handleSearchSubmit = (e) => {
-    e.preventDefault()
-    if (searchQuery.trim()) {
-      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`)
+    e?.preventDefault()
+    const term = typeof e === 'string' ? e : searchQuery.trim()
+    if (term) {
+      saveRecentSearch(term)
+      router.push(`/products?search=${encodeURIComponent(term)}`)
       setSearchOpen(false)
       setSearchQuery('')
       setSearchResults([])
     }
   }
 
+  const shopDropdown = [
+    { label: 'All Products', href: '/products' },
+    ...categories.map(cat => ({
+      label: cat.name,
+      href: `/products?category=${encodeURIComponent(cat.name)}`
+    }))
+  ]
+
   const navItems = [
     {
       label: 'Shop',
       href: '/products',
-      dropdown: [
-        { label: 'All Products', href: '/products' },
-        { label: 'Sculptures & Art', href: '/products?category=Sculptures' },
-        { label: 'Dining Décor', href: '/products?category=Dining' },
-        { label: 'Wall Art', href: '/products?category=Wall Art' },
-        { label: 'Personalized Gifts', href: '/products?category=Gifts' },
-        { label: 'Marble Games', href: '/products?category=Games' },
-      ]
+      dropdown: shopDropdown
     },
     { label: 'Custom Orders', href: '/custom' },
     { label: 'Portfolio', href: '/projects' },
@@ -301,9 +337,82 @@ export default function Header() {
               </form>
 
               {/* Search Results */}
-              <AnimatePresence>
+              <AnimatePresence mode="wait">
+                {!searchQuery && (
+                  <motion.div
+                    key="zero-state"
+                    className={styles.searchZeroState}
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    {recentSearches.length > 0 && (
+                      <div className={styles.zeroSection}>
+                        <p className={styles.zeroLabel}>Recent searches</p>
+                        <div className={styles.zeroChips}>
+                          {recentSearches.map(term => (
+                            <button
+                              key={term}
+                              className={styles.recentChip}
+                              onClick={() => handleSearchSubmit(term)}
+                            >
+                              {term}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {categories.length > 0 && (
+                      <div className={styles.zeroSection}>
+                        <p className={styles.zeroLabel}>Browse categories</p>
+                        <div className={styles.zeroChips}>
+                          {categories.slice(0, 6).map(cat => (
+                            <Link
+                              key={cat.name}
+                              href={`/products?category=${encodeURIComponent(cat.name)}`}
+                              className={styles.categoryChip}
+                              onClick={() => setSearchOpen(false)}
+                            >
+                              {cat.name}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {productsCache.current?.length > 0 && (
+                      <div className={styles.zeroSection}>
+                        <p className={styles.zeroLabel}>Trending products</p>
+                        <div className={styles.trendingGrid}>
+                          {productsCache.current.slice(0, 4).map(product => (
+                            <Link
+                              key={product._id || product.id}
+                              href={`/products/${product._id || product.id}`}
+                              className={styles.trendingItem}
+                              onClick={() => setSearchOpen(false)}
+                            >
+                              {product.mainImage && (
+                                <div className={styles.trendingImage}>
+                                  <Image
+                                    src={product.mainImage}
+                                    alt={product.name}
+                                    width={48}
+                                    height={48}
+                                    className={styles.trendingImg}
+                                  />
+                                </div>
+                              )}
+                              <span className={styles.trendingName}>{product.name}</span>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </motion.div>
+                )}
                 {searchResults.length > 0 && (
                   <motion.div
+                    key="results"
                     className={styles.searchResults}
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -349,18 +458,19 @@ export default function Header() {
                       onClick={handleSearchSubmit}
                       className={styles.searchViewAll}
                     >
-                      View all results for "{searchQuery}"
+                      View all results for &ldquo;{searchQuery}&rdquo;
                       <ArrowRight size={16} />
                     </button>
                   </motion.div>
                 )}
                 {searchQuery && !searchLoading && searchResults.length === 0 && (
                   <motion.div
+                    key="no-results"
                     className={styles.searchNoResults}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                   >
-                    No products found for "{searchQuery}"
+                    No products found for &ldquo;{searchQuery}&rdquo;
                   </motion.div>
                 )}
               </AnimatePresence>

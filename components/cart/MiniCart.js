@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useCart } from '@/contexts/CartContext'
-import { X, Minus, Plus, ShoppingBag, ArrowRight, Truck } from 'lucide-react'
+import { X, Minus, Plus, ShoppingBag, ArrowRight, Truck, MapPin } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { getDeliveryEstimate, formatDeliveryDate } from '@/lib/delivery'
 import styles from './MiniCart.module.css'
 
 export default function MiniCart() {
@@ -16,6 +17,12 @@ export default function MiniCart() {
 
     const itemsEndRef = useRef(null)
     const prevCartLength = useRef(cart.length)
+    const [deliveryEstimate, setDeliveryEstimate] = useState(null)
+
+    // Load the pincode the user checked on a product page
+    useEffect(() => {
+        if (isCartOpen) setDeliveryEstimate(getDeliveryEstimate())
+    }, [isCartOpen])
 
     const freeShippingThreshold = 2999
     const currentTotal = getCartTotal()
@@ -80,6 +87,12 @@ export default function MiniCart() {
                             <><Truck size={12} /> Add <strong>₹{amountToFreeShipping.toLocaleString()}</strong> for free shipping</>
                         )}
                     </p>
+                    {cart.length > 0 && deliveryEstimate && formatDeliveryDate(deliveryEstimate.estimatedDays) && (
+                        <p className={styles.deliveryEstimate}>
+                            <MapPin size={12} />
+                            Delivers to <strong>{deliveryEstimate.pincode}</strong> by {formatDeliveryDate(deliveryEstimate.estimatedDays)}
+                        </p>
+                    )}
                 </div>
 
                 {/* Cart Items */}

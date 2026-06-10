@@ -1,287 +1,66 @@
-'use client'
+import { notFound } from 'next/navigation'
+import mongoose from 'mongoose'
+import connectDB from '@/lib/mongodb'
+import Product from '@/models/Product'
+import Review from '@/models/Review'
+import Order from '@/models/Order'
+import Project from '@/models/Project'
+import ProductDetailClient from './ProductDetailClient'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import Link from 'next/link'
-import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
-import ProductCard from '@/components/ui/ProductCard'
-import StarRating from '@/components/ui/StarRating'
-import QuantitySelector from '@/components/ui/QuantitySelector'
-import PincodeChecker from '@/components/checkout/PincodeChecker'
-import RatingsSummary from '@/components/reviews/RatingsSummary'
-import ReviewForm from '@/components/reviews/ReviewForm'
-import ReviewList from '@/components/reviews/ReviewList'
-import { useCart } from '@/contexts/CartContext'
-import { useNotification } from '@/contexts/NotificationContext'
-import { convertGDriveUrl } from '@/lib/utils'
-import { normalizeDimensionsDisplay, normalizeWeightDisplay } from '@/lib/product-specs'
-import { getCloudinarySrcSet } from '@/lib/cloudinary-responsive'
-import { fadeInUp, staggerContainer } from '@/lib/animations'
-import {
-    ChevronLeft, ChevronRight, Heart, Share2, Truck, Shield,
-    RotateCcw, Instagram, X, ZoomIn, Check, Package, Play,
-    Eye, Clock, Flame
-} from 'lucide-react'
-import styles from './product-detail.module.css'
-
-export default function ProductDetailPage() {
-    const params = useParams()
-    const router = useRouter()
-    const { addToCart } = useCart()
-    const notification = useNotification()
-
-    const [product, setProduct] = useState(null)
-    const [relatedProducts, setRelatedProducts] = useState([])
-    const [reviewSummary, setReviewSummary] = useState(null)
-    const [loading, setLoading] = useState(true)
-    const [currentMediaIndex, setCurrentMediaIndex] = useState(0)
-    const [quantity, setQuantity] = useState(1)
-    const [wishlisted, setWishlisted] = useState(false)
-    const [imageZoom, setImageZoom] = useState(false)
-    const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 })
-    const [lightboxOpen, setLightboxOpen] = useState(false)
-    const [addedToCart, setAddedToCart] = useState(false)
-    const [stickyVisible, setStickyVisible] = useState(false)
-    const [viewersCount, setViewersCount] = useState(0)
-    const [recentlyViewed, setRecentlyViewed] = useState([])
-
-    useEffect(() => {
-        const loadProduct = async () => {
-            try {
-                const [productRes, allProductsRes] = await Promise.all([
-                    fetch(`/api/products/${params.id}`),
-                    fetch('/api/products')
-                ])
-
-                const productData = await productRes.json()
-                const allProductsData = await allProductsRes.json()
-
-                setProduct(productData)
-
-                const productId = productData._id || productData.id
-                if (productId) {
-                    const reviewsRes = await fetch(`/api/reviews?productId=${productId}`)
-                    const reviewsData = await reviewsRes.json()
-                    setReviewSummary(reviewsData.summary || null)
-
-                    // Track recently viewed
-                    trackRecentlyViewed(productData)
-                }
-
-                const productsArray = Array.isArray(allProductsData) ? allProductsData : (allProductsData.products || [])
-                const related = productsArray
-                    .filter(p => p.category === productData.category && (p._id || p.id) !== (productData._id || productData.id))
-                    .slice(0, 4)
-
-                setRelatedProducts(related)
-
-                // Load recently viewed (excluding current product)
-                const rv = getRecentlyViewed().filter(id => id !== (productData._id || productData.id))
-                const rvProducts = productsArray.filter(p => rv.includes(p._id || p.id)).slice(0, 4)
-                setRecentlyViewed(rvProducts)
-            } catch (error) {
-                console.error('Failed to load product:', error)
-            } finally {
-                setLoading(false)
-            }
-        }
-
-        if (params.id) loadProduct()
-    }, [params.id])
-
-    // Fake viewers count (randomized social proof)
-    useEffect(() => {
-        if (!product) return
-        const base = Math.floor(Math.random() * 12) + 3 // 3-15
-        setViewersCount(base)
-        const interval = setInterval(() => {
-            setViewersCount(prev => {
-                const change = Math.floor(Math.random() * 5) - 2 // -2 to +2
-                const next = prev + change
-                return Math.max(3, Math.min(18, next))
-            })
-        }, 5000)
-        return () => clearInterval(interval)
-    }, [product])
-
-    // Delivery countdown
-    const getDeliveryEstimate = () => {
-        const now = new Date()
-        const cutoff = new Date(now)
-        cutoff.setHours(16, 0, 0, 0) // 4 PM cutoff
-        const hoursLeft = cutoff > now ? Math.ceil((cutoff - now) / (1000 * 60 * 60)) : 0
-
-        const delivery = new Date(now)
-        delivery.setDate(delivery.getDate() + (hoursLeft > 0 ? 5 : 6))
-        const dayName = delivery.toLocaleDateString('en-IN', { weekday: 'short' })
-        const dateStr = delivery.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
-        return { hoursLeft, deliveryText: `${dayName}, ${dateStr}` }
+function serializeDoc(doc) {
+    if (!doc) return doc
+    const serialized = JSON.parse(JSON.stringify(doc))
+    if (serialized._id) {
+        serialized.id = serialized._id.toString()
     }
+    return serialized
+}
 
-    // Sticky ATC visibility
-    useEffect(() => {
-        const handleScroll = () => {
-            const actionsEl = document.getElementById('product-actions')
-            if (actionsEl) {
-                const rect = actionsEl.getBoundingClientRect()
-                setStickyVisible(rect.bottom < 0)
-            }
-        }
-        window.addEventListener('scroll', handleScroll, { passive: true })
-        return () => window.removeEventListener('scroll', handleScroll)
-    }, [loading])
+function serializeDocs(docs) {
+    return docs.map(serializeDoc)
+}
 
-    const handleShare = async () => {
-        const shareData = { title: product?.name, text: product?.shortDescription, url: window.location.href }
-        try {
-            if (navigator.share) await navigator.share(shareData)
-            else {
-                await navigator.clipboard.writeText(window.location.href)
-                notification.success('Link copied to clipboard!')
-            }
-        } catch (error) {
-            if (error.name !== 'AbortError') notification.error('Failed to share')
+function buildReviewSummary(reviews) {
+    if (!reviews || reviews.length === 0) {
+        return {
+            average: 0,
+            total: 0,
+            distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
         }
     }
+    const total = reviews.length
+    const sum = reviews.reduce((acc, r) => acc + (r.rating || 0), 0)
+    const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
+    reviews.forEach(r => {
+        const rating = Math.min(5, Math.max(1, Math.round(r.rating || 0)))
+        distribution[rating] = (distribution[rating] || 0) + 1
+    })
+    return { average: sum / total, total, distribution }
+}
 
-    const handleAddToCart = () => {
-        addToCart(product, quantity)
-        setAddedToCart(true)
-        notification.success(`${product.name} added to cart!`)
-        setTimeout(() => setAddedToCart(false), 2000)
-    }
-
-    const handleWishlist = () => {
-        setWishlisted(!wishlisted)
-        notification[!wishlisted ? 'success' : 'info'](!wishlisted ? 'Added to wishlist!' : 'Removed from wishlist')
-    }
-
-    const handleImageMouseMove = (e) => {
-        const rect = e.currentTarget.getBoundingClientRect()
-        setZoomPosition({
-            x: ((e.clientX - rect.left) / rect.width) * 100,
-            y: ((e.clientY - rect.top) / rect.height) * 100,
-        })
-    }
-
-    // Compute allImages early so callbacks can close over it safely
-    const allImages = product
-        ? [product.mainImage, ...(product.additionalImages || [])].filter(Boolean).map(convertGDriveUrl)
-        : []
-
-    // Build media items array: images + videos combined
-    const mediaItems = product
-        ? [
-            ...allImages.map(src => ({ type: 'image', src })),
-            ...(product.videos || []).map(v => ({
-                type: 'video',
-                src: v.url,
-                title: v.title
-            }))
-        ]
-        : []
-
-    const nextImage = useCallback(() => {
-        setCurrentMediaIndex(prev => {
-            const len = mediaItems.length || 1
-            return (prev + 1) % len
-        })
-    }, [mediaItems.length])
-
-    const prevImage = useCallback(() => {
-        setCurrentMediaIndex(prev => {
-            const len = mediaItems.length || 1
-            return (prev - 1 + len) % len
-        })
-    }, [mediaItems.length])
-
-    // Keyboard navigation for lightbox
-    useEffect(() => {
-        const handleKey = (e) => {
-            if (!lightboxOpen) return
-            if (e.key === 'ArrowRight') nextImage()
-            if (e.key === 'ArrowLeft') prevImage()
-            if (e.key === 'Escape') setLightboxOpen(false)
-        }
-        window.addEventListener('keydown', handleKey)
-        return () => window.removeEventListener('keydown', handleKey)
-    }, [lightboxOpen, nextImage, prevImage])
-
-    // Reset media index when product changes
-    useEffect(() => {
-        setCurrentMediaIndex(0)
-    }, [product?._id || product?.id])
-
-    if (loading) {
-        return (
-            <main className={styles.main}>
-                <div className="container">
-                    <div className="shimmer h-5 w-64 rounded mb-8" />
-                    <div className={styles.layout}>
-                        <div className="space-y-4">
-                            <div className="shimmer w-full aspect-[3/4] rounded-2xl" />
-                            <div className="flex gap-3">
-                                {[1, 2, 3, 4].map(i => (
-                                    <div key={i} className="shimmer w-20 h-20 rounded-lg" />
-                                ))}
-                            </div>
-                        </div>
-                        <div className="space-y-6 pt-4">
-                            <div className="shimmer h-4 w-24 rounded" />
-                            <div className="shimmer h-10 w-3/4 rounded" />
-                            <div className="shimmer h-8 w-40 rounded" />
-                            <div className="shimmer h-20 w-full rounded" />
-                            <div className="shimmer h-14 w-full rounded" />
-                        </div>
-                    </div>
-                </div>
-            </main>
-        )
-    }
-
-    if (!product) {
-        return (
-            <main className={styles.notFound}>
-                <Package size={64} className="text-[var(--color-platinum)]" />
-                <h1>Product Not Found</h1>
-                <p>The product you&apos;re looking for doesn&apos;t exist or has been removed.</p>
-                <button onClick={() => router.push('/products')} className="btn btn-primary">
-                    Browse Products
-                </button>
-            </main>
-        )
-    }
-
-    const discountedPrice = product.discount > 0
-        ? (product.price * (100 - product.discount) / 100).toFixed(0)
-        : null
-
-    // Product structured data for Google rich snippets
-    const productSchema = {
+function buildProductSchema(product, reviewSummary, discountedPrice) {
+    return {
         '@context': 'https://schema.org',
         '@type': 'Product',
         name: product.name,
-        image: [
-            product.mainImage,
-            ...(product.additionalImages || [])
-        ].filter(Boolean),
+        image: [product.mainImage, ...(product.additionalImages || [])].filter(Boolean),
         description: product.shortDescription || product.detailedDescription || product.name,
-        sku: product._id || product.id,
+        sku: product.id,
         brand: {
             '@type': 'Brand',
             name: 'Marmex India'
         },
         offers: {
             '@type': 'Offer',
-            url: `https://marmex-prod-production.up.railway.app/products/${product._id || product.id}`,
+            url: `https://marmex-prod-production.up.railway.app/products/${product.id}`,
             priceCurrency: 'INR',
             price: discountedPrice || product.price,
-            availability: product.stock === 'In Stock'
-                ? 'https://schema.org/InStock'
-                : product.stock === 'Made to Order'
-                    ? 'https://schema.org/PreOrder'
-                    : 'https://schema.org/OutOfStock',
+            availability:
+                product.stock === 'In Stock'
+                    ? 'https://schema.org/InStock'
+                    : product.stock === 'Made to Order'
+                        ? 'https://schema.org/PreOrder'
+                        : 'https://schema.org/OutOfStock',
             itemCondition: 'https://schema.org/NewCondition',
             shippingDetails: {
                 '@type': 'OfferShippingDetails',
@@ -303,589 +82,165 @@ export default function ProductDetailPage() {
                 returnFees: 'https://schema.org/FreeReturn'
             }
         },
-        aggregateRating: reviewSummary ? {
-            '@type': 'AggregateRating',
-            ratingValue: reviewSummary.averageRating || 0,
-            reviewCount: reviewSummary.totalReviews || 0,
-            bestRating: 5,
-            worstRating: 1
-        } : undefined,
-        ...(product.material && { material: product.material }),
-        ...(product.weight && { weight: { '@type': 'QuantitativeValue', value: product.weight } }),
-        ...(product.dimensions && { size: product.dimensions })
+        ...(reviewSummary.total > 0
+            ? {
+                aggregateRating: {
+                    '@type': 'AggregateRating',
+                    ratingValue: Number(reviewSummary.average.toFixed(1)),
+                    reviewCount: reviewSummary.total,
+                    bestRating: 5,
+                    worstRating: 1
+                }
+            }
+            : {}),
+        ...(product.material ? { material: product.material } : {}),
+        ...(product.weight
+            ? { weight: { '@type': 'QuantitativeValue', value: product.weight } }
+            : {}),
+        ...(product.dimensions ? { size: product.dimensions } : {})
     }
+}
+
+function buildBreadcrumbSchema(product) {
+    const baseUrl = 'https://marmex-prod-production.up.railway.app'
+    const items = [
+        { name: 'Home', url: baseUrl },
+        { name: 'Products', url: `${baseUrl}/products` },
+        ...(product.category
+            ? [{ name: product.category, url: `${baseUrl}/products?category=${encodeURIComponent(product.category)}` }]
+            : []),
+        { name: product.name, url: `${baseUrl}/products/${product.id}` }
+    ]
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: items.map((item, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            name: item.name,
+            item: item.url
+        }))
+    }
+}
+
+export async function generateMetadata({ params }) {
+    const { id } = await params
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return { title: 'Product Not Found | Marmex India' }
+    }
+
+    let product = null
+    try {
+        await connectDB()
+        product = await Product.findById(id).lean()
+    } catch {
+        product = null
+    }
+
+    if (!product) {
+        return { title: 'Product Not Found | Marmex India' }
+    }
+
+    return {
+        title: `${product.name} | Marmex India`,
+        description:
+            product.shortDescription ||
+            product.metaDescription ||
+            `Shop ${product.name} at Marmex India.`,
+        openGraph: {
+            title: product.name,
+            description: product.shortDescription || product.metaDescription || '',
+            images: product.mainImage ? [{ url: product.mainImage }] : []
+        }
+    }
+}
+
+export default async function ProductDetailPage({ params }) {
+    const { id } = await params
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        notFound()
+    }
+
+    await connectDB()
+
+    let productDoc = null
+    try {
+        productDoc = await Product.findById(id).lean()
+    } catch {
+        notFound()
+    }
+
+    if (!productDoc) {
+        notFound()
+    }
+
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+
+    const [allProductsDocs, reviewsDocs, soldAgg, featuredInDocs] = await Promise.all([
+        Product.find({})
+            .select('name category price discount mainImage stock highlight shortDescription')
+            .lean(),
+        Review.find({ product: id, status: 'approved' }).lean(),
+        Order.aggregate([
+            {
+                $match: {
+                    createdAt: { $gte: thirtyDaysAgo },
+                    status: { $nin: ['cancelled'] },
+                    'items.productId': id
+                }
+            },
+            { $unwind: '$items' },
+            { $match: { 'items.productId': id } },
+            { $group: { _id: null, units: { $sum: '$items.quantity' } } }
+        ]).catch(() => []),
+        Project.find({ relatedProducts: id })
+            .select('name afterImage location projectType')
+            .limit(2)
+            .lean()
+            .catch(() => [])
+    ])
+
+    const soldRecently = soldAgg?.[0]?.units || 0
+    const featuredIn = serializeDocs(featuredInDocs)
+
+    const product = serializeDoc(productDoc)
+    const allProducts = serializeDocs(allProductsDocs)
+    const reviews = serializeDocs(reviewsDocs)
+
+    const reviewSummary = buildReviewSummary(reviews)
+
+    const relatedProducts = allProducts
+        .filter(p => (p.id || p._id?.toString()) !== product.id && p.category === product.category)
+        .slice(0, 4)
+
+    const discountedPrice =
+        product.discount > 0
+            ? Math.round(product.price * (100 - product.discount) / 100)
+            : null
+
+    const productSchema = buildProductSchema(product, reviewSummary, discountedPrice)
+    const breadcrumbSchema = buildBreadcrumbSchema(product)
 
     return (
         <>
-            {/* Product Schema (JSON-LD) for Google rich snippets */}
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
             />
-            <main className={styles.main}>
-                <div className="container">
-                    {/* Breadcrumbs */}
-                    <motion.nav
-                        className={styles.breadcrumbs}
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4 }}
-                    >
-                        <Link href="/">Home</Link>
-                        <span>/</span>
-                        <Link href="/products">Products</Link>
-                        <span>/</span>
-                        {product.category && (
-                            <>
-                                <Link href={`/products?category=${product.category}`}>{product.category}</Link>
-                                <span>/</span>
-                            </>
-                        )}
-                        <span>{product.name}</span>
-                    </motion.nav>
-
-                    <div className={styles.layout}>
-                        {/* Image Gallery */}
-                        <motion.div
-                            className={styles.gallery}
-                            initial={{ opacity: 0, x: -30 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.6, delay: 0.2 }}
-                        >
-                            <div
-                                className={`${styles.mainImage} ${imageZoom && mediaItems[currentMediaIndex]?.type === 'image' ? styles.zoomed : ''}`}
-                                onMouseEnter={() => mediaItems[currentMediaIndex]?.type === 'image' && setImageZoom(true)}
-                                onMouseLeave={() => setImageZoom(false)}
-                                onMouseMove={handleImageMouseMove}
-                                onClick={() => setLightboxOpen(true)}
-                            >
-                                {mediaItems.length > 0 ? (
-                                    mediaItems[currentMediaIndex]?.type === 'video' ? (
-                                        <video
-                                            src={mediaItems[currentMediaIndex].src}
-                                            className={styles.videoPlayer}
-                                            controls
-                                            autoPlay
-                                            playsInline
-                                        />
-                                    ) : (
-                                        <Image
-                                            src={mediaItems[currentMediaIndex].src}
-                                            alt={product.name}
-                                            fill
-                                            sizes="(max-width: 768px) 100vw, 50vw"
-                                            className={styles.image}
-                                            style={imageZoom ? {
-                                                transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
-                                                transform: 'scale(1.8)',
-                                                transition: 'transform 0.1s ease-out',
-                                            } : {}}
-                                            priority
-                                        />
-                                    )
-                                ) : (
-                                    <div className={styles.imagePlaceholder}>No Image</div>
-                                )}
-
-                                {/* Zoom hint - only for images */}
-                                {mediaItems[currentMediaIndex]?.type === 'image' && (
-                                    <div className={styles.zoomHint}>
-                                        <ZoomIn size={16} />
-                                        <span>Click to enlarge</span>
-                                    </div>
-                                )}
-
-                                {/* Navigation Arrows */}
-                                {mediaItems.length > 1 && (
-                                    <>
-                                        <motion.button
-                                            className={`${styles.navBtn} ${styles.navPrev}`}
-                                            onClick={(e) => { e.stopPropagation(); prevImage() }}
-                                            aria-label="Previous media"
-                                            whileHover={{ scale: 1.1 }}
-                                            whileTap={{ scale: 0.9 }}
-                                        >
-                                            <ChevronLeft size={24} />
-                                        </motion.button>
-                                        <motion.button
-                                            className={`${styles.navBtn} ${styles.navNext}`}
-                                            onClick={(e) => { e.stopPropagation(); nextImage() }}
-                                            aria-label="Next media"
-                                            whileHover={{ scale: 1.1 }}
-                                            whileTap={{ scale: 0.9 }}
-                                        >
-                                            <ChevronRight size={24} />
-                                        </motion.button>
-                                    </>
-                                )}
-
-                                {/* Badges */}
-                                <div className={styles.badges}>
-                                    {product.highlight && (
-                                        <span className={styles.badgeHighlight}>{product.highlight}</span>
-                                    )}
-                                    {product.discount > 0 && (
-                                        <span className={styles.badgeDiscount}>-{product.discount}%</span>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Thumbnails */}
-                            {mediaItems.length > 1 && (
-                                <div className={styles.thumbnails}>
-                                    {mediaItems.map((item, index) => (
-                                        <motion.button
-                                            key={index}
-                                            className={`${styles.thumbnail} ${index === currentMediaIndex ? styles.thumbnailActive : ''}`}
-                                            onClick={() => setCurrentMediaIndex(index)}
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                        >
-                                            {item.type === 'video' ? (
-                                                <div className={styles.thumbVideo}>
-                                                    <video src={item.src} preload="metadata" />
-                                                    <div className={styles.thumbPlayIcon}>
-                                                        <Play size={16} color="white" />
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <Image src={item.src} alt={`View ${index + 1}`} fill className={styles.thumbImage} sizes="80px" />
-                                            )}
-                                        </motion.button>
-                                    ))}
-                                </div>
-                            )}
-                        </motion.div>
-
-                        {/* Product Info */}
-                        <motion.div
-                            className={styles.info}
-                            initial={{ opacity: 0, x: 30 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.6, delay: 0.3 }}
-                        >
-                            {product.category && (
-                                <Link href={`/products?category=${product.category}`} className={styles.category}>
-                                    {product.category}
-                                </Link>
-                            )}
-
-                            <h1 className={styles.title}>{product.name}</h1>
-
-                            {/* Rating */}
-                            {reviewSummary && (
-                                <div className={styles.rating}>
-                                    <StarRating
-                                        rating={reviewSummary.averageRating || 0}
-                                        reviewCount={reviewSummary.totalReviews || 0}
-                                        showValue
-                                        size={18}
-                                    />
-                                </div>
-                            )}
-
-                            {/* Price */}
-                            <div className={styles.priceSection}>
-                                {discountedPrice ? (
-                                    <>
-                                        <span className={styles.currentPrice}>₹{parseInt(discountedPrice).toLocaleString()}</span>
-                                        <span className={styles.originalPrice}>₹{product.price?.toLocaleString()}</span>
-                                        <span className={styles.saveAmount}>Save ₹{(product.price - parseInt(discountedPrice)).toLocaleString()}</span>
-                                    </>
-                                ) : (
-                                    <span className={styles.currentPrice}>₹{product.price?.toLocaleString()}</span>
-                                )}
-                            </div>
-
-                            {/* Description */}
-                            {product.shortDescription && (
-                                <p className={styles.description}>{product.shortDescription}</p>
-                            )}
-
-                            {/* Urgency Bar */}
-                            <div className={styles.urgencyBar}>
-                                {product.stock === 'Low Stock' && (
-                                    <div className={styles.urgencyItem + ' ' + styles.urgencyLowStock}>
-                                        <Flame size={14} />
-                                        <span>Only a few left — selling fast!</span>
-                                    </div>
-                                )}
-                                {product.stock === 'In Stock' && viewersCount > 0 && (
-                                    <div className={styles.urgencyItem + ' ' + styles.urgencyViewers}>
-                                        <Eye size={14} />
-                                        <span>{viewersCount} people viewing this item right now</span>
-                                    </div>
-                                )}
-                                {product.stock !== 'Out of Stock' && (() => {
-                                    const { hoursLeft, deliveryText } = getDeliveryEstimate()
-                                    return (
-                                        <div className={styles.urgencyItem + ' ' + styles.urgencyDelivery}>
-                                            <Clock size={14} />
-                                            <span>
-                                                {hoursLeft > 0
-                                                    ? `Order in ${hoursLeft}h for delivery by ${deliveryText}`
-                                                    : `Order now for delivery by ${deliveryText}`}
-                                            </span>
-                                        </div>
-                                    )
-                                })()}
-                            </div>
-
-                            {/* Stock Status */}
-                            <div className={styles.stock}>
-                                <span className={product.stock === 'Out of Stock' ? styles.outOfStock : product.stock === 'Low Stock' ? styles.lowStock : styles.inStock}>
-                                    {product.stock === 'Out of Stock' ? '✕ Out of Stock' : product.stock === 'Low Stock' ? '⚠ Low Stock' : '✓ In Stock'}
-                                </span>
-                            </div>
-
-                            {/* Quantity & Add to Cart */}
-                            <div className={styles.actions} id="product-actions">
-                                <QuantitySelector value={quantity} onChange={setQuantity} />
-
-                                <motion.button
-                                    className={`${styles.addToCart} ${addedToCart ? styles.added : ''}`}
-                                    onClick={handleAddToCart}
-                                    disabled={product.stock === 'Out of Stock'}
-                                    whileHover={{ y: -2 }}
-                                    whileTap={{ scale: 0.98 }}
-                                >
-                                    {addedToCart ? (
-                                        <><Check size={20} /> Added to Cart</>
-                                    ) : product.stock === 'Out of Stock' ? (
-                                        'Out of Stock'
-                                    ) : (
-                                        <><ShoppingCartIcon size={20} /> Add to Cart</>
-                                    )}
-                                </motion.button>
-
-                                <motion.button
-                                    className={`${styles.iconBtn} ${wishlisted ? styles.wishlisted : ''}`}
-                                    onClick={handleWishlist}
-                                    aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
-                                    whileHover={{ scale: 1.1 }}
-                                    whileTap={{ scale: 0.9 }}
-                                >
-                                    <Heart size={20} fill={wishlisted ? 'currentColor' : 'none'} />
-                                </motion.button>
-
-                                <motion.button
-                                    className={styles.iconBtn}
-                                    onClick={handleShare}
-                                    aria-label="Share product"
-                                    whileHover={{ scale: 1.1 }}
-                                    whileTap={{ scale: 0.9 }}
-                                >
-                                    <Share2 size={20} />
-                                </motion.button>
-                            </div>
-
-                            {/* Features */}
-                            <div className={styles.features}>
-                                <div className={styles.feature}>
-                                    <Truck size={20} />
-                                    <div><strong>Free Shipping</strong><p>On orders above ₹2,999</p></div>
-                                </div>
-                                <div className={styles.feature}>
-                                    <Shield size={20} />
-                                    <div><strong>Secure Payment</strong><p>100% safe & encrypted</p></div>
-                                </div>
-                                <div className={styles.feature}>
-                                    <RotateCcw size={20} />
-                                    <div><strong>30-Day Returns</strong><p>Hassle-free refunds</p></div>
-                                </div>
-                            </div>
-
-                            {/* Pincode Delivery Check */}
-                            <PincodeChecker
-                                productWeight={product.weight || '1'}
-                                codAvailable={product.price < 50000}
-                            />
-
-                            {/* Full Description */}
-                            {product.detailedDescription && (
-                                <motion.div
-                                    className={styles.fullDescription}
-                                    initial={{ opacity: 0 }}
-                                    whileInView={{ opacity: 1 }}
-                                    viewport={{ once: true }}
-                                >
-                                    <h3>About This Product</h3>
-                                    <p>{product.detailedDescription}</p>
-                                </motion.div>
-                            )}
-                        </motion.div>
-                    </div>
-
-                    {/* Product Specifications */}
-                    {(product.dimensions || product.material || product.color || product.weight) && (
-                        <motion.section
-                            className={styles.specsSection}
-                            initial={{ opacity: 0, y: 40 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6 }}
-                        >
-                            <h2>Product Specifications</h2>
-                            <div className={styles.specsGrid}>
-                                {product.dimensions && (
-                                    <div className={styles.specItem}>
-                                        <span className={styles.specLabel}>Dimensions</span>
-                                        <span className={styles.specValue}>{normalizeDimensionsDisplay(product.dimensions)}</span>
-                                    </div>
-                                )}
-                                {product.material && (
-                                    <div className={styles.specItem}>
-                                        <span className={styles.specLabel}>Material</span>
-                                        <span className={styles.specValue}>{product.material}</span>
-                                    </div>
-                                )}
-                                {product.color && (
-                                    <div className={styles.specItem}>
-                                        <span className={styles.specLabel}>Color</span>
-                                        <span className={styles.specValue}>{product.color}</span>
-                                    </div>
-                                )}
-                                {product.weight && (
-                                    <div className={styles.specItem}>
-                                        <span className={styles.specLabel}>Weight</span>
-                                        <span className={styles.specValue}>{normalizeWeightDisplay(product.weight)}</span>
-                                    </div>
-                                )}
-                                {product.category && (
-                                    <div className={styles.specItem}>
-                                        <span className={styles.specLabel}>Category</span>
-                                        <span className={styles.specValue}>{product.category}</span>
-                                    </div>
-                                )}
-                            </div>
-                        </motion.section>
-                    )}
-
-                    {/* Video Showcase */}
-                    {product.videoUrl && (
-                        <motion.section
-                            className={styles.videoSection}
-                            initial={{ opacity: 0, y: 40 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6 }}
-                        >
-                            <h2>See It In Action</h2>
-                            <div className={styles.videoWrapper}>
-                                <iframe
-                                    src={product.videoUrl}
-                                    title={`${product.name} video`}
-                                    frameBorder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                />
-                            </div>
-                        </motion.section>
-                    )}
-
-                    {/* Instagram Reel */}
-                    {product.instagramReel && (
-                        <motion.section
-                            className={styles.instagramSection}
-                            initial={{ opacity: 0, y: 40 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6 }}
-                        >
-                            <h2>Featured on Instagram</h2>
-                            <div className={styles.instagramWrapper}>
-                                <a href={product.instagramReel} target="_blank" rel="noopener noreferrer" className={styles.instagramLink}>
-                                    <Instagram size={24} />
-                                    <span>Watch on Instagram</span>
-                                </a>
-                            </div>
-                        </motion.section>
-                    )}
-
-                    {/* Reviews Section */}
-                    <motion.section
-                        className={styles.reviewsSection}
-                        initial={{ opacity: 0, y: 40 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
-                    >
-                        <h2>Customer Reviews</h2>
-                        <div className={styles.reviewsContainer}>
-                            <div className={styles.reviewsSidebar}>
-                                <RatingsSummary summary={reviewSummary} />
-                            </div>
-                            <div className={styles.reviewsMain}>
-                                <ReviewList reviews={[]} productId={product._id || product.id} />
-                                <ReviewForm productId={product._id || product.id} onSuccess={() => {}} />
-                            </div>
-                        </div>
-                    </motion.section>
-
-                    {/* Related Products */}
-                    {relatedProducts.length > 0 && (
-                        <motion.section
-                            className={styles.relatedSection}
-                            initial={{ opacity: 0, y: 40 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6 }}
-                        >
-                            <h2>You May Also Like</h2>
-                            <motion.div
-                                className={styles.relatedGrid}
-                                variants={staggerContainer}
-                                initial="hidden"
-                                whileInView="visible"
-                                viewport={{ once: true }}
-                            >
-                                {relatedProducts.map(related => (
-                                    <motion.div key={related._id || related.id} variants={fadeInUp}>
-                                        <ProductCard product={related} />
-                                    </motion.div>
-                                ))}
-                            </motion.div>
-                        </motion.section>
-                    )}
-                </div>
-            </main>
-
-            {/* Lightbox */}
-            <AnimatePresence>
-                {lightboxOpen && (
-                    <motion.div
-                        key="lightbox"
-                        className={styles.lightbox}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={() => setLightboxOpen(false)}
-                    >
-                        <button className={styles.lightboxClose} onClick={() => setLightboxOpen(false)}>
-                            <X size={28} />
-                        </button>
-                        <motion.button
-                            className={`${styles.lightboxNav} ${styles.lightboxPrev}`}
-                            onClick={(e) => { e.stopPropagation(); prevImage() }}
-                            whileHover={{ scale: 1.1 }}
-                        >
-                            <ChevronLeft size={32} />
-                        </motion.button>
-                        <motion.div
-                            key={currentMediaIndex}
-                            className={styles.lightboxImage}
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            transition={{ duration: 0.2 }}
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            {mediaItems[currentMediaIndex]?.type === 'video' ? (
-                                <video
-                                    src={mediaItems[currentMediaIndex].src}
-                                    className={styles.lightboxImg}
-                                    controls
-                                    autoPlay
-                                    playsInline
-                                />
-                            ) : (
-                                /* eslint-disable-next-line @next/next/no-img-element */
-                                <img
-                                    src={mediaItems[currentMediaIndex]?.src}
-                                    alt={product.name}
-                                    className={styles.lightboxImg}
-                                    srcSet={getCloudinarySrcSet(mediaItems[currentMediaIndex]?.src, [640, 1080, 1440, 1920])}
-                                    sizes="100vw"
-                                />
-                            )}
-                        </motion.div>
-                        <motion.button
-                            className={`${styles.lightboxNav} ${styles.lightboxNext}`}
-                            onClick={(e) => { e.stopPropagation(); nextImage() }}
-                            whileHover={{ scale: 1.1 }}
-                        >
-                            <ChevronRight size={32} />
-                        </motion.button>
-                        <div className={styles.lightboxCounter}>
-                            {currentMediaIndex + 1} / {mediaItems.length}
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* Sticky Mobile ATC Bar */}
-            <AnimatePresence>
-                {stickyVisible && (
-                    <motion.div
-                        className={styles.stickyBar}
-                        initial={{ y: 100 }}
-                        animate={{ y: 0 }}
-                        exit={{ y: 100 }}
-                        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                    >
-                        <div className={styles.stickyContent}>
-                            <div className={styles.stickyInfo}>
-                                <p className={styles.stickyName}>{product.name}</p>
-                                <p className={styles.stickyPrice}>
-                                    {discountedPrice
-                                        ? `₹${parseInt(discountedPrice).toLocaleString()}`
-                                        : `₹${product.price?.toLocaleString()}`
-                                    }
-                                </p>
-                            </div>
-                            <div className={styles.stickyActions}>
-                                <QuantitySelector value={quantity} onChange={setQuantity} size="small" />
-                                <motion.button
-                                    className={`${styles.stickyAddToCart} ${addedToCart ? styles.added : ''}`}
-                                    onClick={handleAddToCart}
-                                    disabled={product.stock === 'Out of Stock'}
-                                    whileTap={{ scale: 0.95 }}
-                                >
-                                    {addedToCart ? <Check size={18} /> : 'Add to Cart'}
-                                </motion.button>
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+            />
+            <ProductDetailClient
+                product={product}
+                allProducts={allProducts}
+                relatedProducts={relatedProducts}
+                reviewSummary={reviewSummary}
+                soldRecently={soldRecently}
+                featuredIn={featuredIn}
+            />
         </>
     )
-}
-
-// Simple shopping cart icon component
-function ShoppingCartIcon({ size }) {
-    return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-        </svg>
-    )
-}
-
-// Recently viewed helpers
-const RV_STORAGE_KEY = 'marmex-recently-viewed'
-const RV_MAX_ITEMS = 8
-
-function getRecentlyViewed() {
-    if (typeof window === 'undefined') return []
-    try {
-        const raw = localStorage.getItem(RV_STORAGE_KEY)
-        return raw ? JSON.parse(raw) : []
-    } catch {
-        return []
-    }
-}
-
-function trackRecentlyViewed(product) {
-    if (typeof window === 'undefined') return
-    try {
-        const id = product._id || product.id
-        if (!id) return
-        const current = getRecentlyViewed()
-        const filtered = current.filter(item => item !== id)
-        const updated = [id, ...filtered].slice(0, RV_MAX_ITEMS)
-        localStorage.setItem(RV_STORAGE_KEY, JSON.stringify(updated))
-    } catch {
-        // ignore
-    }
 }

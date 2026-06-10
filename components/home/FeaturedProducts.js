@@ -69,12 +69,9 @@ export default function FeaturedProducts() {
                     viewport={{ once: true, margin: '-50px' }}
                 >
                     {products.map((product, index) => (
-                        <motion.div
-                            key={product._id || index}
-                            variants={fadeInUp}
-                        >
+                        <div key={product._id || index}>
                             <ProductCard product={product} />
-                        </motion.div>
+                        </div>
                     ))}
                 </motion.div>
             </div>

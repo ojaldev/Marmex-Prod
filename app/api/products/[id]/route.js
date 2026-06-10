@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import mongoose from 'mongoose'
 import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
 import { validateDimensions, validateWeight, formatDimensions, formatWeight } from '@/lib/product-specs'
@@ -7,6 +8,10 @@ import { deleteResourceFromUrl } from '@/lib/cloudinary'
 export async function GET(request, { params }) {
     try {
         const { id } = await params
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return NextResponse.json({ error: 'Invalid product ID' }, { status: 404 })
+        }
 
         await connectDB()
 

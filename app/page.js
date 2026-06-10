@@ -4,6 +4,7 @@ import TrustBar from '@/components/home/TrustBar'
 import CategoryTiles from '@/components/home/CategoryTiles'
 import FeaturedProducts from '@/components/home/FeaturedProducts'
 import TrendingProducts from '@/components/home/TrendingProducts'
+import PortfolioTeaser from '@/components/home/PortfolioTeaser'
 import PromoBanner from '@/components/home/PromoBanner'
 import BrandStory from '@/components/home/BrandStory'
 import VideoShowcase from '@/components/home/VideoShowcase'
@@ -18,6 +19,7 @@ export default function Home() {
             <CategoryTiles />
             <FeaturedProducts />
             <TrendingProducts />
+            <PortfolioTeaser />
             <PromoBanner />
             <BrandStory />
             <VideoShowcase />

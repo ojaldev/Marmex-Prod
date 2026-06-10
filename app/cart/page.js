@@ -1,16 +1,23 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '@/contexts/CartContext'
-import { Minus, Plus, X, ArrowLeft, Lock, Truck, Shield, Package, ShoppingBag } from 'lucide-react'
+import { Minus, Plus, X, ArrowLeft, Lock, Truck, Shield, Package, ShoppingBag, MapPin } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import QuantitySelector from '@/components/ui/QuantitySelector'
 import { fadeInUp, staggerContainer } from '@/lib/animations'
+import { getDeliveryEstimate, formatDeliveryDate } from '@/lib/delivery'
 import styles from './cart.module.css'
 
 export default function CartPage() {
     const { cart, updateQuantity, removeFromCart, getCartTotal, clearCart } = useCart()
+    const [deliveryEstimate, setDeliveryEstimate] = useState(null)
+
+    useEffect(() => {
+        setDeliveryEstimate(getDeliveryEstimate())
+    }, [])
 
     const freeShippingThreshold = 2999
     const currentTotal = getCartTotal()
@@ -226,6 +233,13 @@ export default function CartPage() {
                                     <span>Total</span>
                                     <span>₹{grandTotal.toLocaleString()}</span>
                                 </div>
+
+                                {deliveryEstimate && formatDeliveryDate(deliveryEstimate.estimatedDays) && (
+                                    <p className={styles.deliveryEstimate}>
+                                        <MapPin size={14} />
+                                        Delivers to <strong>{deliveryEstimate.pincode}</strong> by {formatDeliveryDate(deliveryEstimate.estimatedDays)}
+                                    </p>
+                                )}
 
                                 <Link href="/checkout" className="btn btn-primary w-full mt-6">
                                     <Lock size={18} />

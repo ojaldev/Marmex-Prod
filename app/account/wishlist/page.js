@@ -15,7 +15,8 @@ export default function WishlistPage() {
     const [products, setProducts] = useState([])
     const [loading, setLoading] = useState(true)
     const { addToCart } = useCart()
-    const { wishlist, removeFromWishlist, loading: wishlistLoading } = useWishlist()
+    const { wishlist, removeFromWishlist, getWishlistMeta, loading: wishlistLoading } = useWishlist()
+    const wishlistMeta = getWishlistMeta ? getWishlistMeta() : {}
 
     useEffect(() => {
         if (!wishlistLoading) {
@@ -106,18 +107,32 @@ export default function WishlistPage() {
                         initial="hidden"
                         animate="visible"
                     >
-                        {products.map(product => (
-                            <motion.div
-                                key={product._id || product.id}
-                                variants={fadeInUp}
-                                layout
-                            >
-                                <ProductCard
-                                    product={product}
-                                    onAddToCart={handleAddToCart}
-                                />
-                            </motion.div>
-                        ))}
+                        {products.map(product => {
+                            const pid = product._id?.toString() || product.id
+                            const meta = wishlistMeta[pid]
+                            const currentPrice = product.discount > 0
+                                ? Math.round(product.price * (100 - product.discount) / 100)
+                                : product.price
+                            const priceDrop = meta?.price && currentPrice < meta.price
+                            return (
+                                <motion.div
+                                    key={pid}
+                                    variants={fadeInUp}
+                                    layout
+                                    style={{ position: 'relative' }}
+                                >
+                                    {priceDrop && (
+                                        <div className={styles.priceDropBadge}>
+                                            Price dropped! ₹{(meta.price - currentPrice).toLocaleString()} off
+                                        </div>
+                                    )}
+                                    <ProductCard
+                                        product={product}
+                                        onAddToCart={handleAddToCart}
+                                    />
+                                </motion.div>
+                            )
+                        })}
                     </motion.div>
                 )}
             </div>

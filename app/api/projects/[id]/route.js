@@ -1,6 +1,22 @@
 import { NextResponse } from 'next/server'
+import mongoose from 'mongoose'
 import connectDB from '@/lib/mongodb'
 import Project from '@/models/Project'
+
+const VALID_PROJECT_TYPES = ['residential', 'commercial']
+
+function sanitizeProjectData(data) {
+    const sanitized = { ...data }
+    if (sanitized.projectType && !VALID_PROJECT_TYPES.includes(sanitized.projectType)) {
+        delete sanitized.projectType
+    }
+    if (Array.isArray(sanitized.relatedProducts)) {
+        sanitized.relatedProducts = sanitized.relatedProducts.filter(id =>
+            mongoose.Types.ObjectId.isValid(id)
+        )
+    }
+    return sanitized
+}
 
 export async function GET(request, { params }) {
     try {
@@ -28,9 +44,10 @@ export async function PUT(request, { params }) {
 
         await connectDB()
 
+        const sanitized = sanitizeProjectData(updateData)
         const project = await Project.findByIdAndUpdate(
             id,
-            updateData,
+            sanitized,
             { new: true, runValidators: true }
         )
 

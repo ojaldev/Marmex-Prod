@@ -61,6 +61,15 @@ const projectSchema = new mongoose.Schema({
     tags: [{
         type: String,
         trim: true
+    }],
+    projectType: {
+        type: String,
+        enum: ['residential', 'commercial'],
+        default: 'residential'
+    },
+    relatedProducts: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product'
     }]
 }, {
     timestamps: true
@@ -71,6 +80,8 @@ projectSchema.index({ name: 'text', description: 'text', tags: 'text' })
 projectSchema.index({ category: 1 })
 projectSchema.index({ featured: 1, createdAt: -1 })
 projectSchema.index({ completionDate: -1 })
+projectSchema.index({ projectType: 1, featured: -1, completionDate: -1 })
+projectSchema.index({ relatedProducts: 1 })
 
 // Export model
 export default mongoose.models.Project || mongoose.model('Project', projectSchema)

@@ -38,7 +38,8 @@ export default function ProductCard({ product, onAddToCart }) {
         e.stopPropagation()
         setWishlistAnimating(true)
         setTimeout(() => setWishlistAnimating(false), 600)
-        toggleWishlist(productId)
+        const price = discountedPrice ? Number(discountedPrice) : product.price
+        toggleWishlist(productId, price)
     }
 
     const handleQuickView = (e) => {
@@ -187,6 +188,12 @@ export default function ProductCard({ product, onAddToCart }) {
                             <span className={styles.currentPrice}>₹{product.price?.toLocaleString()}</span>
                         )}
                     </div>
+
+                    {(product.dimensions || product.weight) && (
+                        <p className={styles.specs}>
+                            {product.dimensions}{product.dimensions && product.weight && ' · '}{product.weight}
+                        </p>
+                    )}
 
                     {(product.customizationAvailable || product.freeShipping !== false) && (
                         <ul className={styles.features}>

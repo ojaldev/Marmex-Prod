@@ -8,7 +8,47 @@ export default function BeforeAfterSlider({ beforeImage, afterImage, className =
   const [sliderPosition, setSliderPosition] = useState(50)
   const [isDragging, setIsDragging] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
+  const [hasNudged, setHasNudged] = useState(false)
   const containerRef = useRef(null)
+  const hasInteracted = useRef(false)
+
+  // Viewport nudge: 50 → 66 → 50 over 1200ms, once, on first enter
+  useEffect(() => {
+    if (!containerRef.current || hasNudged) return
+    let rafId
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasInteracted.current && !hasNudged) {
+          setHasNudged(true)
+          observer.disconnect()
+          const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          if (prefersReduced) return
+          const start = performance.now()
+          const duration = 1200
+          const animate = (now) => {
+            const t = Math.min((now - start) / duration, 1)
+            // ease in-out: go to 66 then back to 50
+            const pos = t < 0.5
+              ? 50 + 16 * (t / 0.5)
+              : 66 - 16 * ((t - 0.5) / 0.5)
+            setSliderPosition(Math.round(pos))
+            if (t < 1 && !hasInteracted.current) {
+              rafId = requestAnimationFrame(animate)
+            } else if (!hasInteracted.current) {
+              setSliderPosition(50)
+            }
+          }
+          rafId = requestAnimationFrame(animate)
+        }
+      },
+      { threshold: 0.5 }
+    )
+    observer.observe(containerRef.current)
+    return () => {
+      observer.disconnect()
+      if (rafId) cancelAnimationFrame(rafId)
+    }
+  }, [hasNudged])
 
   const handleMove = useCallback((clientX) => {
     if (!containerRef.current) return
@@ -20,8 +60,10 @@ export default function BeforeAfterSlider({ beforeImage, afterImage, className =
 
   const handleMouseDown = useCallback((e) => {
     e.preventDefault()
+    hasInteracted.current = true
     setIsDragging(true)
-    handleMove(e.clientX)
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX
+    handleMove(clientX)
   }, [handleMove])
 
   const handleMouseMove = useCallback((e) => {

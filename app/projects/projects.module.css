@@ -111,6 +111,58 @@
   background: rgba(255, 255, 255, 0.15);
 }
 
+/* ===== TYPE TOGGLE ===== */
+.typeToggle {
+  display: flex;
+  gap: var(--space-xs);
+  padding: var(--space-xl) 0 0;
+  flex-wrap: wrap;
+}
+
+.typeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--color-platinum);
+  background: var(--color-surface);
+  color: var(--color-text-gray);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s var(--ease-smooth);
+  white-space: nowrap;
+}
+
+.typeBtn:hover {
+  border-color: var(--color-gold-24k);
+  color: var(--color-obsidian);
+}
+
+.typeBtnActive {
+  background: var(--color-obsidian);
+  color: var(--color-gold-24k);
+  border-color: var(--color-obsidian);
+}
+
+.typeBtnCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: var(--radius-full);
+  background: rgba(255,255,255,0.15);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.typeBtnActive .typeBtnCount {
+  background: rgba(212, 165, 116, 0.2);
+}
+
 /* ===== TOOLBAR ===== */
 .toolbar {
   display: flex;

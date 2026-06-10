@@ -518,6 +518,7 @@ export default function EditProductPage() {
                                 required
                             >
                                 <option value="In Stock">In Stock</option>
+                                <option value="Low Stock">Low Stock</option>
                                 <option value="Made to Order">Made to Order</option>
                                 <option value="Out of Stock">Out of Stock</option>
                             </select>

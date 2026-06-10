@@ -333,6 +333,19 @@
     margin: var(--space-lg) 0;
 }
 
+.deliveryEstimate {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--text-sm);
+    color: var(--color-emerald);
+    margin: var(--space-md) 0 0;
+}
+
+.deliveryEstimate strong {
+    font-weight: 600;
+}
+
 .continueShopping {
     display: flex;
     align-items: center;

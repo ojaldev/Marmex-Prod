@@ -9,7 +9,7 @@ import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '@/contexts/CartContext'
 import AddressSelector from '@/components/checkout/AddressSelector'
-import { ArrowLeft, Lock, Check, Loader2, CreditCard, Truck, Shield, ChevronRight } from 'lucide-react'
+import { ArrowLeft, Lock, Check, Loader2, CreditCard, Truck, Shield, ChevronRight, FileText } from 'lucide-react'
 import { fadeInUp, staggerContainer } from '@/lib/animations'
 import styles from './checkout.module.css'
 
@@ -41,6 +41,7 @@ export default function CheckoutPage() {
     const [loading, setLoading] = useState(false)
     const [razorpayLoaded, setRazorpayLoaded] = useState(false)
     const [currentStep, setCurrentStep] = useState(1)
+    const [showGST, setShowGST] = useState(false)
 
     // Form state
     const [selectedAddress, setSelectedAddress] = useState(null)
@@ -317,6 +318,31 @@ export default function CheckoutPage() {
                                             </div>
                                         </section>
                                     )}
+                                    {/* GST toggle */}
+                                    <div className={styles.gstToggle}>
+                                        <button
+                                            type="button"
+                                            className={`${styles.gstToggleBtn} ${showGST ? styles.gstToggleActive : ''}`}
+                                            onClick={() => setShowGST(v => !v)}
+                                        >
+                                            <FileText size={16} />
+                                            I need a GST invoice
+                                            <ChevronRight size={14} className={`${styles.gstChevron} ${showGST ? styles.gstChevronOpen : ''}`} />
+                                        </button>
+                                        <AnimatePresence>
+                                            {showGST && (
+                                                <motion.div
+                                                    initial={{ height: 0, opacity: 0 }}
+                                                    animate={{ height: 'auto', opacity: 1 }}
+                                                    exit={{ height: 0, opacity: 0 }}
+                                                    transition={{ duration: 0.3 }}
+                                                    style={{ overflow: 'hidden' }}
+                                                >
+                                                    <GSTInvoice onUpdate={setGSTData} gstData={gstData} />
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
                                     <motion.button
                                         type="button"
                                         className={styles.nextStepBtn}
@@ -347,7 +373,6 @@ export default function CheckoutPage() {
                                         selectedMethod={shippingMethod}
                                     />
                                     <GiftOptions onUpdate={setGiftData} giftData={giftData} />
-                                    <GSTInvoice onUpdate={setGSTData} gstData={gstData} />
                                     <div className={styles.stepNav}>
                                         <button type="button" className={styles.backStepBtn} onClick={() => setCurrentStep(1)}>
                                             <ArrowLeft size={16} /> Back
@@ -520,6 +545,20 @@ export default function CheckoutPage() {
                                 )}
                             </motion.button>
 
+                            <div className={styles.trustRow}>
+                                <span className={styles.trustItem}>
+                                    <Shield size={14} />
+                                    Secure checkout
+                                </span>
+                                <span className={styles.trustItem}>
+                                    <Lock size={14} />
+                                    SSL encrypted
+                                </span>
+                                <span className={styles.trustItem}>
+                                    <Check size={14} />
+                                    100% genuine products
+                                </span>
+                            </div>
                             <div className={styles.secureNote}>
                                 <Lock size={14} />
                                 <span>Secure {paymentMethod === 'cod' ? 'Checkout' : 'Payment'} powered by Razorpay</span>

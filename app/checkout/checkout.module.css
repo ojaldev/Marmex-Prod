@@ -358,6 +358,32 @@
     margin-top: var(--space-lg);
 }
 
+.trustRow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-lg);
+    flex-wrap: wrap;
+    margin-top: var(--space-md);
+    padding: var(--space-sm) 0;
+    border-top: 1px solid var(--color-platinum);
+}
+
+.trustItem {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-text-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.trustItem svg {
+    color: var(--color-gold-24k);
+}
+
 .secureNote {
     display: flex;
     align-items: center;
@@ -480,6 +506,54 @@
 .stepNav .backStepBtn {
     width: auto;
     margin-top: 0;
+}
+
+/* GST Toggle */
+.gstToggle {
+    margin: var(--space-lg) 0;
+    border: 1px solid var(--color-platinum);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.gstToggleBtn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    width: 100%;
+    padding: var(--space-md) var(--space-lg);
+    background: var(--color-surface);
+    border: none;
+    cursor: pointer;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text-dark);
+    transition: background 0.2s ease;
+    text-align: left;
+}
+
+.gstToggleBtn svg:first-child {
+    color: var(--color-gold-24k);
+    flex-shrink: 0;
+}
+
+.gstToggleBtn:hover {
+    background: var(--color-pearl);
+}
+
+.gstToggleActive {
+    background: var(--color-pearl);
+    color: var(--color-obsidian);
+}
+
+.gstChevron {
+    margin-left: auto;
+    transition: transform 0.3s ease;
+    color: var(--color-text-gray);
+}
+
+.gstChevronOpen {
+    transform: rotate(90deg);
 }
 
 /* Payment Options */

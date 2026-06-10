@@ -380,6 +380,120 @@
     margin-top: var(--space-md);
 }
 
+/* ===== SEARCH ZERO STATE ===== */
+.searchZeroState {
+    margin-top: var(--space-md);
+    background: white;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-platinum);
+}
+
+.zeroSection {
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--color-platinum);
+}
+
+.zeroSection:last-child {
+    border-bottom: none;
+}
+
+.zeroLabel {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-text-gray);
+    margin: 0 0 var(--space-sm) 0;
+}
+
+.zeroChips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+}
+
+.recentChip {
+    padding: 0.35rem 0.8rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-platinum);
+    background: var(--color-pearl);
+    color: var(--color-text-dark);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.recentChip:hover {
+    border-color: var(--color-gold-24k);
+    color: var(--color-obsidian);
+    background: rgba(212, 165, 116, 0.08);
+}
+
+.categoryChip {
+    padding: 0.35rem 0.8rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-platinum);
+    background: var(--color-pearl);
+    color: var(--color-text-dark);
+    font-size: var(--text-sm);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.categoryChip:hover {
+    border-color: var(--color-obsidian);
+    background: var(--color-obsidian);
+    color: var(--color-gold-24k);
+}
+
+.trendingGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-sm);
+}
+
+.trendingItem {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: background 0.2s ease;
+}
+
+.trendingItem:hover {
+    background: var(--color-pearl);
+}
+
+.trendingImage {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--color-pearl);
+}
+
+.trendingImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.trendingName {
+    font-size: var(--text-sm);
+    color: var(--color-text-dark);
+    font-weight: 500;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
 /* ===== MOBILE ===== */
 .mobileMenuBtn {
     display: none;

@@ -107,6 +107,12 @@
     100% { background-position: 200% 0; }
 }
 
+@media (min-width: 768px) {
+    .section {
+        display: none;
+    }
+}
+
 @media (max-width: 768px) {
     .section {
         padding: var(--space-xl) 0;
