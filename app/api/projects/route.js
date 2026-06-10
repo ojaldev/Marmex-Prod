@@ -54,11 +54,6 @@ export async function GET(request) {
             projects = await projectsQuery
                 .populate('relatedProducts', 'name mainImage price discount category stock')
                 .lean()
-            // Filter out null entries from deleted products
-            projects = projects.map(p => ({
-                ...p,
-                relatedProducts: (p.relatedProducts || []).filter(Boolean)
-            }))
         } catch {
             projects = await Project.find(query)
                 .sort({ featured: -1, completionDate: -1, createdAt: -1 })
@@ -66,6 +61,14 @@ export async function GET(request) {
                 .limit(limit)
                 .lean()
         }
+
+        // lean() skips Mongoose schema defaults — apply them manually so old
+        // documents created before projectType existed get the correct fallback.
+        projects = projects.map(p => ({
+            ...p,
+            projectType: p.projectType || 'residential',
+            relatedProducts: (p.relatedProducts || []).filter(Boolean)
+        }))
 
         const total = await Project.countDocuments(query)
 
