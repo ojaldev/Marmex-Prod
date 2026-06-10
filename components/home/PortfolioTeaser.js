@@ -26,12 +26,48 @@ export default function PortfolioTeaser() {
 
   if (projects.length === 0) return null
 
-  // Pad to at least 5 items so the loop feels full, then duplicate for seamless scroll
-  let padded = [...projects]
-  while (padded.length < 5) {
-    padded = [...padded, ...projects]
+  // Use infinite carousel only when there are enough unique items to fill the
+  // viewport twice without visible repetition. With ≤4 items, a static grid
+  // looks cleaner; with ≥5 we duplicate once for the seamless CSS loop.
+  const useCarousel = projects.length >= 5
+  const loopItems = useCarousel ? [...projects, ...projects] : projects
+
+  const CardItem = ({ project, index }) => {
+    const id = project._id || project.id
+    const img = project.afterImage || project.beforeImage
+    return (
+      <Link
+        key={`${id}-${index}`}
+        href={`/projects?open=${id}`}
+        className={styles.card}
+      >
+        <div className={styles.imageWrap}>
+          {img && (
+            <img
+              src={img}
+              alt={project.name}
+              className={styles.image}
+              loading="lazy"
+            />
+          )}
+          <div className={styles.overlay}>
+            {project.category && (
+              <span className={styles.badge}>{project.category}</span>
+            )}
+          </div>
+        </div>
+        <div className={styles.info}>
+          <p className={styles.name}>{project.name}</p>
+          {project.location && (
+            <p className={styles.location}>
+              <MapPin size={12} />
+              {project.location}
+            </p>
+          )}
+        </div>
+      </Link>
+    )
   }
-  const loopItems = [...padded, ...padded]
 
   return (
     <section className={styles.section}>
@@ -56,52 +92,26 @@ export default function PortfolioTeaser() {
         </motion.div>
       </div>
 
-      {/* Full-width scroll track — outside container so it bleeds edge to edge */}
-      <div className={styles.trackOuter}>
-        <div className={styles.track}>
-          {loopItems.map((project, index) => {
-            const id = project._id || project.id
-            const img = project.afterImage || project.beforeImage
-            return (
-              <Link
-                key={`${id}-${index}`}
-                href={`/projects?open=${id}`}
-                className={styles.card}
-              >
-                <div className={styles.imageWrap}>
-                  {img && (
-                    <img
-                      src={img}
-                      alt={project.name}
-                      className={styles.image}
-                      loading="lazy"
-                    />
-                  )}
-                  <div className={styles.overlay}>
-                    {project.category && (
-                      <span className={styles.badge}>{project.category}</span>
-                    )}
-                  </div>
-                </div>
-                <div className={styles.info}>
-                  <p className={styles.name}>{project.name}</p>
-                  {project.location && (
-                    <p className={styles.location}>
-                      <MapPin size={12} />
-                      {project.location}
-                    </p>
-                  )}
-                </div>
-              </Link>
-            )
-          })}
+      {useCarousel ? (
+        /* ── Infinite scroll carousel (≥5 projects) ── */
+        <div className={styles.trackOuter}>
+          <div className={styles.track}>
+            {loopItems.map((project, index) => (
+              <CardItem key={`${project._id || project.id}-${index}`} project={project} index={index} />
+            ))}
+          </div>
+          <div className={styles.hoverHint} aria-hidden="true">Hover to explore</div>
         </div>
-
-        {/* Hover hint — pure CSS visibility toggle */}
-        <div className={styles.hoverHint} aria-hidden="true">
-          Hover to explore
+      ) : (
+        /* ── Static centered grid (≤4 projects, no duplication) ── */
+        <div className="container">
+          <div className={styles.staticGrid}>
+            {projects.map((project, index) => (
+              <CardItem key={project._id || project.id} project={project} index={index} />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* CTA — back inside container */}
       <div className="container">

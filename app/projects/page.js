@@ -51,13 +51,13 @@ function ProjectsContent() {
   }, [selectedType])
 
   // Counts per type
-  const residentialCount = useMemo(() => projects.filter(p => (p.projectType || 'residential') === 'residential').length, [projects])
-  const commercialCount = useMemo(() => projects.filter(p => (p.projectType || 'residential') === 'commercial').length, [projects])
+  const residentialCount = useMemo(() => projects.filter(p => p.projectType === 'residential').length, [projects])
+  const commercialCount = useMemo(() => projects.filter(p => p.projectType === 'commercial').length, [projects])
 
   // Extract unique categories within selected type
   const categories = useMemo(() => {
     const cats = new Set()
-    const base = selectedType === 'all' ? projects : projects.filter(p => (p.projectType || 'residential') === selectedType)
+    const base = selectedType === 'all' ? projects : projects.filter(p => p.projectType === selectedType)
     base.forEach(p => { if (p.category) cats.add(p.category) })
     return ['all', ...Array.from(cats).sort()]
   }, [projects, selectedType])
@@ -67,7 +67,7 @@ function ProjectsContent() {
     let result = [...projects]
 
     if (selectedType !== 'all') {
-      result = result.filter(p => (p.projectType || 'residential') === selectedType)
+      result = result.filter(p => p.projectType === selectedType)
     }
 
     if (selectedCategory !== 'all') {

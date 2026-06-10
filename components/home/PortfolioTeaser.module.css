@@ -59,6 +59,18 @@
   color: var(--color-champagne);
 }
 
+/* ===== STATIC GRID (≤4 projects) ===== */
+.staticGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.staticGrid .card {
+  width: auto;
+}
+
 /* ===== SCROLL TRACK ===== */
 .trackOuter {
   position: relative;
