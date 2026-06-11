@@ -1,21 +1,26 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { Plus, Edit, Trash2, Star } from 'lucide-react'
+import { Plus, Trash2, Star, BadgeCheck } from 'lucide-react'
 import styles from '../products/products.module.css'
+
+const EMPTY_FORM = {
+    customerName: '',
+    location: '',
+    reviewText: '',
+    rating: 5,
+    imageUrl: '',
+    videoUrl: '',
+    productReference: '',
+    verified: false,
+    featured: false,
+}
 
 export default function TestimonialsPage() {
     const [testimonials, setTestimonials] = useState([])
     const [loading, setLoading] = useState(true)
     const [showForm, setShowForm] = useState(false)
-    const [formData, setFormData] = useState({
-        customerName: '',
-        reviewText: '',
-        rating: 5,
-        imageUrl: '',
-        videoUrl: ''
-    })
+    const [formData, setFormData] = useState(EMPTY_FORM)
 
     useEffect(() => {
         loadTestimonials()
@@ -25,7 +30,7 @@ export default function TestimonialsPage() {
         try {
             const res = await fetch('/api/testimonials')
             const data = await res.json()
-            setTestimonials(data)
+            setTestimonials(Array.isArray(data) ? data : [])
         } catch (error) {
             console.error('Failed to load testimonials:', error)
         } finally {
@@ -39,22 +44,12 @@ export default function TestimonialsPage() {
             const res = await fetch('/api/testimonials', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ...formData,
-                    rating: parseInt(formData.rating)
-                })
+                body: JSON.stringify({ ...formData, rating: parseInt(formData.rating) })
             })
-
             if (res.ok) {
                 loadTestimonials()
                 setShowForm(false)
-                setFormData({
-                    customerName: '',
-                    reviewText: '',
-                    rating: 5,
-                    imageUrl: '',
-                    videoUrl: ''
-                })
+                setFormData(EMPTY_FORM)
             }
         } catch (error) {
             console.error('Failed to create testimonial:', error)
@@ -63,7 +58,6 @@ export default function TestimonialsPage() {
 
     const deleteTestimonial = async (id) => {
         if (!confirm('Delete this testimonial?')) return
-
         try {
             const res = await fetch(`/api/testimonials/${id}`, { method: 'DELETE' })
             if (res.ok) loadTestimonials()
@@ -71,6 +65,19 @@ export default function TestimonialsPage() {
             console.error('Failed to delete:', error)
         }
     }
+
+    const field = (label, key, type = 'text', placeholder = '') => (
+        <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>{label}</label>
+            <input
+                type={type}
+                value={formData[key]}
+                onChange={e => setFormData({ ...formData, [key]: e.target.value })}
+                placeholder={placeholder}
+                style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--color-border)', borderRadius: '4px' }}
+            />
+        </div>
+    )
 
     return (
         <div>
@@ -90,26 +97,17 @@ export default function TestimonialsPage() {
                     <h3 style={{ marginBottom: 'var(--spacing-md)' }}>Add New Testimonial</h3>
                     <form onSubmit={handleSubmit}>
                         <div style={{ display: 'grid', gap: 'var(--spacing-md)' }}>
-                            <div>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Customer Name *</label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={formData.customerName}
-                                    onChange={e => setFormData({ ...formData, customerName: e.target.value })}
-                                    placeholder="John Doe"
-                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--color-border)', borderRadius: '4px' }}
-                                />
-                            </div>
+                            {field('Customer Name *', 'customerName', 'text', 'e.g. Priya Sharma')}
+                            {field('Location', 'location', 'text', 'e.g. Mumbai, Maharashtra')}
 
                             <div>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Review Text *</label>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Review *</label>
                                 <textarea
                                     required
                                     rows="4"
                                     value={formData.reviewText}
                                     onChange={e => setFormData({ ...formData, reviewText: e.target.value })}
-                                    placeholder="Share your experience..."
+                                    placeholder="Share the customer's experience..."
                                     style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--color-border)', borderRadius: '4px' }}
                                 />
                             </div>
@@ -121,34 +119,33 @@ export default function TestimonialsPage() {
                                     onChange={e => setFormData({ ...formData, rating: e.target.value })}
                                     style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--color-border)', borderRadius: '4px' }}
                                 >
-                                    <option value="5">5 Stars</option>
-                                    <option value="4">4 Stars</option>
-                                    <option value="3">3 Stars</option>
-                                    <option value="2">2 Stars</option>
-                                    <option value="1">1 Star</option>
+                                    {[5, 4, 3, 2, 1].map(n => (
+                                        <option key={n} value={n}>{n} Star{n !== 1 ? 's' : ''}</option>
+                                    ))}
                                 </select>
                             </div>
 
-                            <div>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Image URL (Google Drive)</label>
-                                <input
-                                    type="url"
-                                    value={formData.imageUrl}
-                                    onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
-                                    placeholder="https://drive.google.com/file/d/..."
-                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--color-border)', borderRadius: '4px' }}
-                                />
-                            </div>
+                            {field('Product / Item Purchased', 'productReference', 'text', 'e.g. Marble Ganesha Statue')}
+                            {field('Customer Photo URL (optional)', 'imageUrl', 'url', 'https://...')}
+                            {field('Video Review URL (optional)', 'videoUrl', 'url', 'https://youtube.com/...')}
 
-                            <div>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Video Review URL (YouTube/Instagram)</label>
-                                <input
-                                    type="url"
-                                    value={formData.videoUrl}
-                                    onChange={e => setFormData({ ...formData, videoUrl: e.target.value })}
-                                    placeholder="https://www.youtube.com/watch?v=..."
-                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--color-border)', borderRadius: '4px' }}
-                                />
+                            <div style={{ display: 'flex', gap: '2rem' }}>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontWeight: 600 }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={formData.verified}
+                                        onChange={e => setFormData({ ...formData, verified: e.target.checked })}
+                                    />
+                                    Verified Purchase
+                                </label>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontWeight: 600 }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={formData.featured}
+                                        onChange={e => setFormData({ ...formData, featured: e.target.checked })}
+                                    />
+                                    Featured (show first)
+                                </label>
                             </div>
 
                             <div style={{ display: 'flex', gap: 'var(--spacing-md)', justifyContent: 'flex-end' }}>
@@ -166,35 +163,47 @@ export default function TestimonialsPage() {
                 <div className={styles.empty}>
                     <Star size={64} color="var(--color-text-light)" />
                     <h3>No testimonials yet</h3>
-                    <p>Add your first customer review</p>
+                    <p>Add your first customer review to display it on the homepage</p>
                 </div>
             ) : (
                 <div style={{ display: 'grid', gap: 'var(--spacing-md)' }}>
-                    {testimonials.map(testimonial => (
-                        <div key={testimonial.id} className="card" style={{ padding: 'var(--spacing-md)' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                    {testimonials.map(t => (
+                        <div key={t._id} className="card" style={{ padding: 'var(--spacing-md)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', gap: '1rem' }}>
                                 <div style={{ flex: 1 }}>
-                                    <h3 style={{ marginBottom: '0.5rem' }}>{testimonial.customerName}</h3>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                                        <h3 style={{ margin: 0 }}>{t.customerName}</h3>
+                                        {t.verified && (
+                                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8rem', color: '#22c55e', fontWeight: 600 }}>
+                                                <BadgeCheck size={14} /> Verified
+                                            </span>
+                                        )}
+                                        {t.featured && (
+                                            <span style={{ fontSize: '0.8rem', color: 'var(--color-secondary)', fontWeight: 600 }}>⭐ Featured</span>
+                                        )}
+                                    </div>
+                                    {t.location && (
+                                        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-light)', margin: '0 0 0.5rem' }}>{t.location}</p>
+                                    )}
                                     <div style={{ display: 'flex', gap: '0.25rem', marginBottom: '0.75rem' }}>
                                         {[...Array(5)].map((_, i) => (
                                             <Star
                                                 key={i}
                                                 size={16}
-                                                fill={i < testimonial.rating ? 'var(--color-secondary)' : 'none'}
+                                                fill={i < t.rating ? 'var(--color-secondary)' : 'none'}
                                                 color="var(--color-secondary)"
                                             />
                                         ))}
                                     </div>
-                                    <p style={{ color: 'var(--color-text-gray)', marginBottom: '0.5rem' }}>{testimonial.reviewText}</p>
-                                    {testimonial.imageUrl && (
-                                        <span style={{ fontSize: '0.85rem', color: 'var(--color-text-light)' }}>📷 Has image</span>
-                                    )}
-                                    {testimonial.videoUrl && (
-                                        <span style={{ fontSize: '0.85rem', color: 'var(--color-text-light)', marginLeft: '1rem' }}>🎥 Has video</span>
+                                    <p style={{ color: 'var(--color-text-gray)', margin: '0 0 0.5rem' }}>{t.reviewText}</p>
+                                    {t.productReference && (
+                                        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-light)', margin: 0, fontStyle: 'italic' }}>
+                                            Purchased: {t.productReference}
+                                        </p>
                                     )}
                                 </div>
                                 <button
-                                    onClick={() => deleteTestimonial(testimonial.id)}
+                                    onClick={() => deleteTestimonial(t._id)}
                                     className={styles.actionBtn}
                                     title="Delete"
                                 >
