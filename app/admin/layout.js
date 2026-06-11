@@ -105,6 +105,20 @@ export default function AdminLayout({ children }) {
                 <div className={styles.logo}>
                     <h2>Marmex CMS</h2>
                 </div>
+                <div className={styles.quickActions}>
+                    <Link
+                        href="/admin/settings"
+                        className={`${styles.navItem} ${pathname === '/admin/settings' ? styles.active : ''}`}
+                        onClick={handleNavClick}
+                    >
+                        <Settings size={20} />
+                        <span>Settings</span>
+                    </Link>
+                    <button onClick={handleLogout} className={styles.logoutBtn}>
+                        <LogOut size={20} />
+                        <span>Logout</span>
+                    </button>
+                </div>
                 <nav className={styles.nav}>
                     {navGroups.map(group => (
                         <div key={group.label} className={styles.navGroup}>
@@ -124,20 +138,6 @@ export default function AdminLayout({ children }) {
                         </div>
                     ))}
                 </nav>
-                <div className={styles.sidebarFooter}>
-                    <Link
-                        href="/admin/settings"
-                        className={`${styles.navItem} ${pathname === '/admin/settings' ? styles.active : ''}`}
-                        onClick={handleNavClick}
-                    >
-                        <Settings size={20} />
-                        <span>Settings</span>
-                    </Link>
-                    <button onClick={handleLogout} className={styles.logoutBtn}>
-                        <LogOut size={20} />
-                        <span>Logout</span>
-                    </button>
-                </div>
             </aside>
             <main className={styles.mainContent}>
                 {children}

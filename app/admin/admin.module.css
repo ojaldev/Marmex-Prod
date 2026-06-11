@@ -92,10 +92,9 @@
     margin-left: auto;
 }
 
-.sidebarFooter {
-    flex: 0 0 auto; /* always its natural height, never grows or shrinks */
-    padding: 0 0 var(--spacing-sm);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+.quickActions {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: var(--spacing-xs);
 }
 
 .logoutBtn {
