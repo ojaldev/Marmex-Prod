@@ -520,11 +520,13 @@ export default function Header({ categories = [] }) {
               ))}
 
               <div className={styles.mobileMenuDivider} />
+              <Link href="/account/wishlist" className={styles.mobileNavItem}>
+                Wishlist{wishlistCount > 0 ? ` (${wishlistCount})` : ''}
+              </Link>
               {session ? (
                 <>
                   <Link href="/account" className={styles.mobileNavItem}>My Account</Link>
                   <Link href="/account/orders" className={styles.mobileNavItem}>My Orders</Link>
-                  <Link href="/account/wishlist" className={styles.mobileNavItem}>Wishlist</Link>
                 </>
               ) : (
                 <>

@@ -33,9 +33,9 @@ export default function HeroSection() {
     const subtitle = hero?.subtitle || 'Handcrafted Perfection for Your Space'
 
     const stats = [
-        { icon: Users, number: '5000+', label: 'Happy Customers' },
-        { icon: Award, number: '300+', label: 'Unique Designs' },
-        { icon: Star, number: '4.9', label: 'Average Rating' },
+        { icon: Users, number: hero?.stats?.customers || '5000+', label: 'Happy Customers' },
+        { icon: Award, number: hero?.stats?.designs || '300+', label: 'Unique Designs' },
+        { icon: Star, number: hero?.stats?.rating || '4.8', label: 'Average Rating' },
     ]
 
     if (hero === null) {

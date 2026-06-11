@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '@/contexts/CartContext'
-import { Minus, Plus, X, ArrowLeft, Lock, Truck, Shield, Package, ShoppingBag, MapPin } from 'lucide-react'
+import { Plus, X, ArrowLeft, Lock, Truck, Shield, Package, ShoppingBag, MapPin } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import QuantitySelector from '@/components/ui/QuantitySelector'
@@ -12,12 +12,29 @@ import { getDeliveryEstimate, formatDeliveryDate } from '@/lib/delivery'
 import styles from './cart.module.css'
 
 export default function CartPage() {
-    const { cart, updateQuantity, removeFromCart, getCartTotal, clearCart } = useCart()
+    const { cart, updateQuantity, removeFromCart, getCartTotal, clearCart, addToCart } = useCart()
     const [deliveryEstimate, setDeliveryEstimate] = useState(null)
+    const [upsells, setUpsells] = useState([])
 
     useEffect(() => {
         setDeliveryEstimate(getDeliveryEstimate())
     }, [])
+
+    useEffect(() => {
+        if (cart.length === 0) return
+        fetch('/api/products?limit=20')
+            .then(r => r.json())
+            .then(data => {
+                const all = data.products || data || []
+                const cartIds = new Set(cart.map(i => i.id))
+                const suggestions = all
+                    .filter(p => !cartIds.has(p._id?.toString()) && !cartIds.has(p.id))
+                    .filter(p => p.stock !== 'out_of_stock')
+                    .slice(0, 4)
+                setUpsells(suggestions)
+            })
+            .catch(() => {})
+    }, [cart])
 
     const freeShippingThreshold = 2999
     const currentTotal = getCartTotal()
@@ -200,6 +217,56 @@ export default function CartPage() {
                                     })}
                                 </AnimatePresence>
                             </motion.div>
+                            {/* Upsell — You Might Also Like */}
+                            {upsells.length > 0 && (
+                                <motion.div
+                                    className={styles.upsellSection}
+                                    initial={{ opacity: 0, y: 16 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.5, delay: 0.3 }}
+                                >
+                                    <h3 className={styles.upsellTitle}>You Might Also Like</h3>
+                                    <div className={styles.upsellGrid}>
+                                        {upsells.map(product => {
+                                            const pid = product._id?.toString() || product.id
+                                            const price = product.discount > 0
+                                                ? Math.round(product.price * (100 - product.discount) / 100)
+                                                : product.price
+                                            return (
+                                                <div key={pid} className={styles.upsellCard}>
+                                                    <Link href={`/products/${pid}`} className={styles.upsellImage}>
+                                                        {product.mainImage ? (
+                                                            <Image
+                                                                src={product.mainImage}
+                                                                alt={product.name}
+                                                                fill
+                                                                className={styles.upsellImg}
+                                                                sizes="72px"
+                                                            />
+                                                        ) : (
+                                                            <div className={styles.upsellImgPlaceholder} />
+                                                        )}
+                                                    </Link>
+                                                    <div className={styles.upsellInfo}>
+                                                        <Link href={`/products/${pid}`} className={styles.upsellName}>
+                                                            {product.name}
+                                                        </Link>
+                                                        <p className={styles.upsellPrice}>₹{price.toLocaleString()}</p>
+                                                    </div>
+                                                    <button
+                                                        className={styles.upsellAdd}
+                                                        onClick={() => addToCart(product, 1)}
+                                                        aria-label={`Add ${product.name} to cart`}
+                                                    >
+                                                        <Plus size={14} />
+                                                        Add
+                                                    </button>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                </motion.div>
+                            )}
                         </div>
 
                         {/* Order Summary */}

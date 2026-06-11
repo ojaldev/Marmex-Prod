@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import ProductCard from '@/components/ui/ProductCard'
 import { ProductListSkeleton } from '@/components/ui/SkeletonLoader'
-import { Filter, Package, X, SlidersHorizontal, Grid3X3, LayoutGrid } from 'lucide-react'
+import { Filter, Package, X, SlidersHorizontal, Grid3X3, LayoutGrid, Sparkles } from 'lucide-react'
 import { fadeInUp, staggerContainer } from '@/lib/animations'
 import styles from './products.module.css'
 
@@ -102,8 +102,12 @@ export default function ProductsPageClient({
             case 'newest':
                 result.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
                 break
-            default:
-                break
+            default: // 'featured'
+                result.sort((a, b) => {
+                    if (a.featured && !b.featured) return -1
+                    if (!a.featured && b.featured) return 1
+                    return 0
+                })
         }
 
         return result
@@ -337,28 +341,53 @@ export default function ProductsPageClient({
                                 </button>
                             </motion.div>
                         ) : (
-                            <motion.div
-                                className={styles.grid}
-                                style={{ gridTemplateColumns: `repeat(${gridColumns}, 1fr)` }}
-                                variants={staggerContainer}
-                                initial="hidden"
-                                animate="visible"
-                            >
-                                <AnimatePresence mode="popLayout">
-                                    {filteredProducts.map((product) => (
-                                        <motion.div
-                                            key={product._id || product.id}
-                                            layout
-                                            initial={{ opacity: 0, scale: 0.95 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            exit={{ opacity: 0, scale: 0.95 }}
-                                            transition={{ duration: 0.25 }}
+                            <>
+                                <motion.div
+                                    className={styles.grid}
+                                    style={{ gridTemplateColumns: `repeat(${gridColumns}, 1fr)` }}
+                                    variants={staggerContainer}
+                                    initial="hidden"
+                                    animate="visible"
+                                >
+                                    <AnimatePresence mode="popLayout">
+                                        {filteredProducts.map((product) => (
+                                            <motion.div
+                                                key={product._id || product.id}
+                                                layout
+                                                initial={{ opacity: 0, scale: 0.95 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0.95 }}
+                                                transition={{ duration: 0.25 }}
+                                            >
+                                                <ProductCard product={product} />
+                                            </motion.div>
+                                        ))}
+                                    </AnimatePresence>
+                                </motion.div>
+
+                                {resolvedCategoryName !== 'all' && filteredProducts.length < 4 && (
+                                    <motion.div
+                                        className={styles.comingSoonBanner}
+                                        initial={{ opacity: 0, y: 12 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.4 }}
+                                    >
+                                        <Sparkles size={20} className={styles.comingSoonIcon} />
+                                        <div>
+                                            <strong>More designs coming soon</strong>
+                                            <p>We&apos;re expanding this collection. Chat with us for custom or upcoming pieces.</p>
+                                        </div>
+                                        <a
+                                            href="https://wa.me/919582134493?text=Hi%20Marmex%2C%20I%27m%20looking%20for%20more%20options%20in%20this%20category."
+                                            className={styles.comingSoonCta}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
                                         >
-                                            <ProductCard product={product} />
-                                        </motion.div>
-                                    ))}
-                                </AnimatePresence>
-                            </motion.div>
+                                            WhatsApp Us
+                                        </a>
+                                    </motion.div>
+                                )}
+                            </>
                         )}
                     </div>
                 </div>

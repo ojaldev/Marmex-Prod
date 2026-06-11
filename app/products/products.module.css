@@ -365,6 +365,56 @@
     margin-bottom: var(--space-xl);
 }
 
+/* ===== COMING SOON BANNER ===== */
+.comingSoonBanner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    margin-top: var(--space-2xl);
+    padding: var(--space-lg) var(--space-xl);
+    background: linear-gradient(135deg, rgba(212, 165, 116, 0.08), rgba(212, 165, 116, 0.04));
+    border: 1px solid rgba(212, 165, 116, 0.25);
+    border-radius: var(--radius-xl);
+    flex-wrap: wrap;
+}
+
+.comingSoonIcon {
+    color: var(--color-gold-24k);
+    flex-shrink: 0;
+}
+
+.comingSoonBanner strong {
+    display: block;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-obsidian);
+    margin-bottom: 0.2rem;
+}
+
+.comingSoonBanner p {
+    font-size: var(--text-sm);
+    color: var(--color-text-gray);
+    margin: 0;
+}
+
+.comingSoonCta {
+    margin-left: auto;
+    padding: 0.5rem 1.25rem;
+    border: 1.5px solid var(--color-gold-24k);
+    border-radius: var(--radius-full);
+    color: var(--color-gold-24k);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all var(--duration-fast) ease;
+}
+
+.comingSoonCta:hover {
+    background: var(--color-gold-24k);
+    color: var(--color-obsidian);
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1024px) {
     .toolbar {
