@@ -4,6 +4,24 @@ import path from 'path'
 
 const dataPath = path.join(process.cwd(), 'data', 'site-config.json')
 
+function deepMerge(target, source) {
+    const result = { ...target }
+    for (const key of Object.keys(source)) {
+        if (
+            source[key] !== null &&
+            typeof source[key] === 'object' &&
+            !Array.isArray(source[key]) &&
+            typeof target[key] === 'object' &&
+            !Array.isArray(target[key])
+        ) {
+            result[key] = deepMerge(target[key] || {}, source[key])
+        } else {
+            result[key] = source[key]
+        }
+    }
+    return result
+}
+
 export async function GET() {
     try {
         const data = fs.readFileSync(dataPath, 'utf8')
@@ -25,7 +43,8 @@ export async function PUT(request) {
         const data = fs.readFileSync(dataPath, 'utf8')
         const config = JSON.parse(data)
 
-        const updatedConfig = { ...config, ...updates }
+        // Deep merge so nested keys (e.g. pricing.gstRate) aren't wiped
+        const updatedConfig = deepMerge(config, updates)
         fs.writeFileSync(dataPath, JSON.stringify(updatedConfig, null, 2))
 
         return NextResponse.json(updatedConfig)

@@ -9,10 +9,12 @@ import Link from 'next/link'
 import QuantitySelector from '@/components/ui/QuantitySelector'
 import { fadeInUp, staggerContainer } from '@/lib/animations'
 import { getDeliveryEstimate, formatDeliveryDate } from '@/lib/delivery'
+import { useTaxRate } from '@/lib/hooks/useTaxRate'
 import styles from './cart.module.css'
 
 export default function CartPage() {
     const { cart, updateQuantity, removeFromCart, getCartTotal, clearCart, addToCart } = useCart()
+    const taxRate = useTaxRate()
     const [deliveryEstimate, setDeliveryEstimate] = useState(null)
     const [upsells, setUpsells] = useState([])
 
@@ -41,7 +43,7 @@ export default function CartPage() {
     const amountToFreeShipping = Math.max(0, freeShippingThreshold - currentTotal)
     const shippingProgress = Math.min((currentTotal / freeShippingThreshold) * 100, 100)
     const shipping = currentTotal >= freeShippingThreshold ? 0 : 199
-    const tax = currentTotal * 0.18
+    const tax = currentTotal * (taxRate / 100)
     const grandTotal = currentTotal + shipping + tax
 
     return (
@@ -290,7 +292,7 @@ export default function CartPage() {
                                     </span>
                                 </div>
                                 <div className={styles.summaryRow}>
-                                    <span>Tax (18% GST)</span>
+                                    <span>Tax ({taxRate}% GST)</span>
                                     <span>₹{tax.toLocaleString()}</span>
                                 </div>
 

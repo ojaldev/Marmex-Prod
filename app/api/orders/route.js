@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
+import fs from 'fs'
+import path from 'path'
 import { auth } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import Order from '@/models/Order'
@@ -43,6 +45,18 @@ const createOrderSchema = z.object({
     discount: z.number().min(0),
     total: z.number().positive()
 })
+
+function getGstRate() {
+    try {
+        const raw = fs.readFileSync(
+            path.join(process.cwd(), 'data', 'site-config.json'),
+            'utf8'
+        )
+        return Number(JSON.parse(raw)?.pricing?.gstRate ?? 18)
+    } catch {
+        return 18
+    }
+}
 
 // Get user's order history
 export async function GET(request) {
@@ -154,8 +168,10 @@ export async function POST(request) {
             }
         })
 
+        // Read GST rate from config (falls back to 18% if config unreadable)
+        const gstRate = getGstRate()
         // Recalculate totals server-side
-        const serverTax = serverSubtotal * 0.18 // 18% GST
+        const serverTax = serverSubtotal * (gstRate / 100)
         const serverShipping = shippingMethod?.cost || 0
         const serverTotal = serverSubtotal + serverTax + serverShipping
 
@@ -178,6 +194,7 @@ export async function POST(request) {
             items: validatedItems,
             subtotal: Math.round(serverSubtotal * 100) / 100,
             tax: Math.round(serverTax * 100) / 100,
+            taxRate: gstRate,
             shipping: serverShipping,
             discount: validatedData.discount || 0,
             total: Math.round(serverTotal * 100) / 100,

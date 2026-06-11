@@ -8,6 +8,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '@/contexts/CartContext'
+import { useTaxRate } from '@/lib/hooks/useTaxRate'
 import AddressSelector from '@/components/checkout/AddressSelector'
 import { ArrowLeft, Lock, Check, Loader2, CreditCard, Truck, Shield, ChevronRight, FileText } from 'lucide-react'
 import { fadeInUp, staggerContainer } from '@/lib/animations'
@@ -59,6 +60,7 @@ export default function CheckoutPage() {
     const [gstData, setGSTData] = useState({ needsGST: false })
     const [appliedPromo, setAppliedPromo] = useState(null)
     const [paymentMethod, setPaymentMethod] = useState('cod')
+    const taxRate = useTaxRate()
 
     useEffect(() => {
         loadRazorpay().then(setRazorpayLoaded)
@@ -70,7 +72,7 @@ export default function CheckoutPage() {
     const shippingCost = shippingMethod?.cost || 0
     const giftCost = giftData?.cost || 0
     const taxableAmount = subtotal - promoDiscount + shippingCost + giftCost
-    const tax = taxableAmount * 0.18
+    const tax = taxableAmount * (taxRate / 100)
     const total = taxableAmount + tax
 
     const handleAddressSelect = (address) => setSelectedAddress(address)
@@ -106,7 +108,7 @@ export default function CheckoutPage() {
                 guestEmail: !session ? manualAddress.email : undefined,
                 promoCode: appliedPromo?.code, shippingMethod,
                 giftOptions: giftData, gstInvoice: gstData,
-                subtotal, tax, shipping: shippingCost, discount: promoDiscount, total
+                subtotal, tax, taxRate, shipping: shippingCost, discount: promoDiscount, total
             }
 
             const orderRes = await fetch('/api/orders', {
@@ -520,7 +522,7 @@ export default function CheckoutPage() {
                             {promoDiscount > 0 && <div className={styles.summaryRow}><span>Promo Discount:</span><span className={styles.discount}>-₹{promoDiscount.toLocaleString()}</span></div>}
                             <div className={styles.summaryRow}><span>Shipping:</span><span>{shippingCost === 0 ? 'FREE' : `₹${shippingCost.toLocaleString()}`}</span></div>
                             {giftCost > 0 && <div className={styles.summaryRow}><span>Gift Wrapping:</span><span>₹{giftCost.toLocaleString()}</span></div>}
-                            <div className={styles.summaryRow}><span>Tax (GST 18%):</span><span>₹{tax.toFixed(2)}</span></div>
+                            <div className={styles.summaryRow}><span>Tax (GST {taxRate}%):</span><span>₹{tax.toFixed(2)}</span></div>
 
                             <div className={styles.summaryDivider} />
 
