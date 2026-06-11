@@ -49,20 +49,34 @@ export default function AdminLayout({ children }) {
         }
     }
 
-    const navItems = [
-        { href: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
-        { href: '/admin/orders', icon: ShoppingCart, label: 'Orders', count: counts.orders },
-        { href: '/admin/shipments', icon: Truck, label: 'Shipments' },
-        { href: '/admin/returns', icon: RotateCcw, label: 'Returns' },
-        { href: '/admin/couriers', icon: BarChart3, label: 'Couriers' },
-        { href: '/admin/promocodes', icon: Tag, label: 'Promo Codes' },
-        { href: '/admin/products', icon: Package, label: 'Products', count: counts.products },
-        { href: '/admin/categories', icon: FolderOpen, label: 'Categories' },
-        { href: '/admin/projects', icon: Briefcase, label: 'Portfolio', count: counts.projects },
-        { href: '/admin/testimonials', icon: Star, label: 'Testimonials', count: counts.testimonials },
-        { href: '/admin/reviews', icon: MessageSquare, label: 'Reviews' },
-        { href: '/admin/homepage', icon: Home, label: 'Homepage' },
-        { href: '/admin/settings', icon: Settings, label: 'Settings' }
+    const navGroups = [
+        {
+            label: 'Orders',
+            items: [
+                { href: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
+                { href: '/admin/orders', icon: ShoppingCart, label: 'Orders', count: counts.orders },
+                { href: '/admin/shipments', icon: Truck, label: 'Shipments' },
+                { href: '/admin/returns', icon: RotateCcw, label: 'Returns' },
+                { href: '/admin/couriers', icon: BarChart3, label: 'Couriers' },
+                { href: '/admin/promocodes', icon: Tag, label: 'Promo Codes' },
+            ]
+        },
+        {
+            label: 'Catalogue',
+            items: [
+                { href: '/admin/products', icon: Package, label: 'Products', count: counts.products },
+                { href: '/admin/categories', icon: FolderOpen, label: 'Categories' },
+                { href: '/admin/projects', icon: Briefcase, label: 'Portfolio', count: counts.projects },
+            ]
+        },
+        {
+            label: 'Content',
+            items: [
+                { href: '/admin/testimonials', icon: Star, label: 'Testimonials', count: counts.testimonials },
+                { href: '/admin/reviews', icon: MessageSquare, label: 'Reviews' },
+                { href: '/admin/homepage', icon: Home, label: 'Homepage' },
+            ]
+        },
     ]
 
     const handleNavClick = () => {
@@ -92,20 +106,33 @@ export default function AdminLayout({ children }) {
                     <h2>Marmex CMS</h2>
                 </div>
                 <nav className={styles.nav}>
-                    {navItems.map(item => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={`${styles.navItem} ${pathname === item.href ? styles.active : ''}`}
-                            onClick={handleNavClick}
-                        >
-                            <item.icon size={20} />
-                            <span>{item.label}</span>
-                            {item.count !== undefined && <span className={styles.badge}>{item.count}</span>}
-                        </Link>
+                    {navGroups.map(group => (
+                        <div key={group.label} className={styles.navGroup}>
+                            <p className={styles.navGroupLabel}>{group.label}</p>
+                            {group.items.map(item => (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className={`${styles.navItem} ${pathname === item.href ? styles.active : ''}`}
+                                    onClick={handleNavClick}
+                                >
+                                    <item.icon size={20} />
+                                    <span>{item.label}</span>
+                                    {item.count !== undefined && <span className={styles.badge}>{item.count}</span>}
+                                </Link>
+                            ))}
+                        </div>
                     ))}
                 </nav>
                 <div className={styles.sidebarFooter}>
+                    <Link
+                        href="/admin/settings"
+                        className={`${styles.navItem} ${pathname === '/admin/settings' ? styles.active : ''}`}
+                        onClick={handleNavClick}
+                    >
+                        <Settings size={20} />
+                        <span>Settings</span>
+                    </Link>
                     <button onClick={handleLogout} className={styles.logoutBtn}>
                         <LogOut size={20} />
                         <span>Logout</span>

@@ -31,10 +31,29 @@
 
 .nav {
     flex: 1;
-    padding: var(--spacing-md) 0;
+    padding: var(--spacing-sm) 0;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.nav::-webkit-scrollbar {
+    display: none;
+}
+
+.navGroup {
+    padding: var(--spacing-sm) 0 0.25rem;
+}
+
+.navGroupLabel {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.3);
+    padding: 0.5rem var(--spacing-md) 0.25rem;
+    margin: 0;
 }
 
 .navItem {
@@ -73,8 +92,7 @@
 }
 
 .sidebarFooter {
-    margin-top: auto;
-    padding: var(--spacing-md);
+    padding: 0 0 var(--spacing-sm);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
