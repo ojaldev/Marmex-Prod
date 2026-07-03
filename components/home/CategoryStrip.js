@@ -35,7 +35,7 @@ export default function CategoryStrip() {
         const loadData = async () => {
             try {
                 const [catRes, prodRes] = await Promise.all([
-                    fetch('/api/categories'),
+                    fetch('/api/categories?withProducts=true'),
                     fetch('/api/products')
                 ])
                 const cats = await catRes.json()

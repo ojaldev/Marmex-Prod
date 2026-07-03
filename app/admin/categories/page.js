@@ -76,7 +76,8 @@ export default function AdminCategoriesPage() {
                 notification.success('Category deleted!')
                 fetchCategories()
             } else {
-                notification.error('Failed to delete category')
+                const data = await res.json().catch(() => ({}))
+                notification.error(data.error || 'Failed to delete category')
             }
         } catch (error) {
             notification.error('Failed to delete category')

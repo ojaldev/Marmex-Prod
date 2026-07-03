@@ -49,7 +49,7 @@ export default function ProductsPageClient({
         try {
             const [productsRes, categoriesRes] = await Promise.all([
                 fetch('/api/products'),
-                fetch('/api/categories')
+                fetch('/api/categories?withProducts=true')
             ])
             if (!productsRes.ok || !categoriesRes.ok) {
                 throw new Error('Failed to load products')

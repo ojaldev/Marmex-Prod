@@ -7,7 +7,7 @@ export default async function sitemap() {
     try {
         const [productsRes, categoriesRes] = await Promise.all([
             fetch(`${baseUrl}/api/products?limit=1000`, { next: { revalidate: 3600 } }),
-            fetch(`${baseUrl}/api/categories`, { next: { revalidate: 3600 } })
+            fetch(`${baseUrl}/api/categories?withProducts=true`, { next: { revalidate: 3600 } })
         ])
         if (productsRes.ok) {
             const data = await productsRes.json()

@@ -14,7 +14,7 @@ export default function CategoryTiles() {
 
     useEffect(() => {
         Promise.all([
-            fetch('/api/categories').then(r => r.json()),
+            fetch('/api/categories?withProducts=true').then(r => r.json()),
             fetch('/api/products').then(r => r.json())
         ])
             .then(([categoriesData, productsData]) => {
