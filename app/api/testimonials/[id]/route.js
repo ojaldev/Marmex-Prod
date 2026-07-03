@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Testimonial from '@/models/Testimonial'
+import { requireAdmin } from '@/lib/admin-auth'
 
 export async function GET(request, { params }) {
     try {
@@ -25,6 +26,9 @@ export async function GET(request, { params }) {
 
 export async function PUT(request, { params }) {
     try {
+        const denied = await requireAdmin(request)
+        if (denied) return denied
+
         const { id } = await params
         const updateData = await request.json()
 
@@ -52,6 +56,9 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
     try {
+        const denied = await requireAdmin(request)
+        if (denied) return denied
+
         const { id } = await params
 
         await connectDB()

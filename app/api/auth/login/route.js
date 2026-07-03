@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { checkRateLimit, getClientIP } from '@/lib/rate-limit'
 import { signAdminToken } from '@/lib/admin-jwt'
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Marmex@OmShanti'
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
 
 export async function POST(request) {
     try {
@@ -14,6 +14,11 @@ export async function POST(request) {
                 { error: 'Too many login attempts. Please try again later.' },
                 { status: 429, headers: { 'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': String(rateLimit.reset) } }
             )
+        }
+
+        if (!ADMIN_PASSWORD) {
+            console.error('ADMIN_PASSWORD env var is not configured')
+            return NextResponse.json({ error: 'Admin login is not configured' }, { status: 500 })
         }
 
         const { password } = await request.json()

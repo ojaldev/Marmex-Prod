@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import { auth } from '@/lib/auth'
 import connectDB from '@/lib/mongodb'
 import Review from '@/models/Review'
+import Order from '@/models/Order'
 
 // Get reviews for a product
 export async function GET(request) {
@@ -119,24 +120,10 @@ export async function POST(request) {
         const body = await request.json()
         const { productId, rating, title, content, media } = body
 
-        console.log('Review submission data:', { productId, rating, title, content: content?.substring(0, 50), media: media?.length })
-
         // Validation
         if (!productId || !rating || !title || !content) {
-            console.log('Review validation failed:', {
-                hasProductId: !!productId,
-                hasRating: !!rating,
-                hasTitle: !!title,
-                hasContent: !!content
-            })
             return NextResponse.json({
-                error: 'Product ID, rating, title, and content are required',
-                missing: {
-                    productId: !productId,
-                    rating: !rating,
-                    title: !title,
-                    content: !content
-                }
+                error: 'Product ID, rating, title, and content are required'
             }, { status: 400 })
         }
 
@@ -158,6 +145,13 @@ export async function POST(request) {
             }, { status: 400 })
         }
 
+        // Mark as verified if the user has a confirmed/delivered order containing this product
+        const hasPurchased = await Order.exists({
+            user: session.user.id,
+            'items.productId': productId,
+            status: { $in: ['confirmed', 'processing', 'shipped', 'delivered'] }
+        })
+
         // Create review
         const review = await Review.create({
             product: productId,
@@ -166,7 +160,7 @@ export async function POST(request) {
             title,
             content,
             media: media || [],
-            verified: false, // TODO: Check if user purchased this product
+            verified: Boolean(hasPurchased),
             status: 'pending' // Requires approval
         })
 

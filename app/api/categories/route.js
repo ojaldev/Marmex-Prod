@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Category from '@/models/Category'
+import Product from '@/models/Product'
+import { requireAdmin } from '@/lib/admin-auth'
 
 export async function GET(request) {
     try {
@@ -8,9 +10,9 @@ export async function GET(request) {
 
         const { searchParams } = new URL(request.url)
         const activeParam = searchParams.get('active')
+        const withProducts = searchParams.get('withProducts') === 'true'
 
         let query = {}
-        // Only filter by active if explicitly set to 'true'
         if (activeParam === 'true') {
             query.active = true
         }
@@ -19,7 +21,15 @@ export async function GET(request) {
             .sort({ order: 1, name: 1 })
             .lean()
 
-        console.log('Categories fetched:', categories.length, 'Query:', query)
+        if (withProducts) {
+            // Get all category names that have at least one product — single query
+            const populated = await Product.distinct('category')
+            const populatedSet = new Set(populated)
+            const filtered = categories.filter(c => populatedSet.has(c.name))
+            return NextResponse.json(filtered, {
+                headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' }
+            })
+        }
 
         return NextResponse.json(categories, {
             headers: {
@@ -34,6 +44,9 @@ export async function GET(request) {
 
 export async function POST(request) {
     try {
+        const denied = await requireAdmin(request)
+        if (denied) return denied
+
         await connectDB()
 
         const categoryData = await request.json()
@@ -46,13 +59,9 @@ export async function POST(request) {
                 .replace(/(^-|-$)/g, '')
         }
 
-        console.log('Creating category with data:', categoryData)
-
         // Use new + save instead of create for better error handling
         const category = new Category(categoryData)
         await category.save()
-
-        console.log('Category created successfully:', category._id)
 
         return NextResponse.json(category, { status: 201 })
     } catch (error) {

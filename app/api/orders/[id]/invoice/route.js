@@ -19,14 +19,17 @@ export async function GET(request, { params }) {
         }
 
         // Authorization:
-        // - Guests: only if order has guestEmail (no session required)
-        // - Logged-in users: only their own orders
         // - Admins: all orders
-        const isAdmin = session?.user?.role === 'admin'
-        if (!isAdmin) {
+        // - Logged-in users: only their own orders
+        // - Guests: must prove knowledge of the order's email via ?email= param
+        const isAdminUser = session?.user?.role === 'admin'
+        if (!isAdminUser) {
             if (!session) {
-                // No session — only guest orders allowed
-                if (!order.guestEmail) {
+                // Guest access — require the caller to supply the order's email
+                const url = new URL(request.url)
+                const providedEmail = (url.searchParams.get('email') || '').trim().toLowerCase()
+                const orderEmail = (order.guestEmail || '').trim().toLowerCase()
+                if (!orderEmail || !providedEmail || providedEmail !== orderEmail) {
                     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
                 }
             } else {

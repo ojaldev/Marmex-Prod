@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import mongoose from 'mongoose'
 import connectDB from '@/lib/mongodb'
 import Project from '@/models/Project'
+import { requireAdmin } from '@/lib/admin-auth'
 
 const VALID_PROJECT_TYPES = ['residential', 'commercial']
 
@@ -91,6 +92,9 @@ export async function GET(request) {
 
 export async function POST(request) {
     try {
+        const denied = await requireAdmin(request)
+        if (denied) return denied
+
         await connectDB()
 
         const raw = await request.json()

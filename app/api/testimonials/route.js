@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Testimonial from '@/models/Testimonial'
+import { requireAdmin } from '@/lib/admin-auth'
 
 export async function GET(request) {
     try {
@@ -34,6 +35,9 @@ export async function GET(request) {
 
 export async function POST(request) {
     try {
+        const denied = await requireAdmin(request)
+        if (denied) return denied
+
         await connectDB()
 
         const testimonialData = await request.json()

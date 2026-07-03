@@ -4,6 +4,7 @@ import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
 import { validateDimensions, validateWeight, formatDimensions, formatWeight } from '@/lib/product-specs'
 import { deleteResourceFromUrl } from '@/lib/cloudinary'
+import { requireAdmin } from '@/lib/admin-auth'
 
 export async function GET(request, { params }) {
     try {
@@ -30,6 +31,9 @@ export async function GET(request, { params }) {
 
 export async function PUT(request, { params }) {
     try {
+        const denied = await requireAdmin(request)
+        if (denied) return denied
+
         const { id } = await params
         let updateData = await request.json()
 
@@ -94,6 +98,9 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
     try {
+        const denied = await requireAdmin(request)
+        if (denied) return denied
+
         const { id } = await params
 
         await connectDB()

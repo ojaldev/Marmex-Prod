@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Category from '@/models/Category'
+import { requireAdmin } from '@/lib/admin-auth'
 
 // Seed categories data with images
 const categoriesData = [
@@ -56,6 +57,9 @@ const categoriesData = [
 
 export async function POST(request) {
     try {
+        const denied = await requireAdmin(request)
+        if (denied) return denied
+
         await connectDB()
 
         // Check if categories already exist
@@ -89,6 +93,9 @@ export async function POST(request) {
 // PUT handler to update existing categories with images
 export async function PUT(request) {
     try {
+        const denied = await requireAdmin(request)
+        if (denied) return denied
+
         await connectDB()
 
         // Update each category with its image

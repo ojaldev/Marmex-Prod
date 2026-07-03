@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import fs from 'fs'
-import path from 'path'
 import { auth } from '@/lib/auth'
+import { getSiteConfig } from '@/lib/site-config'
 import connectDB from '@/lib/mongodb'
 import Order from '@/models/Order'
 import Product from '@/models/Product'
@@ -46,13 +45,10 @@ const createOrderSchema = z.object({
     total: z.number().positive()
 })
 
-function getGstRate() {
+async function getGstRate() {
     try {
-        const raw = fs.readFileSync(
-            path.join(process.cwd(), 'data', 'site-config.json'),
-            'utf8'
-        )
-        return Number(JSON.parse(raw)?.pricing?.gstRate ?? 18)
+        const config = await getSiteConfig()
+        return Number(config?.pricing?.gstRate ?? 18)
     } catch {
         return 18
     }
@@ -150,26 +146,32 @@ export async function POST(request) {
         const productMap = new Map(products.map(p => [p._id.toString(), p]))
 
         let serverSubtotal = 0
-        const validatedItems = items.map(item => {
+        const validatedItems = []
+        for (const item of items) {
             const dbProduct = productMap.get(item.productId)
-            // If product not found in DB, use client price but log warning
-            const unitPrice = dbProduct ? dbProduct.price : item.price
-            const unitDiscount = dbProduct ? (dbProduct.discount || 0) : item.discount
+            if (!dbProduct) {
+                return NextResponse.json(
+                    { error: `Product ${item.productId} is no longer available` },
+                    { status: 400 }
+                )
+            }
+            const unitPrice = dbProduct.price
+            const unitDiscount = dbProduct.discount || 0
             const finalPrice = unitDiscount > 0
                 ? unitPrice * (100 - unitDiscount) / 100
                 : unitPrice
             const itemTotal = finalPrice * item.quantity
             serverSubtotal += itemTotal
 
-            return {
+            validatedItems.push({
                 ...item,
                 price: unitPrice,
                 discount: unitDiscount
-            }
-        })
+            })
+        }
 
         // Read GST rate from config (falls back to 18% if config unreadable)
-        const gstRate = getGstRate()
+        const gstRate = await getGstRate()
         // Recalculate totals server-side
         const serverTax = serverSubtotal * (gstRate / 100)
         const serverShipping = shippingMethod?.cost || 0
@@ -231,14 +233,10 @@ export async function POST(request) {
         if (paymentMethod === 'cod') {
             try {
                 const payload = buildForwardShipmentPayload(order)
-                console.log('📦 Shiprocket forward payload:', JSON.stringify(payload, null, 2))
-
                 const srResponse = await createForwardShipment(payload)
-                console.log('📦 Shiprocket raw response:', JSON.stringify(srResponse, null, 2))
 
                 // Shiprocket may return nested or flat structure
                 const orderData = srResponse.payload || srResponse.data || srResponse.response?.data || srResponse
-                console.log('📦 Shiprocket extracted orderData:', JSON.stringify(orderData, null, 2))
 
                 const shiprocketOrderId = orderData.order_id || orderData.sr_order_id || orderData.id
                 const shipmentId = orderData.shipment_id || orderData.shipmentId
@@ -309,7 +307,7 @@ export async function POST(request) {
                     }
                 }
 
-                console.log(`✅ Shiprocket COD shipment created for order ${order.orderNumber}: AWB ${awbCode}`)
+                console.info(`Shiprocket COD shipment created for order ${order.orderNumber}: AWB ${awbCode}`)
             } catch (shiprocketErr) {
                 console.error('❌ Shiprocket COD shipment creation failed (non-blocking):', shiprocketErr.message)
                 order.timeline.push({

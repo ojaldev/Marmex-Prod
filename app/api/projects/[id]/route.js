@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import mongoose from 'mongoose'
 import connectDB from '@/lib/mongodb'
 import Project from '@/models/Project'
+import { requireAdmin } from '@/lib/admin-auth'
 
 const VALID_PROJECT_TYPES = ['residential', 'commercial']
 
@@ -39,6 +40,9 @@ export async function GET(request, { params }) {
 
 export async function PUT(request, { params }) {
     try {
+        const denied = await requireAdmin(request)
+        if (denied) return denied
+
         const { id } = await params
         const updateData = await request.json()
 
@@ -67,6 +71,9 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
     try {
+        const denied = await requireAdmin(request)
+        if (denied) return denied
+
         const { id } = await params
 
         await connectDB()

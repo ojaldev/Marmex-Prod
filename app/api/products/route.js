@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import Product from '@/models/Product'
 import { validateDimensions, validateWeight, formatDimensions, formatWeight } from '@/lib/product-specs'
+import { requireAdmin } from '@/lib/admin-auth'
 
 export async function GET(request) {
     try {
@@ -58,6 +59,9 @@ export async function GET(request) {
 
 export async function POST(request) {
     try {
+        const denied = await requireAdmin(request)
+        if (denied) return denied
+
         await connectDB()
 
         let productData = await request.json()

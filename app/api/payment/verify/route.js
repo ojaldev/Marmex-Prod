@@ -44,6 +44,14 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Order not found' }, { status: 404 })
         }
 
+        // Server-authoritative amount check — reject if paid amount differs from order total.
+        // paymentDetails.amount is in paise; order.total is in rupees.
+        const expectedPaise = Math.round(order.total * 100)
+        if (Number(paymentDetails.amount) !== expectedPaise) {
+            console.error(`Payment amount mismatch: paid=${paymentDetails.amount} expected=${expectedPaise} order=${order.orderNumber}`)
+            return NextResponse.json({ error: 'Payment amount mismatch' }, { status: 400 })
+        }
+
         // Update order
         order.payment.status = 'completed'
         order.payment.transactionId = razorpayPaymentId
